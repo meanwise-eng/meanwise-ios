@@ -1,0 +1,136 @@
+//
+//  APIObjects_FeedObj.m
+//  MeanWiseUX
+//
+//  Created by Hardik on 22/01/17.
+//  Copyright © 2017 Hardik. All rights reserved.
+//
+
+#import "APIObjects_FeedObj.h"
+
+@implementation APIObjects_FeedObj
+
+-(void)setUpWithDict:(NSDictionary *)dict
+{
+    self.postId=[dict valueForKey:@"id"];
+    
+    int len=(int)[NSString stringWithFormat:@"%@",self.postId].intValue;
+    
+    
+
+    self.colorNumber=[NSNumber numberWithInt:len%13];
+                      
+    self.text=[dict valueForKey:@"text"];
+    self.user_firstname=[dict valueForKey:@"user_firstname"];
+    self.user_lastname=[dict valueForKey:@"user_lastname"];
+    self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+    self.user_profile_photo_small=[dict valueForKey:@"user_profile_photo_small"];
+    self.video_url=[dict valueForKey:@"video_url"];
+    self.video_thumb_url=[dict valueForKey:@"video_thumb_url"];
+    self.image_url=[dict valueForKey:@"image_url"];
+    self.user_id=[dict valueForKey:@"user_id"];
+    
+    
+    
+    NSString *temp=[dict valueForKey:@"created_on"];
+    self.timeString=[self dateTimeSetup:temp];
+
+    
+    int interest_id=[[dict valueForKey:@"interest_id"] intValue];
+
+    self.interest_name=[Constant static_getInterstFromId:interest_id];
+    
+    self.num_comments=[dict valueForKey:@"num_comments"];
+    self.num_likes=[dict valueForKey:@"num_likes"];
+    
+    
+    if(self.video_url!=nil && ![self.video_url isEqualToString:@""])
+    {
+        self.mediaType=[NSNumber numberWithInt:2];
+        self.image_url=[dict valueForKey:@"video_thumb_url"];
+
+    }
+    else if(self.image_url!=nil && ![self.image_url isEqualToString:@""])
+    {
+        self.mediaType=[NSNumber numberWithInt:1];
+        
+    }
+    else
+    {
+        self.mediaType=[NSNumber numberWithInt:0];
+        
+    }
+    
+    /*
+     
+     int mediaType1=1;
+     
+     if(dataImgURL!=nil && ![dataImgURL isEqualToString:@""])
+     {
+     }
+     else
+     {
+     mediaType1=0;
+     }
+     
+     
+     int num_comments=[[dict valueForKey:@"num_comments"] intValue];
+     int num_likes=[[dict valueForKey:@"num_likes"] intValue];
+     int interest_id=[[dict valueForKey:@"interest_id"] intValue];
+     
+
+     */
+}
+-(NSString *)dateTimeSetup:(NSString *)dateString
+{
+
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss.SSSSSSZ"];
+    NSDate *dateFromString = [[NSDate alloc] init];
+    dateFromString = [dateFormatter dateFromString:dateString];
+
+   // NSString *stringDate = [dateFormatter stringFromDate:[NSDate date]];
+
+    NSString *time=[self relativeDateStringForDate:dateFromString];
+    
+    return time;
+}
+- (NSString *)relativeDateStringForDate:(NSDate *)date
+{
+    NSDictionary *timeScale = @{@"s"  :@1,
+                                @"m"  :@60,
+                                @"hr"   :@3600,
+                                @"d"  :@86400,
+                                @"w" :@605800,
+                                @"mo":@2629743,
+                                @"y" :@31556926};
+    NSString *scale;
+    
+    int timeAgo = 0-(int)[date timeIntervalSinceNow];
+    if (timeAgo < 60) {
+        scale = @"s";
+    } else if (timeAgo < 3600) {
+        scale = @"m";
+    } else if (timeAgo < 86400) {
+        scale = @"hr";
+    } else if (timeAgo < 605800) {
+        scale = @"d";
+    } else if (timeAgo < 2629743) {
+        scale = @"w";
+    } else if (timeAgo < 31556926) {
+        scale = @"mo";
+    } else {
+        scale = @"y";
+    }
+    
+    timeAgo = timeAgo/[[timeScale objectForKey:scale] integerValue];
+    NSString *s = @"";
+    if (timeAgo > 1) {
+        s = @"";
+    }
+    
+    return [NSString stringWithFormat:@"%d %@%@", timeAgo, scale, s];
+}
+
+
+@end
