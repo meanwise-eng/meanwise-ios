@@ -189,13 +189,21 @@
 
     
 }
+- (BOOL)image:(UIImage *)image1 isEqualTo:(UIImage *)image2
+{
+    NSData *data1 = UIImagePNGRepresentation(image1);
+    NSData *data2 = UIImagePNGRepresentation(image2);
+    
+    return [data1 isEqual:data2];
+}
+
 -(void)setDownloadedImage
 {
     dispatch_async(dispatch_get_main_queue(), ^{
     
     NSString *path=[self getCachePathIfExists:mainURL];
     
-    if(path!=nil)
+    if(path!=nil && [self image:self.image isEqualTo:[UIImage imageNamed:@"placeholder.jpg"]])
     {
         self.alpha=0;
 
@@ -272,8 +280,10 @@
     completionOperation.queuePriority=NSOperationQueuePriorityHigh;
     completionOperation.name=videoUrl;
     completionOperation.qualityOfService=NSQualityOfServiceUserInitiated;
+  
+    [[self getVideoQueue] addOperationAtFrontOfQueue:completionOperation];
     
-    [[self getVideoQueue] addOperation:completionOperation];
+//    [[self getVideoQueue] addOperation:completionOperation];
     
 
 }

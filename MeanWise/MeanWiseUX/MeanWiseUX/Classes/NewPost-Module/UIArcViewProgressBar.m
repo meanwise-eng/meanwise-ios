@@ -64,7 +64,7 @@
     
     CGContextSetLineWidth(tx, 2);
 
-    CGContextSetStrokeColorWithColor(tx, [UIColor colorWithRed:0.4 green:0.4 blue:0.4 alpha:1.00].CGColor);
+    CGContextSetStrokeColorWithColor(tx, [UIColor colorWithRed:0.5 green:0.5 blue:0.5 alpha:1.00].CGColor);
 
     
     CGContextAddArc(tx, Center.x, Center.y, radious, -M_PI/2, (2*M_PI*progress)-M_PI/2, 0);

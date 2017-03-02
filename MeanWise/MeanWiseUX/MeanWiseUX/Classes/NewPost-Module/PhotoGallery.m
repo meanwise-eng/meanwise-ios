@@ -716,6 +716,12 @@
 -(void)fixTheOrientationOfVideo:(NSURL *)outputFileUrl
 {
     
+    if(outputFileUrl!=nil)
+    {
+    [self videoRecordedSuccessfully:outputFileUrl];
+
+    return;
+    }
     
     NSURL *newVideoURL;
     NSError *error = nil;
@@ -807,11 +813,11 @@
     
     videoComposition.renderSize = mainSize; //select you video size
     
-    [Constant okAlert:@"alert" withSubTitle:[NSString stringWithFormat:@"%@",NSStringFromCGSize(videoTrack.naturalSize)] onView:self andStatus:1];
+   // [Constant okAlert:@"alert" withSubTitle:[NSString stringWithFormat:@"%@",NSStringFromCGSize(videoTrack.naturalSize)] onView:self andStatus:1];
     
 
     
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:composition presetName:AVAssetExportPresetHighestQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:composition presetName:AVAssetExportPresetPassthrough];
     
     
     NSURL *outputURL1 = [[[Constant applicationDocumentsDirectory]

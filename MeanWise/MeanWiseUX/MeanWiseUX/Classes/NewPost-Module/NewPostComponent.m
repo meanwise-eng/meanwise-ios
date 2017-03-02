@@ -50,6 +50,7 @@
     attachedImage.hidden=true;
     attachedImage.clipsToBounds=YES;
     
+    [attachedImage setTarget:self showFullScreenCallBack:@selector(mediaManupulatorOpen:) andShowThumbCallBack:@selector(mediaManupulatorClose:)];
     
     
    // attachedImage.center=CGPointMake(self.frame.size.width/2, attachedImage.center.y);
@@ -121,10 +122,23 @@
 //
     
     
- 
+    [self cameraSelect:nil];
     
     
 }
+-(void)mediaManupulatorOpen:(id)sender
+{
+    NSLog(@"openFull");
+    [self setGestureEnabled:false];
+
+}
+-(void)mediaManupulatorClose:(id)sender
+{
+    NSLog(@"openSmall");
+    [self setGestureEnabled:true];
+
+}
+
 -(void)gallerySelect:(id)sender
 {
     [self setGestureEnabled:false];
@@ -158,6 +172,7 @@
 -(void)mediaSelected:(NSString *)path
 {
 
+
     cropperControl=[[MediaCropper alloc] initWithFrame:self.bounds];
     [cropperControl setUpWithPath:path];
     [cropperControl setTarget:self andDoneBtn:@selector(showAttachImage:) andCancelBtn:nil];
@@ -173,7 +188,6 @@
     [attachedImage setUp:path andRect:frame];
     [attachedImage openFullMode:nil];
     
-    [self setGestureEnabled:true];
 }
 -(void)postBtnClicked:(id)sender
 {

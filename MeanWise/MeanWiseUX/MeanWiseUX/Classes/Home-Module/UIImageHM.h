@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "AppDelegate.h"
 #import "UIArcViewProgressBar.h"
+#import "NSOperationStack.h"
 
 @interface UIImageHM : UIImageView
 {
