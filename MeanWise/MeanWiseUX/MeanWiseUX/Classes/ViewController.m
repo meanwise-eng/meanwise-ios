@@ -10,9 +10,12 @@
 #import "HomeScreen.h"
 #import "APITesterView.h"
 #import "ConnectionBar.h"
-#import "MaxPlayer.h"
 #import "UserSession.h"
 #import "SignUpWizardAppearanceComponent.h"
+#import "APIObjectsParser.h"
+#import "EditInterestsComponent.h"
+#import "SearchComponent.h"
+#import "NewPostComponent.h"
 
 @interface ViewController ()
 
@@ -20,31 +23,85 @@
 
 @implementation ViewController
 
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    /*self.view.backgroundColor=[UIColor grayColor];
+    NotificationBadgeView *notificationBar;
+    notificationBar=[[NotificationBadgeView alloc] init];
+    [notificationBar setDelegate:self andFunc1:@selector(showStatusBar) andFunc2:@selector(hideStatusBar)];
+    [notificationBar setUp:[NSNumber numberWithInt:5]];
+ */   
+    
+}
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.navigationController.navigationBar setHidden:YES];
     self.automaticallyAdjustsScrollViewInsets = NO;
-
     statusBarHide=false;
+
+    
+    
+    
+    
+    //Final
+    [self AppStart];
+
+    
+    
+    /*[UserSession setUserSessionIfExist];
+    NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:cont];
+    [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
+*/
+    
+    
+    //TestCases
+   /*[UserSession setUserSessionIfExist];
+    SearchComponent *compo=[[SearchComponent alloc] initWithFrame:self.view.bounds];
+    [compo setUp];
+    [self.view addSubview:compo];
+    */
+ 
+
     
 
-   [self AppStart];
   
     /*SignUpWizardAppearanceComponent *c=[[SignUpWizardAppearanceComponent alloc] initWithFrame:self.view.frame];
     [self.view addSubview:c];
     [c setUp];
     */
     
-
+    /*[UserSession setUserSessionIfExist];
     
-/*    [UserSession setUserSessionIfExist];
+    EditInterestsComponent *Compo=[[EditInterestsComponent alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    
+    [Compo setUp];
+    Compo.blackOverLayView.image=[Constant takeScreenshot];
+    Compo.blackOverLayView.alpha=1;
+  //  [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+    
+    [self.view addSubview:Compo];
+    
+    [UIView animateWithDuration:0.001 animations:^{
+        Compo.frame=self.view.bounds;
+        Compo.backgroundColor=[UIColor whiteColor];
+    }];*/
+    
 
+   
+  
+
+   /*[UserSession setUserSessionIfExist];
       APITesterView *tester=[[APITesterView alloc] initWithFrame:self.view.bounds];
      [tester setUp];
      [self.view addSubview:tester];
-
 */
-    
+
+//    [UserSession setUserSessionIfExist];
+//    ExploreComponent *compo=[[ExploreComponent alloc] initWithFrame:self.view.bounds];
+//    [self.view addSubview:compo];
+//    [compo setUp];
+
 }
 -(void)testViews
 {
@@ -180,8 +237,22 @@
 
 -(void)addNewPostResponse:(APIResponseObj *)responseObj
 {
-    
-    [postUploader hideProgress];
+    if(responseObj.statusCode!=200)
+    {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"REFRESH_HOME"
+         object:self];
+        
+        [postUploader FailedProgress];
+    }
+    else
+    {
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"REFRESH_HOME"
+         object:self];
+        
+        [postUploader hideProgress];
+    }
 }
 
 
@@ -225,10 +296,10 @@
          [cm setUp];
          [self.view addSubview:cm];
 
-        
     }
     
     
+    [self UserNotificationAPI];
     
 }
 
@@ -246,7 +317,6 @@
     if(responseObj.statusCode==200)
     {
         [UserSession setSessionProfileObj:responseObj.response andAccessToken:[UserSession getAccessToken]];
-
     }
 }
 -(void)updateCoverPicture:(NSString *)path
@@ -258,12 +328,40 @@
 }
 -(void)updateProfileWithDict:(NSDictionary *)dict;
 {
-    APIManager *manager=[[APIManager alloc] init];
-    [manager sendRequestForEditProfile:dict delegate:self andSelector:@selector(coverPhotoUpdated:)];
-    
-    [postUploader showProgress];
+    if(![dict valueForKey:@"old_password"])
+    {
+        APIManager *manager=[[APIManager alloc] init];
+        [manager sendRequestForEditProfile:dict delegate:self andSelector:@selector(coverPhotoUpdated:)];
+        [postUploader showProgress];
+
+        
+    }
+    else
+    {
+       // NSString *stringPassword=[dict valueForKey:@"old_password"];
+        
+        APIManager *manager=[[APIManager alloc] init];
+        [manager sendRequestForChangePassword:dict delegate:self andSelector:@selector(changePasswordSuccessfully:)];
+        [postUploader showProgress];
+        
+    }
 
 }
+-(void)changePasswordSuccessfully:(APIResponseObj *)responseObj
+{
+    [postUploader hideProgress];
+    
+    if(responseObj.statusCode==200)
+    {
+        //[UserSession setSessionProfileObj:responseObj.response andAccessToken:[UserSession getAccessToken]];
+        
+    }
+    else
+    {
+        [FTIndicator showErrorWithMessage:@"Make sure you enter correct password Or New password must contain letters and digits."];
+    }
+}
+
 -(void)coverPhotoUpdated:(APIResponseObj *)responseObj
 {
     [postUploader hideProgress];
@@ -317,7 +415,75 @@
     
 
 }
+#pragma mark - Notifications
 
+-(void)UserNotificationAPI
+{
+    if(self.sessionMain!=nil)
+    {
+    APIManager *manager=[[APIManager alloc] init];
+    [manager sendRequestForNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
+    }
+    
+    [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:45.0f];
+}
+-(void)UserNotificationAPIReceived:(APIResponseObj *)responseObj
+{
+   // NSLog(@"%@",responseObj.response);
+    
+    
+    if([responseObj.response isKindOfClass:[NSArray class]])
+    {
+        NSArray *array=(NSArray *)responseObj.response;
+        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+        [DataSession sharedInstance].notificationsResults=[NSMutableArray arrayWithArray:[parser parseObjects_NOTIFICATIONS:array]];
+       
+        
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:@"NewNotificationDataReceived"
+         object:self];
+        
+        
+        if([DataSession sharedInstance].notificationsResults.count>0)
+        {
+        int no=[DataSession sharedInstance].noOfInstantNotificationReceived.intValue;
+        
+            if(no>0)
+            {
+
+        
+                NotificationBadgeView *notificationBar=[[NotificationBadgeView alloc] init];
+                [notificationBar setDelegate:self andFunc1:@selector(showStatusBar) andFunc2:@selector(hideStatusBar)];
+            
+
+                if(no==1)
+                {
+                    [notificationBar setUp:[[DataSession sharedInstance].notificationsResults objectAtIndex:0]];
+                }
+                else
+                {
+                    [notificationBar setUp:[NSNumber numberWithInt:no]];
+                }
+            }
+//
+        }
+        
+     //   [FTIndicator showNotificationWithTitle:@"Notifications" message:[NSString stringWithFormat:@"%d",(int)[DataSession sharedInstance].notificationsResults.count]];
+        
+        
+        /*NotificationScreen *screen=[[NotificationScreen alloc] initWithFrame:self.frame];
+        [self addSubview:screen];
+        [screen setUp:result];*/
+        
+        
+    }
+    
+    
+    
+    
+    
+    
+}
 
 #pragma mark - other
 

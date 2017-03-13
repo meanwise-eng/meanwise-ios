@@ -63,6 +63,19 @@
     return obj.profile_story_description;
     
 }
++(NSArray *)getUserInterests
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.interests;
+
+}
++(NSArray *)getUserSkills
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.skills;
+
+}
+
 
 +(NSString *)getLastName
 {

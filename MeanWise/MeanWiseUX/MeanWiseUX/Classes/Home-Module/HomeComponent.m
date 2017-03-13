@@ -18,15 +18,16 @@
 #import "APIObjects_ProfileObj.h"
 #import "ProfileFullScreen.h"
 #import "UserSession.h"
+#import "DataSession.h"
+
+#import "HMPlayerManager.h"
 
 @implementation HomeComponent
 
-
-
-
 -(void)setUp
 {
-
+    
+    screenIdentifier=@"HOME";
     
     self.backgroundColor=[UIColor whiteColor];
     
@@ -85,11 +86,25 @@
     myAccountCompo=nil;
     
 
+//
+   // [self setttingBtnClicked:nil];
     
     //[self messageBtnClicked:nil];
    // [self tableView:feedList didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
  
     [self manuallyRefresh];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(manuallyRefresh)
+                                                 name:@"REFRESH_HOME"
+                                               object:nil];
+
+
+}
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 
 }
 
@@ -116,6 +131,8 @@
 
 -(void)refreshAction
 {
+    [HMPlayerManager sharedInstance].Home_urlIdentifier=@"";
+
     emptyView.hidden=true;
 
     [Constant setStatusBarColorWhite:false];
@@ -134,7 +151,7 @@
     
     NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
     
-    NSLog(@"%@",responseObj.response);
+  //  NSLog(@"%@",responseObj.response);
     
     if(responseArray.count==0)
     {
@@ -147,13 +164,15 @@
 
     
     APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-    dataRecords=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
+    
+    [DataSession sharedInstance].homeFeedResults=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
     
     
-    [feedList reloadData];
+
     //[self setUpDataRecords];
     
     [refreshControl endRefreshing];
+
     refreshControl.attributedTitle = nil;
     
     
@@ -163,11 +182,30 @@
 
     } completion:^(BOOL finished){
         
-        
+        [self feedReloadViaAutoPlay];
+
+
     }];
 
 }
 
+-(void)feedReloadViaAutoPlay
+{
+    [HMPlayerManager sharedInstance].Home_urlIdentifier=@"";
+
+    [feedList reloadData];
+    [feedList performBatchUpdates:^{}
+                                  completion:^(BOOL finished) {
+                                      
+                                      if(finished==true)
+                                      {
+                                      [self stoppedScrolling];
+                                      }
+                                      /// collection-view finished reload
+                                  }];
+
+   
+}
 
 
 #pragma mark - TableView
@@ -224,7 +262,7 @@
 }
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return dataRecords.count;
+    return [DataSession sharedInstance].homeFeedResults.count;
 }
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -236,13 +274,15 @@
 {
     PostFullCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     
-    [cell setDataObj:[dataRecords objectAtIndex:indexPath.row]];
+    [cell setDataObj:[[DataSession sharedInstance].homeFeedResults objectAtIndex:indexPath.row]];
      
     [cell setTarget:self shareBtnFunc:@selector(shareBtnClicked:) andCommentBtnFunc:@selector(commentBtnClicked:)];
     
     
-    
-    
+    //cell.player.screenIdentifier=screenIdentifier;
+
+    [cell setPlayerScreenIdeantifier:screenIdentifier];
+
     
     
 
@@ -251,12 +291,28 @@
     return cell;
 
 }
+-(void)HomeScreenGoesBack
+{
+    NSLog(@"Home screen back");
+    [HMPlayerManager sharedInstance].Home_isPaused=true;
+
+}
+-(void)HomeScreenComesToFront
+{
+        NSLog(@"Home screen front");
+    [HMPlayerManager sharedInstance].Home_isPaused=false;
+    
+}
 
 -(void)shareBtnClicked:(NSString *)senderId
 {
+    
+    
     if(sharecompo==nil)
     {
 
+        [self HomeScreenGoesBack];
+        
         [self hideBottomBar];
     sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
     [sharecompo setUp];
@@ -268,8 +324,12 @@
 }
 -(void)commentBtnClicked:(NSString *)senderId
 {
+    
+
     if(commentDisplay==nil)
     {
+        [self HomeScreenGoesBack];
+
         
         [self hideBottomBar];
         
@@ -294,6 +354,8 @@
 }
 -(void)commentFullClosed:(id)sender
 {
+    [self HomeScreenComesToFront];
+
     [self showBottomBar];
 
     commentDisplay=nil;
@@ -353,104 +415,69 @@
 }
 
 #pragma mark - scrollView
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
-    
-    [self playFirstVideo];
-    
+    [self stoppedScrolling];
 }
--(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    if(decelerate==false)
-    {
-        [self playFirstVideo];
-    }
-    
-}
--(void)playFirstVideo
-{
-    NSLog(@"cell Changed");
-    
 
-    NSArray *visibleCells=[feedList visibleCells];
-    
-    for(int i=0;i<visibleCells.count;i++)
-    {
-        PostFullCell *cell=[visibleCells objectAtIndex:i];
-        
-        [cell pausePlayer];
-        [cell setMute];
-        
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                 willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate) {
+        [self stoppedScrolling];
     }
+}
+
+-(void)stoppedScrolling
+{
     
-    for(int i=0;i<visibleCells.count;i++)
+    
+    CGRect visibleRect = (CGRect){.origin = feedList.contentOffset, .size = feedList.bounds.size};
+    CGPoint visiblePoint = CGPointMake(CGRectGetMidX(visibleRect), CGRectGetMidY(visibleRect));
+    NSIndexPath *visibleIndexPath = [feedList indexPathForItemAtPoint:visiblePoint];
+    
+    NSLog(@"Visible center - %d\n",(int)visibleIndexPath.row);
+    
+    
+    
+    for(UICollectionViewCell *cell in [feedList visibleCells])
     {
-        PostFullCell *cell=[visibleCells objectAtIndex:i];
         
-        CGRect rect=cell.frame;
-        
-        rect=CGRectMake(cell.frame.origin.x, cell.frame.origin.y-feedList.contentOffset.y, cell.frame.size.width, cell.frame.size.height);
-        
-        
-        if(rect.origin.y<10 && rect.origin.y>-10)
+        NSIndexPath *indexPath = [feedList indexPathForCell:cell];
+        NSLog(@"visibleCells %d",(int)indexPath.row);
+        if(indexPath==visibleIndexPath)
         {
-            [cell setUnMute];
+            NSArray *array=[DataSession sharedInstance].homeFeedResults;
+            APIObjects_FeedObj *obj=[array objectAtIndex:indexPath.row];
+            NSString *url=obj.video_url;
+
+            
+            if(![obj.video_url isEqualToString:[HMPlayerManager sharedInstance].Home_urlIdentifier])
+            {
+            
+                PostFullCell *cell=(PostFullCell *)[feedList cellForItemAtIndexPath:visibleIndexPath];
+                [cell playVideoIfAvaialble];
+                
+                [HMPlayerManager sharedInstance].Home_screenIdentifier=screenIdentifier;
+                [HMPlayerManager sharedInstance].Home_urlIdentifier=url;
+                
+            }
             
             
-         //   [cell playVideoIfAvaialble];
-            
-            
-//        UIView *view=[[UIView alloc] initWithFrame:rect];
-//        [self addSubview:view];
-//        view.backgroundColor=[UIColor blackColor];
-//        view.alpha=0.5;
-//        
-//        [UIView animateWithDuration:0.5 animations:^{
-//            view.alpha=0;
-//            
-//        } completion:^(BOOL finished) {
-//            [view removeFromSuperview];
-//        }];
         }
-
-        
     }
     
+    
+    
+    // done, do whatever
 }
-
-
-/*
-- (void)scrollViewWillEndDragging:(UIScrollView *)scrollView withVelocity:(CGPoint)velocity targetContentOffset:(inout CGPoint *)targetContentOffset
-{
-    
-    if(velocity.y>0)
-    {
-        
-        [UIView animateWithDuration:0.5 animations:^{
-            
-            feedList.frame=CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height);
-            // navBar.frame=CGRectMake(0, 0, self.bounds.size.width, 65);
-            
-        }];
-        
-    }
-    else
-    {
-        
-        [UIView animateWithDuration:0.5 animations:^{
-            
-            feedList.frame=CGRectMake(0, 65, self.bounds.size.width, self.bounds.size.height-65);
-            // navBar.frame=CGRectMake(0, 0, self.bounds.size.width, 65);
-            
-        }];
-        
-    }
-}*/
-
 
 #pragma mark - Flow
 -(void)centerBtnClicked:(id)sender
 {
+        [self HomeScreenGoesBack];
+    
+
     //APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
     
     APIObjects_ProfileObj *obj=[UserSession getUserObj];
@@ -459,11 +486,23 @@
     [self addSubview:com];
     [com setUpProfileObj:obj];
     
-    CGRect rect=CGRectMake(0, 0, self.frame.size.width, 0);
+    CGRect rect=CGRectMake(0, self.frame.size.height/2, self.frame.size.width, 0);
     [com setUpWithCellRect:rect];
     
     
     [com setDelegate:self andPageChangeCallBackFunc:@selector(backFromCenterProfile:) andDownCallBackFunc:@selector(backFromCenterProfile:)];
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     [self hideBottomBar];
@@ -471,14 +510,34 @@
 }
 -(void)backFromCenterProfile:(id)sender
 {
+    [self HomeScreenComesToFront];
+    
+
     [self showBottomBar];
 
 }
 -(void)messageBtnClicked:(id)sender
 {
+    [self HomeScreenGoesBack];
+
     
+    messageCompo=[[NotificationsComponent alloc] initWithFrame:CGRectMake(0, -self.frame.size.height, self.frame.size.width, self.frame.size.height)];
+    [self addSubview:messageCompo];
+    [messageCompo setUp:[DataSession sharedInstance].notificationsResults];
+    [messageCompo setTarget:self andBackBtnFunc:@selector(backFromMessage)];
     
-    messageCompo=[[MessageComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+ 
+    [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:1 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        
+        messageCompo.alpha=1;
+        messageCompo.frame=self.bounds;
+
+        
+    } completion:^(BOOL finished) {
+        
+    }];
+
+    /*messageCompo=[[MessageComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
     [messageCompo setUp];
     messageCompo.blackOverLayView.image=[Constant takeScreenshot];
     messageCompo.blackOverLayView.alpha=1;
@@ -492,7 +551,8 @@
     [UIView animateWithDuration:0.3 animations:^{
         messageCompo.frame=self.bounds;
         messageCompo.backgroundColor=[UIColor whiteColor];
-    }];
+    }];*/
+    
     
     [self hideBottomBar];
     
@@ -501,11 +561,15 @@
 }
 -(void)backFromMessage
 {
+    [self HomeScreenComesToFront];
+
+    messageCompo=nil;
     [self showBottomBar];
 }
 -(void)setttingBtnClicked:(id)sender
 {
-    
+    [self HomeScreenGoesBack];
+
     
     myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
     [myAccountCompo setUp];
@@ -530,6 +594,8 @@
 }
 -(void)backFromSetting
 {
+    [self HomeScreenComesToFront];
+
     [self showBottomBar];
 }
 
@@ -551,123 +617,6 @@
     
 }
 
--(void)setUpDataRecords
-{
-    dataRecords=[[NSMutableArray alloc] init];
-    
-    
-    for(int i=0;i<1;i++)
-    {
-        
-        
-        NSDictionary *dict1=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_3.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict1];
-        
-        NSDictionary *dict42=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr11.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_mxlga0gj0e1shsvoe.mp4"};
-        
-        [dataRecords addObject:dict42];
-        
-        
-        
-        
-        NSDictionary *dict2=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_4.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict2];
-        
-        NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                              @"imageURL":@"post_5.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict5];
-        
-        
-        NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_7.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict3];
-        
-        
-        NSDictionary *dict41=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr1.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi00kfkvMq1vrn2g4_480.mp4"};
-        
-        [dataRecords addObject:dict41];
-        
-        NSDictionary *dict43=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr12.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi4mtbbrHS1vwm5np.mp4"};
-        
-        [dataRecords addObject:dict43];
-        
-        {
-            NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict5];
-        }
-        
-        NSDictionary *dict44=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr7.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3y37m7az1vo8xre_480.mp4"};
-        
-        [dataRecords addObject:dict44];
-        
-        
-        
-        NSDictionary *dict45=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr14.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_ohkwqixP5j1u3ehw5.mp4"};
-        
-        [dataRecords addObject:dict45];
-        
-        {
-            NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict3];
-            
-        }
-        
-        NSDictionary *dict46=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr8.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3vig8Lqp1qbct3j.mp4"};
-        
-        [dataRecords addObject:dict46];
-        
-        
-        NSDictionary *dict4=@{@"postType":[NSNumber numberWithInt:2],
-                              @"imageURL":@"thumb1.png",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              
-                              @"videoURL":@"https://player.vimeo.com/external/121377179.hd.mp4?s=383ab10c2c3229be7e818ccf30888ba8dbb59b26&profile_id=119&oauth2_token_id=57447761"};
-        
-        [dataRecords addObject:dict4];
-        
-        
-    }
-    
-}
+
 
 @end

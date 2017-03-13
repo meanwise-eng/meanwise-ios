@@ -15,6 +15,7 @@
 #import "PrivacyPolicy.h"
 #import "UserSession.h"
 #import "ViewController.h"
+#import "EditInterestsComponent.h"
 
 @implementation MyAccountComponent
 
@@ -140,7 +141,7 @@
     [profilePhoto setUp:[UserSession getBigProfilePictureURL]];
     
     
-    
+  //  [self settingBtnClicked:nil];
     // msgContactTable.bounces=false;
     
 }
@@ -342,7 +343,7 @@
 
 -(void)settingBtnClicked:(id)sender
 {
-    settingCompo=[[SettingComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+    settingCompo=[[SettingsComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
     [settingCompo setUp];
     settingCompo.blackOverLayView.image=[Constant takeScreenshot];
     settingCompo.blackOverLayView.alpha=1;
@@ -417,6 +418,22 @@
         [self addSubview:Compo];
         
         
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            Compo.frame=self.bounds;
+            Compo.backgroundColor=[UIColor whiteColor];
+        }];
+    }
+    if(indexPath.row==1)
+    {
+        EditInterestsComponent *Compo=[[EditInterestsComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+        
+        [Compo setUp];
+        Compo.blackOverLayView.image=[Constant takeScreenshot];
+        Compo.blackOverLayView.alpha=1;
+        [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+        
+        [self addSubview:Compo];
         
         [UIView animateWithDuration:0.3 animations:^{
             Compo.frame=self.bounds;

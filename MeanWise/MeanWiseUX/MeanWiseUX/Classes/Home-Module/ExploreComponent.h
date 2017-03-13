@@ -18,6 +18,7 @@
 @interface ExploreComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate,UITextViewDelegate>
 {
     
+    
     APIManager *manager;
 
     NSArray *channelList;
@@ -26,7 +27,7 @@
     
     int selectedChannel;
     
-    NSMutableArray *dataRecords;
+  //  NSMutableArray *dataRecords;
     DetailViewComponent *detailPostView;
 
     UIImageHM *backgroundImageView;
@@ -44,8 +45,10 @@
     SEL showBottomBarFunc;
     
     ExploreSearchComponent *searchResultView;
-    UIRefreshControl *refreshControl;
 
+    EmptyView *emptyView;
+
+    
 }
 -(void)setUp;
 -(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2;

@@ -17,41 +17,11 @@
 
 @implementation SearchComponent
 
--(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2
-{
-    delegate=target;
-    hideBottomBarFunc=func1;
-    showBottomBarFunc=func2;
-    
-}
--(void)hideBottomBar
-{
-    [delegate performSelector:hideBottomBarFunc withObject:nil afterDelay:0.01];
-}
--(void)showBottomBar
-{
-    [delegate performSelector:showBottomBarFunc withObject:nil afterDelay:0.01];
-    
-}
 
 -(void)setUp
 {
     
-    array=[[NSArray alloc] initWithObjects:
-           @"I can solve problem, Computers..",
-           @"I'm Musician. Music is my life",
-           @"Hey I'm Sam and I love basketball",
-           @"Hey I'm Max and I love Cricket",
-           @"Hey, How are you?", nil];
-    
-    
-    nameArray=[[NSArray alloc] initWithObjects:
-               @"Hi,\nI'm Sam",
-               @"Hi,\nI'm John",
-               @"Hi,\nI'm Marry",
-               @"Hi,\nI'm Mike",
-               @"Hi,\nI'm Kelvin",
-               nil];
+  
     
     
     self.clipsToBounds=YES;
@@ -63,7 +33,7 @@
     layout.minimumInteritemSpacing = 0;
     layout.minimumLineSpacing = 10;
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
+    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 320);
 
     
     
@@ -81,23 +51,43 @@
     
     [self addSubview:galleryView];
 
-    UIView *view=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
-    [self addSubview:view];
-    view.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
-    view.layer.cornerRadius=2;
-    view.clipsToBounds=YES;
+    searchBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
+    [self addSubview:searchBaseView];
+    searchBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
+    searchBaseView.layer.cornerRadius=2;
+    searchBaseView.clipsToBounds=YES;
     
     
     
     UIImageView *searchIcon=[[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 20, 20)];
     searchIcon.image=[UIImage imageNamed:@"ChannelSearchIcon.png"];
-    [view addSubview:searchIcon];
+    [searchBaseView addSubview:searchIcon];
     searchIcon.contentMode=UIViewContentModeScaleAspectFill;
     
-    exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, view.frame.size.width-50, 40)];
-    [view addSubview:exploreTerm];
-    exploreTerm.tintColor=[UIColor whiteColor];
-    exploreTerm.textColor=[UIColor whiteColor];
+    searchFieldTXT=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, searchBaseView.frame.size.width-50, 40)];
+    [searchBaseView addSubview:searchFieldTXT];
+    searchFieldTXT.tintColor=[UIColor whiteColor];
+    searchFieldTXT.textColor=[UIColor whiteColor];
+    searchFieldTXT.keyboardAppearance=UIKeyboardAppearanceDark;
+    searchFieldTXT.autocapitalizationType=UITextAutocapitalizationTypeNone;
+    searchFieldTXT.autocorrectionType=UITextAutocorrectionTypeNo;
+    searchFieldTXT.returnKeyType=UIReturnKeySearch;
+    
+    
+    searchTypeLBL=[[UILabel alloc] initWithFrame:CGRectMake(searchBaseView.frame.size.width-100, 5, 100, 30)];
+    [searchBaseView addSubview:searchTypeLBL];
+    searchTypeLBL.font=[UIFont fontWithName:k_fontBold size:12];
+    searchTypeLBL.textColor=[UIColor whiteColor];
+    searchTypeLBL.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
+    searchTypeLBL.layer.cornerRadius=2;
+    searchTypeLBL.clipsToBounds=YES;
+    searchTypeLBL.textAlignment=NSTextAlignmentCenter;
+
+  
+    
+
+    
+    
     
     statusLabel=[[UILabel alloc] initWithFrame:CGRectMake(20, 110, self.frame.size.width-40, 100)];
     [self addSubview:statusLabel];
@@ -107,6 +97,15 @@
     statusLabel.numberOfLines=3;
     statusLabel.adjustsFontSizeToFitWidth=YES;
     
+    suggestionBox=[[SearchSuggestionsView alloc] initWithFrame:CGRectMake(20, 72, self.frame.size.width-40, 104)];
+    [self addSubview:suggestionBox];
+    [suggestionBox setUp];
+    [suggestionBox setTarget:self OnOptionSelect:@selector(OnOptionSelect:)];
+    
+    
+    
+   
+    
 //    backBtn=[[UIButton alloc] initWithFrame:CGRectMake(20,35, 23*1.2, 16*1.2)];
 //    [backBtn setBackgroundImage:[UIImage imageNamed:@"BackButton.png"] forState:UIControlStateNormal];
 //    [self addSubview:backBtn];
@@ -114,40 +113,70 @@
 //    self.clipsToBounds=YES;
     
     
-    manager=[[APIManager alloc] init];
+    emptyView=[[EmptyView alloc] initWithFrame:galleryView.frame];
+    [self addSubview:emptyView];
+    emptyView.hidden=true;
+    [emptyView setUIForBlack];
+    [emptyView setDelegate:self onReload:@selector(refreshAction)];
     
-    [manager sendRequestForAllUserData:[UserSession getAccessToken] delegate:self andSelector:@selector(userFriendsReceived:)];
-//    [manager sendRequestGettingUsersFriends:[UserSession getUserId] delegate:self andSelector:@selector(userFriendsReceived:)];
+    [emptyView.reloadBtn setTitle:@"SHOW FEATURED USERS" forState:UIControlStateNormal];
 
+
+    
+    [self refreshAction];
 
 }
--(void)userFriendsReceived:(APIResponseObj *)responseObj
+
+#pragma mark - Methods
+-(void)updateSearchTitle:(NSString *)searchTitle
 {
-    NSLog(@"%@",responseObj.response);
+    searchTypeLBL.hidden=false;
+    searchTypeLBL.text=searchTitle;
+    CGSize sizeF=[searchTypeLBL sizeThatFits:searchTypeLBL.bounds.size];
     
-    if([responseObj.response isKindOfClass:[NSArray class]])
+    int width=sizeF.width+20;
+    
+    searchTypeLBL.frame=CGRectMake(searchBaseView.frame.size.width-5-width, 10, width, 20);
+}
+
+
+
+-(void)searchFieldTXTChanged:(id)sender
+{
+    searchTypeLBL.hidden=true;
+    
+    [suggestionBox setSearchString:searchFieldTXT.text];
+    NSLog(@"%@",searchFieldTXT.text);
+    
+}
+-(void)OnOptionSelect:(NSNumber *)number
+{
+    NSLog(@"%d",number.intValue);
+    NSLog(@"%@",searchFieldTXT.text);
+    
+    suggestionBox.hidden=true;
+    NSString *paramKey;
+    
+    if(number.intValue==0)
     {
-        NSArray *arrayTemp=(NSArray *)responseObj.response;
-        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-        resultData=[parser parseObjects_PROFILES:arrayTemp];
-        [galleryView reloadData];
-        
-        if(resultData.count>0)
-        {
-            APIObjects_ProfileObj *obj=[resultData objectAtIndex:0];
-
-
-            if(obj.bio.class!=[NSNull class])
-            {
-            statusLabel.text=obj.bio;
-            }
-            
-        }
+        paramKey=@"username";
+        [self updateSearchTitle:@"Users"];
+    }
+    else
+    {
+        paramKey=@"skills_text";
+        [self updateSearchTitle:@"Skill"];
     }
     
-    int p=0;
+    NSDictionary *dict=@{@"paramKey":paramKey,@"searchTerm":searchFieldTXT.text};
+    
+    [searchFieldTXT resignFirstResponder];
+    [self searchAPI:dict];
+    
+    
 }
 
+#pragma mark - CollectionView delegate
 
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -175,6 +204,7 @@
 
         
     }
+    
 
 //    [cell.profileIMGVIEW setUp:obj.cover_photo];
     
@@ -230,6 +260,9 @@
     NSString *imgURL=[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3];
     [com setImage:imgURL andNumber:indexPath];
 
+    galleryView.scrollEnabled=false;
+    
+    
 //    ProfileComponent *com=[[ProfileComponent alloc] initWithFrame:self.bounds];
 //    [self addSubview:com];
 //
@@ -246,21 +279,6 @@
     [cont setUpWithCellRect:CGRectMake(0, self.frame.size.height, self.frame.size.width, 0)];*/
 
 }
--(void)openingTableViewAtPath:(NSIndexPath *)indexPath
-{
-    
-    
-    
-}
--(void)downClicked:(NSIndexPath *)indexPath
-{
-    [self showBottomBar];
-    
-    ProfileCell *cell=(ProfileCell *)[galleryView cellForItemAtIndexPath:indexPath];
-    cell.hidden=false;
-    
-    // FeedCell *cell=[tableView cellForRowAtIndexPath:indexPath];
-}
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -269,16 +287,13 @@
     return CGSizeMake(350/ratio, 300);
 }
 
--(void)backToSearchScreen
-{
-    [self showBottomBar];
-}
+
+
+#pragma mark - ScrollView delegate
 
 
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate;
 {
-    
-
     
      if(decelerate==true)
      {
@@ -321,7 +336,7 @@
     float diff=galleryView.contentOffset.x-pageNumber*pageWidth;
     float incRatio=1.0f+diff/pageWidth;
     
-    NSLog(@"Page Number :%d, %f",pageNumber, incRatio);
+   // NSLog(@"Page Number :%d, %f",pageNumber, incRatio);
     
     UIColor *color1=[Constant colorGlobal:((pageNumber)%14)];
     UIColor *color0=[Constant colorGlobal:((pageNumber-1)%14)];
@@ -341,7 +356,8 @@
 -(void)scrollingEnded
 {
     CGFloat pageWidth = galleryView.frame.size.width*0.6;
-    float currentPage = galleryView.contentOffset.x / pageWidth;
+    float currentPage = (galleryView.contentOffset.x) / pageWidth;
+    
     
     int pageNumber;
     
@@ -354,12 +370,38 @@
         pageNumber= currentPage;
     }
     
-    NSLog(@"Page Number : %d", pageNumber);
+  //  NSLog(@"Page Number : %d", pageNumber);
     
+    if(resultData.count<=pageNumber)
+    {
+        pageNumber=pageNumber-1;
+    }
     NSIndexPath *indexPath=[NSIndexPath indexPathForItem:pageNumber inSection:0];
     
-    [galleryView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:YES];
     
+    CGPoint oldContentOffset=galleryView.contentOffset;
+    [galleryView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:false];
+
+    
+    CGPoint newContentOffset=galleryView.contentOffset;
+    galleryView.contentOffset=oldContentOffset;
+
+    
+    
+    
+    [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        galleryView.contentOffset=CGPointMake(newContentOffset.x-10, newContentOffset.y);
+
+
+        
+    } completion:^(BOOL finished) {
+        
+      
+        
+    }];
+
+    
+
     
     [UIView animateWithDuration:0.2 animations:^{
         
@@ -387,6 +429,130 @@
         statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
     }
 
+}
+
+#pragma mark - API calls
+-(void)refreshAction
+{
+    [self updateSearchTitle:@"Featured Users"];
+    
+    [searchFieldTXT resignFirstResponder];
+    searchFieldTXT.text=@"";
+    
+    manager=[[APIManager alloc] init];
+    
+    [manager sendRequestForAllUserData:[UserSession getAccessToken] delegate:self andSelector:@selector(userFriendsReceived:)];
+    
+    [searchFieldTXT addTarget:self action:@selector(searchFieldTXTChanged:) forControlEvents:UIControlEventEditingChanged];
+    
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+    
+    
+}
+-(void)userFriendsReceived:(APIResponseObj *)responseObj
+{
+    [FTIndicator dismissProgress];
+    
+  //  NSLog(@"%@",responseObj.response);
+    
+    if([responseObj.response isKindOfClass:[NSArray class]])
+    {
+        NSArray *arrayTemp=(NSArray *)responseObj.response;
+        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+        resultData=[parser parseObjects_PROFILES:arrayTemp];
+        [galleryView reloadData];
+        [galleryView setContentOffset:CGPointZero animated:false];
+
+       
+        
+        if(resultData.count==0)
+        {
+            emptyView.hidden=false;
+        }
+        else
+        {
+            emptyView.hidden=true;
+        }
+        
+        if(resultData.count>0)
+        {
+            APIObjects_ProfileObj *obj=[resultData objectAtIndex:0];
+            
+            
+            if(![obj.bio isEqualToString:@""])
+            {
+                statusLabel.text=obj.bio;
+            }
+            else
+            {
+                statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
+            }
+            
+        }
+        else
+        {
+            statusLabel.text=@"";
+            UIColor *color1=[Constant colorGlobal:1];
+            
+            [UIView animateWithDuration:0.2 animations:^{
+                
+                self.backgroundColor=color1;
+                
+            }];
+            
+        }
+    }
+    
+}
+-(void)searchAPI:(NSDictionary *)dict
+{
+    manager=[[APIManager alloc] init];
+    [manager sendRequestForUserSearch:dict delegate:self andSelector:@selector(userFriendsReceived:)];
+    
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+    
+    
+    
+}
+
+#pragma mark -  setting selectors
+-(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2
+{
+    delegate=target;
+    hideBottomBarFunc=func1;
+    showBottomBarFunc=func2;
+    
+}
+-(void)hideBottomBar
+{
+    [delegate performSelector:hideBottomBarFunc withObject:nil afterDelay:0.01];
+}
+-(void)showBottomBar
+{
+    [delegate performSelector:showBottomBarFunc withObject:nil afterDelay:0.01];
+    
+}
+#pragma mark -  Flows
+
+-(void)backToSearchScreen
+{
+    [self showBottomBar];
+}
+-(void)openingTableViewAtPath:(NSIndexPath *)indexPath
+{
+    
+    
+    
+}
+-(void)downClicked:(NSIndexPath *)indexPath
+{
+    [self showBottomBar];
+    
+    galleryView.scrollEnabled=true;
+    ProfileCell *cell=(ProfileCell *)[galleryView cellForItemAtIndexPath:indexPath];
+    cell.hidden=false;
+    
+    // FeedCell *cell=[tableView cellForRowAtIndexPath:indexPath];
 }
 
 

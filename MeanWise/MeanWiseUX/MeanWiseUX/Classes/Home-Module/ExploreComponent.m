@@ -11,6 +11,8 @@
 #import "ChannelExploreCell.h"
 #import "HomeFeedCell.h"
 #import "APIObjectsParser.h"
+#import "DataSession.h"
+#import "HMPlayerManager.h"
 
 @implementation ExploreComponent
 
@@ -89,11 +91,12 @@
     ChannelList = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout1];
     ChannelList.delegate = self;
     ChannelList.dataSource = self;
-    //  ChannelList.pagingEnabled = YES;
+    //  ChannelList.pagingEnabled = YES;or heavy
     ChannelList.showsHorizontalScrollIndicator = NO;
     ChannelList.backgroundColor=[UIColor clearColor];
     [ChannelList registerClass:[ChannelExploreCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [self addSubview:ChannelList];
+    
     
 
     collectionViewFrame = CGRectMake(0, 210, self.frame.size.width, 380);
@@ -105,7 +108,9 @@
     feedList.backgroundColor=[UIColor clearColor];
     [feedList registerClass:[HomeFeedCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [self addSubview:feedList];
-
+    feedList.alwaysBounceHorizontal=YES;
+    feedList.bounces=true;
+    
     selectedChannel=0;
 
     topicView=[[ExploreTopicView alloc] initWithFrame:CGRectMake(0, 210-35, self.frame.size.width, 30)];
@@ -125,24 +130,40 @@
                   action:@selector(SearchTermChanged:)
         forControlEvents:UIControlEventEditingChanged];
     
+    emptyView=[[EmptyView alloc] initWithFrame:feedList.frame];
+    [self addSubview:emptyView];
+    emptyView.hidden=true;
+    [emptyView setUIForBlack];
+    [emptyView setDelegate:self onReload:@selector(refreshAction)];
 
-    refreshControl=[[UIRefreshControl alloc] init];
-    [feedList addSubview:refreshControl];
-    [refreshControl addTarget:self action:@selector(refreshAction) forControlEvents:UIControlEventValueChanged];
-    refreshControl.backgroundColor=[UIColor clearColor];
+
     
     [self refreshAction];
 
 }
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    NSLog(@"%f",scrollView.contentOffset.x);
+}
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+        NSLog(@"%f",scrollView.contentOffset.x);
+}
+
+
 -(void)refreshAction
 {
     manager=[[APIManager alloc] init];
-    [manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
+    //[manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
     
     NSLog(@"Hello");
-    NSLog(@"%@",NSStringFromCGRect(refreshControl.frame));
     // [feedList setContentOffset:CGPointMake(0, feedList.contentOffset.y-feedList.frame.size.height) animated:YES];
     
+    
+    NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
+    
+    [manager sendRequestExploreWithInterestsName:channelName Withdelegate:self andSelector:@selector(UsersPostReceived:)];
+
     
     
     //[self performSelector:@selector(endRefreshControl) withObject:nil afterDelay:1.0f];
@@ -152,18 +173,25 @@
     
     NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
     
-    NSLog(@"%@",responseObj.response);
+   // NSLog(@"%@",responseObj.response);
     
     APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-    dataRecords=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
+    [DataSession sharedInstance].exploreFeedResults=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
     
     
     [feedList reloadData];
     //[self setUpDataRecords];
     
-    [refreshControl endRefreshing];
-    refreshControl.attributedTitle = nil;
-    // [feedList setContentOffset:CGPointMake(0, 0) animated:YES];
+    if([DataSession sharedInstance].exploreFeedResults.count==0)
+    {
+        emptyView.hidden=false;
+    }
+    else
+    {
+        emptyView.hidden=true;
+    }
+    
+     [feedList setContentOffset:CGPointMake(0, 0) animated:false];
     
     
 }
@@ -251,7 +279,7 @@
         
         
         [cell setFrameX:CGRectMake(0, 0, 250, 380)];
-        [cell setDataObj:[dataRecords objectAtIndex:indexPath.row]];
+        [cell setDataObj:[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row]];
 
         
         // [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
@@ -321,7 +349,7 @@
     }
     else
     {
-        return dataRecords.count;
+        return [DataSession sharedInstance].exploreFeedResults.count;
     }
 }
 
@@ -349,6 +377,8 @@
     
     if(collectionView==feedList && 1==0)
     {
+        
+        
     [self hideBottomBar];
 
     UICollectionViewLayoutAttributes *attributes = [feedList layoutAttributesForItemAtIndexPath:indexPath];
@@ -362,7 +392,7 @@
     HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
     [cell setHiddenCustom:true];
     
-    [detailPostView setDataRecords:dataRecords];
+    [detailPostView setDataRecords:[DataSession sharedInstance].exploreFeedResults];
     
     
     
@@ -379,16 +409,16 @@
     //    UIImage *img=[cell screenshotOfVideo];
     
     
-    int mediaType=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
+    int mediaType=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
     
     if(mediaType!=0)
     {
-        NSString *imgURL=[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
+        NSString *imgURL=[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
         [detailPostView setImage:imgURL andNumber:indexPath];
     }
     else
     {
-        int colorNumber=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
+        int colorNumber=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
         
         [detailPostView setColorNumber:colorNumber];
         
@@ -406,6 +436,9 @@
     }
     else if(collectionView==feedList)
     {
+        
+        [[HMPlayerManager sharedInstance] StopKeepKillingExploreFeedVideosIfAvaialble];
+        
         [self hideBottomBar];
         
         
@@ -427,12 +460,12 @@
         
         detailPostView=[[DetailViewComponent alloc] initWithFrame:self.bounds];
         [self addSubview:detailPostView];
-        [detailPostView setDataRecords:dataRecords];
+        [detailPostView setDataRecords:[DataSession sharedInstance].exploreFeedResults];
         
         [detailPostView setUpWithCellRect:rect];
         
         
-        APIObjects_FeedObj *obj=(APIObjects_FeedObj *)[dataRecords objectAtIndex:indexPath.row];
+        APIObjects_FeedObj *obj=(APIObjects_FeedObj *)[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row];
         
         int mediaType = obj.mediaType.intValue;
         
@@ -460,7 +493,8 @@
     {
         selectedChannel=(int)indexPath.row;
         [self updateBackground];
-
+        [self refreshAction];
+        
     }
     
 }
@@ -512,8 +546,12 @@
 
 -(void)downClicked:(NSIndexPath *)indexPath
 {
+    
+    detailPostView=nil;
+    
+    [[HMPlayerManager sharedInstance] StartKeepKillingExploreFeedVideosIfAvaialble];
+    
     [self showBottomBar];
-
     
     HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
     [cell setHiddenCustom:false];
@@ -527,123 +565,4 @@
         [cell setHiddenCustom:false];
     }
 }
--(void)setUpDataRecords
-{
-    dataRecords=[[NSMutableArray alloc] init];
-    
-    
-    for(int i=0;i<1;i++)
-    {
-        
-        
-        NSDictionary *dict1=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_3.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict1];
-        
-        NSDictionary *dict42=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr11.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_mxlga0gj0e1shsvoe.mp4"};
-        
-        [dataRecords addObject:dict42];
-        
-        
-        
-        
-        NSDictionary *dict2=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_4.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict2];
-        
-        NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                              @"imageURL":@"post_5.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict5];
-        
-        
-        NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_7.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict3];
-        
-        
-        NSDictionary *dict41=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr1.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi00kfkvMq1vrn2g4_480.mp4"};
-        
-        [dataRecords addObject:dict41];
-        
-        NSDictionary *dict43=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr12.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi4mtbbrHS1vwm5np.mp4"};
-        
-        [dataRecords addObject:dict43];
-        
-        {
-            NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict5];
-        }
-        
-        NSDictionary *dict44=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr7.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3y37m7az1vo8xre_480.mp4"};
-        
-        [dataRecords addObject:dict44];
-        
-        
-        
-        NSDictionary *dict45=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr14.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_ohkwqixP5j1u3ehw5.mp4"};
-        
-        [dataRecords addObject:dict45];
-        
-        {
-            NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict3];
-            
-        }
-        
-        NSDictionary *dict46=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr8.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3vig8Lqp1qbct3j.mp4"};
-        
-        [dataRecords addObject:dict46];
-        
-        
-        NSDictionary *dict4=@{@"postType":[NSNumber numberWithInt:2],
-                              @"imageURL":@"thumb1.png",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              
-                              @"videoURL":@"https://player.vimeo.com/external/121377179.hd.mp4?s=383ab10c2c3229be7e818ccf30888ba8dbb59b26&profile_id=119&oauth2_token_id=57447761"};
-        
-        [dataRecords addObject:dict4];
-        
-        
-    }
-    
-}
-
 @end

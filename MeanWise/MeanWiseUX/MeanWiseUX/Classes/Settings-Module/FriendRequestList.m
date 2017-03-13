@@ -14,6 +14,7 @@
 #import "APIObjectsParser.h"
 #import "APIObjects_ProfileObj.h"
 #import "UserSession.h"
+#import "FTIndicator.h"
 
 
 @implementation FriendRequestList
@@ -59,7 +60,8 @@
     [self addSubview:friendListTableView];
     friendListTableView.delegate=self;
     friendListTableView.dataSource=self;
-    
+    friendListTableView.tableFooterView = [[UIView alloc] init];
+
     UIView *searchBox=[[UIView alloc] initWithFrame:CGRectMake(10, 65+10, self.frame.size.width-20, 40)];
     searchBox.backgroundColor=[UIColor colorWithWhite:0.85 alpha:1.0f];
     [self addSubview:searchBox];
@@ -79,19 +81,33 @@
     searchField.font=[UIFont fontWithName:k_fontSemiBold size:15];
     
     
-    
-    
-    manager=[[APIManager alloc] init];
-    [manager sendRequestGettingUsersFriends:[UserSession getUserId] delegate:self andSelector:@selector(userFriendsReceived:)];
+    emptyView=[[EmptyView alloc] initWithFrame:friendListTableView.frame];
+    [self addSubview:emptyView];
+    emptyView.hidden=true;
+    [emptyView setUIForWhite];
+    [emptyView setDelegate:self onReload:@selector(refreshAction)];
+    emptyView.msgLBL.text=@"No Pending Requests";
     
 
+    
+    [self refreshAction];
+    
     
     // msgContactTable.bounces=false;
     
 }
+-(void)refreshAction
+{
+    manager=[[APIManager alloc] init];
+    
+    [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:-1 delegate:self andSelector:@selector(userFriendsReceived:)];
+
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+
+}
 -(void)userFriendsReceived:(APIResponseObj *)responseObj
 {
-    NSLog(@"%@",responseObj.response);
+  //  NSLog(@"%@",responseObj.response);
     
     if([responseObj.response isKindOfClass:[NSArray class]])
     {
@@ -101,6 +117,19 @@
         
         //   int p=0;
         [friendListTableView reloadData];
+    }
+    [FTIndicator dismissProgress];
+
+    if(resultData.count==0)
+    {
+        emptyView.hidden=false;
+        friendListTableView.hidden=true;
+    }
+    else
+    {
+        emptyView.hidden=true;
+        friendListTableView.hidden=false;
+        
     }
 }
 
@@ -113,6 +142,8 @@
 }
 -(void)backBtnClicked:(id)sender
 {
+    [FTIndicator dismissProgress];
+
     [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{
@@ -157,10 +188,52 @@
     cell.acceptBtn.hidden=false;
     cell.rejectBtn.hidden=false;
     
+    [cell setTargetCaller:self];
+    [cell setCallBackForAccept:@selector(FriendShipAccepted:)];
+    [cell setCallBackForReject:@selector(FriendShipRejected:)];
+    
+    
     //    cell.textLabel.text = @"hello";
     
     return cell;
 }
+-(void)FriendShipAccepted:(NSString *)str
+{
+    //'{"friend_id":2, "status":"accepted"}'
+    
+    NSDictionary *dict=@{@"friend_id":str,@"status":@"accepted"};
+
+    
+    
+    manager=[[APIManager alloc] init];
+    
+    [manager sendRequestForUpdateFriendshipStatus:dict delegate:self andSelector:@selector(updateFriendshipStatus:)];
+    
+
+    
+}
+-(void)FriendShipRejected:(NSString *)str
+{
+
+    NSDictionary *dict=@{@"friend_id":str,@"status":@"rejected"};
+
+   // {"friend_id":12, "status":"rejected"}
+    manager=[[APIManager alloc] init];
+    
+    [manager sendRequestForUpdateFriendshipStatus:dict delegate:self andSelector:@selector(updateFriendshipStatus:)];
+    
+
+}
+-(void)updateFriendshipStatus:(APIResponseObj *)responseObj
+{
+    NSString *msg=(NSString *)responseObj.response;
+    
+    [FTIndicator showSuccessWithMessage:msg];
+    
+    [self refreshAction];
+
+}
+
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     

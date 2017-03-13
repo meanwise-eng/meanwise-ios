@@ -7,6 +7,7 @@
 //
 
 #import "DataSession.h"
+#import "APIObjects_FeedObj.h"
 
 @implementation DataSession
 
@@ -17,12 +18,80 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[DataSession alloc] init];
         
-        
+        sharedInstance.homeFeedResults=[[NSMutableArray alloc] init];
+        sharedInstance.exploreFeedResults=[[NSMutableArray alloc] init];
         sharedInstance.signupObject=[[SignupDataObjects alloc] init];
+        sharedInstance.notificationsResults=[[NSMutableArray alloc] init];
+        sharedInstance.noOfNewNotificationReceived=[NSNumber numberWithInt:0];
+        sharedInstance.noOfInstantNotificationReceived=[NSNumber numberWithInt:0];
         
         // Do any other initialisation stuff here
     });
     return sharedInstance;
+}
+-(void)postLiked:(NSString *)postId
+{
+    
+
+    for(int i=0;i<self.homeFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.IsUserLiked=[NSNumber numberWithInt:1];
+            obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]+1];
+            
+            [self.homeFeedResults replaceObjectAtIndex:i withObject:obj];
+
+        }
+        
+    }
+   
+    for(int i=0;i<self.exploreFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.IsUserLiked=[NSNumber numberWithInt:1];
+            obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]+1];
+            
+            [self.exploreFeedResults replaceObjectAtIndex:i withObject:obj];
+            
+        }
+        
+    }
+    
+    
+}
+-(void)postUnliked:(NSString *)postId
+{
+    for(int i=0;i<self.homeFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.IsUserLiked=[NSNumber numberWithInt:0];
+            obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]-1];
+            
+            [self.homeFeedResults replaceObjectAtIndex:i withObject:obj];
+            
+        }
+        
+    }
+    for(int i=0;i<self.exploreFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.IsUserLiked=[NSNumber numberWithInt:0];
+            obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]-1];
+            
+            [self.exploreFeedResults replaceObjectAtIndex:i withObject:obj];
+            
+        }
+        
+    }
+    
 }
 
 

@@ -8,7 +8,7 @@
 
 #import "MessageContactCell.h"
 #import "ChatThreadComponent.h"
-#import "SettingComponent.h"
+#import "SettingsComponent.h"
 #import "ViewController.h"
 
 #import "EditIntroBioComponent.h"
@@ -24,7 +24,7 @@
 #import "EditSkillsComponent.h"
 #import "EditStoryComponent.h"
 
-@implementation SettingComponent
+@implementation SettingsComponent
 
 -(void)setUp
 {
@@ -33,9 +33,9 @@
 
     passed=0;
     
-    items1=[NSArray arrayWithObjects:@"Intro",@"*Story",@"*Intro Video",@"*Skills",@"*Profession",@"Location", nil];
+    items1=[NSArray arrayWithObjects:@"Intro",@"Story",@"*Intro Video",@"*Skills",@"Profession",@"Location", nil];
     
-    items2=[NSArray arrayWithObjects:@"Name",@"*UserName",@"Birthday",@"Mobile Number",@"*Email",@"*Password",@"Logout", nil];
+    items2=[NSArray arrayWithObjects:@"Name",@"*UserName",@"Birthday",@"Mobile Number",@"*Email",@"Password",@"Logout", nil];
 
     
     self.blackOverLayView=[[UIImageView alloc] initWithFrame:CGRectMake(-self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
@@ -279,7 +279,11 @@
             Compo.frame=self.bounds;
             Compo.backgroundColor=[UIColor whiteColor];
         }];
+
+        
+      
     }
+   
     
     
     if(indexPath.row==0 && indexPath.section==1)

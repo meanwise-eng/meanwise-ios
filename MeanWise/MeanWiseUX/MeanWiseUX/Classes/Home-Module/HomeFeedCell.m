@@ -6,6 +6,7 @@
 //  Copyright © 2016 Hardik. All rights reserved.
 //
 
+#import "DataSession.h"
 #import "HomeFeedCell.h"
 
 @implementation HomeFeedCell
@@ -145,6 +146,8 @@
 {
     liked=0;
     dataObj=dict;
+    dataObj=dict;
+    liked=dict.IsUserLiked.intValue;
     
     [self.profileIMGVIEW setUp:dict.user_profile_photo_small];
     
@@ -155,6 +158,14 @@
     else
     {
         [self.postIMGVIEW clearImageAll];
+    }
+    if(liked==1)
+    {
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
+    }
+    else
+    {
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
     }
     
     [self setUpMediaType:dict.mediaType.intValue andColorNumber:dict.colorNumber.intValue];
@@ -376,14 +387,22 @@
     {
         liked=1;
      [self callLikeAPI];
+        [[DataSession sharedInstance] postLiked:dataObj.postId];
+
     [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
     [self likeBtnAnimation];
+        self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
+
     }
     else
     {
         liked=0;
         [self callLikeAPI];
+        [[DataSession sharedInstance] postUnliked:dataObj.postId];
+
         [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+        self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
+
     }
     
 }
@@ -405,7 +424,6 @@
 
     
 
-    //[manager sendRequestGettingUsersFriends:@"18" andAccessToke:@"e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" delegate:self andSelector:@selector(likeActionFinished:)];
     
 
     

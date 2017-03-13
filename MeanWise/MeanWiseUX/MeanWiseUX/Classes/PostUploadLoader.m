@@ -95,6 +95,18 @@
   
     
 }
+-(void)FailedProgress
+{
+    
+    statusBarNotifierView.backgroundColor=[UIColor redColor];
+    statusBarNotifierText.text=@"Fail to submitted!";
+    
+    
+    [self performSelector:@selector(hideDone) withObject:nil afterDelay:2.0f];
+    
+    
+    
+}
 -(void)hideDone
 {
     if(statusBarNotifierView!=nil)

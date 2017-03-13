@@ -7,25 +7,29 @@
 //
 
 #import "ConnectionBar.h"
+#import "FTIndicator.h"
+#import "UIImage+animatedGIF.h"
 
 @implementation ConnectionBar
 
 -(void)setUp
 {
-    statusBarNotifierView=nil;
-    statusBarNotifierText=nil;
-    
-    [self setUpRechability];
     
     window = [UIApplication sharedApplication].keyWindow;
     if (!window) {
         window = [[UIApplication sharedApplication].windows objectAtIndex:0];
     }
 
+
     
-    hiddenRect=CGRectMake(20, window.frame.size.height+100, window.frame.size.width-40, 50);
-    showingRect=CGRectMake(20, window.frame.size.height/2, window.frame.size.width-40, 50);
+    internetErrorView=nil;
     
+    [self setUpRechability];
+    
+    
+    
+    //hiddenRect=window.bounds;
+    //showingRect=window.bounds;
 }
 -(void)setUpRechability
 {
@@ -36,112 +40,137 @@
     
     NetworkStatus remoteHostStatus = [reachability currentReachabilityStatus];
     
-    if          (remoteHostStatus == NotReachable)      {NSLog(@"no");      self.hasInet-=NO;   }
-    else if     (remoteHostStatus == ReachableViaWiFi)  {NSLog(@"wifi");    self.hasInet-=YES;  }
-    else if     (remoteHostStatus == ReachableViaWWAN)  {NSLog(@"cell");    self.hasInet-=YES;  }
+    if          (remoteHostStatus == NotReachable)      {NSLog(@"no");      self.hasInet=NO;   }
+    else if     (remoteHostStatus == ReachableViaWiFi)  {NSLog(@"wifi");    self.hasInet=YES;  }
+    else if     (remoteHostStatus == ReachableViaWWAN)  {NSLog(@"cell");    self.hasInet=YES;  }
+    
     
     [self sendMessage];
 
 }
--(void)sendMessage
-{
-    if(statusBarNotifierView!=nil)
-    {
-        [statusBarNotifierText removeFromSuperview];
-        [statusBarNotifierView removeFromSuperview];
-        statusBarNotifierView=nil;
-        statusBarNotifierText=nil;
-        
-    }
-    
-    statusBarNotifierView=[[UIView alloc] initWithFrame:hiddenRect];
-    [window addSubview:statusBarNotifierView];
-    
-    statusBarNotifierText=[[UILabel alloc] initWithFrame:CGRectMake(5, 10, statusBarNotifierView.frame.size.width-10, 50-20)];
-    [statusBarNotifierView addSubview:statusBarNotifierText];
-    statusBarNotifierText.textColor=[UIColor whiteColor];
-    statusBarNotifierText.backgroundColor=[UIColor clearColor];
-    statusBarNotifierText.textAlignment=NSTextAlignmentCenter;
-    
-    statusBarNotifierView.layer.cornerRadius=25;
-    statusBarNotifierView.clipsToBounds=YES;
-    statusBarNotifierView.alpha=0;
-    
-    
-    
-    [window bringSubviewToFront:statusBarNotifierView];
-    
-    
-    if(self.hasInet==false)
-    {
-        
-        statusBarNotifierView.backgroundColor=[UIColor colorWithWhite:0 alpha:0.8];
-        statusBarNotifierText.text=@"Internet connection available.";
-    }
-    else
-    {
-        statusBarNotifierText.text=@"Internet connection not available.";
-        statusBarNotifierView.backgroundColor=[UIColor colorWithWhite:0 alpha:0.8];
-        
-    }
-    
-    
-    [UIView animateKeyframesWithDuration:1.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-        
-        statusBarNotifierView.alpha=1;
-        statusBarNotifierView.frame=showingRect;
-        
-    } completion:^(BOOL finished) {
-        
-        [self performSelector:@selector(updateStatusBarNotifier:) withObject:nil afterDelay:4.0f];
-        
-    }];
-    
 
-    
-}
 
 - (void) handleNetworkChange:(NSNotification *)notice
 {
     NetworkStatus remoteHostStatus = [reachability currentReachabilityStatus];
     
-    if          (remoteHostStatus == NotReachable)      {NSLog(@"no");      self.hasInet-=NO;   }
-    else if     (remoteHostStatus == ReachableViaWiFi)  {NSLog(@"wifi");    self.hasInet-=YES;  }
-    else if     (remoteHostStatus == ReachableViaWWAN)  {NSLog(@"cell");    self.hasInet-=YES;  }
+    if          (remoteHostStatus == NotReachable)      {NSLog(@"no");      self.hasInet=NO;   }
+    else if     (remoteHostStatus == ReachableViaWiFi)  {NSLog(@"wifi");    self.hasInet=YES;  }
+    else if     (remoteHostStatus == ReachableViaWWAN)  {NSLog(@"cell");    self.hasInet=YES;  }
     
     [self sendMessage];
     
     
-    //    if (self.hasInet) {
-    //        UIAlertView *alert=[[UIAlertView alloc]initWithTitle:@"Net avail" message:@"" delegate:self cancelButtonTitle:OK_EN otherButtonTitles:nil, nil];
-    //        [alert show];
-    //    }
+
     
     
 }
--(void)updateStatusBarNotifier:(id)sender
+-(void)sendMessage
 {
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
     
-    if(statusBarNotifierView!=nil)
+    
+    
+    if(self.hasInet==false)
     {
+        [self showErrorView];
+      //  [FTIndicator showToastMessage:@"Internet connection not available."];
         
-        [UIView animateKeyframesWithDuration:1.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+    }
+    else
+    {
+        [self hideErrorView];
+       // [FTIndicator showToastMessage:@"Internet connection available."];
+        
+    }
+    
+    
+    
+    
+}
+-(void)showErrorView
+{
+   
+    
+    if(internetErrorView==nil)
+    {
+        internetErrorView=[self setUpInternetErrorView];
+        [window addSubview:internetErrorView];
+        
+        internetErrorView.transform=CGAffineTransformMakeScale(10, 10);
+        internetErrorView.alpha=0;
+        
+        [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveLinear animations:^{
             
-            statusBarNotifierView.frame=hiddenRect;
-            statusBarNotifierView.alpha=0;
-            
+            internetErrorView.transform=CGAffineTransformMakeScale(1, 1);
+            internetErrorView.alpha=1;
+
         } completion:^(BOOL finished) {
-            
-            [statusBarNotifierText removeFromSuperview];
-            [statusBarNotifierView removeFromSuperview];
-            statusBarNotifierView=nil;
-            statusBarNotifierText=nil;
-            
             
         }];
         
     }
     
 }
+-(void)hideErrorView
+{
+    if(internetErrorView!=nil)
+    {
+        
+        [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:1.0 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveLinear animations:^{
+            
+            internetErrorView.transform=CGAffineTransformMakeScale(10, 10);
+            internetErrorView.alpha=0;
+            
+        } completion:^(BOOL finished) {
+            
+            [internetErrorView removeFromSuperview];
+            internetErrorView=nil;
 
+            
+        }];
+    }
+   
+    
+}
+-(UIView *)setUpInternetErrorView
+{
+    UIView *view=[[UIView alloc] initWithFrame:window.bounds];
+    view.backgroundColor=[UIColor whiteColor];
+    
+    
+    UIView *whiteView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 400, 500)];
+    [view addSubview:whiteView];
+    whiteView.center=CGPointMake(view.frame.size.width/2, view.frame.size.height/2);
+    
+    UIImageView *imageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 400, 300)];
+    [whiteView addSubview:imageView];
+    
+    NSString *path=[[NSBundle mainBundle]pathForResource:@"wifi" ofType:@"gif"];
+    NSURL *url=[[NSURL alloc] initFileURLWithPath:path];
+    imageView.image= [UIImage animatedImageWithAnimatedGIFURL:url];
+
+    
+    
+    UILabel *errorTitle=[[UILabel alloc] initWithFrame:CGRectMake(0, 200, 400, 50)];
+    [whiteView addSubview:errorTitle];
+    errorTitle.font=[UIFont fontWithName:@"Avenir-Roman" size:30];
+    errorTitle.textAlignment=NSTextAlignmentCenter;
+    errorTitle.textColor=[UIColor grayColor];
+    errorTitle.text=@"Whoops!";
+    
+    UILabel *errorMessage=[[UILabel alloc] initWithFrame:CGRectMake(0, 250, 400, 50)];
+    [whiteView addSubview:errorMessage];
+    errorMessage.font=[UIFont fontWithName:@"Avenir-Roman" size:18];
+    errorMessage.textAlignment=NSTextAlignmentCenter;
+    errorMessage.numberOfLines=2;
+    
+    errorMessage.textColor=[UIColor lightGrayColor];
+    errorMessage.text=@"No internet connection found.\nCheck your connection or try again.";
+
+    
+    
+    
+    return view;
+}
 @end

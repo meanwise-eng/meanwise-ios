@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
 #import "APIManager.h"
+#import "EmptyView.h"
 
 @interface FriendList : UIView <UITableViewDelegate,UITableViewDataSource>
 {
@@ -27,7 +28,8 @@
     SEL backBtnClicked;
     
     UITableView *friendListTableView;
-  
+    EmptyView *emptyView;
+
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;
 

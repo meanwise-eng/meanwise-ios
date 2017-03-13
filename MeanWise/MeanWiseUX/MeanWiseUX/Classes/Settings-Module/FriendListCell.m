@@ -50,6 +50,21 @@
     
 
 }
+
+-(void)setTargetCaller:(id)targetReceived
+{
+     targetCaller=targetReceived;
+}
+-(void)setCallBackForAccept:(SEL)func
+{
+    onAcceptCallBack=func;
+
+}
+-(void)setCallBackForReject:(SEL)func
+{
+    onCancelCallBack=func;
+
+}
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
@@ -82,11 +97,11 @@
         self.proType.font=[UIFont fontWithName:k_fontRegular size:12];
         
         
-        self.acceptBtn=[[UIButton alloc] initWithFrame:CGRectMake(80, 60, 80, 30)];
+        self.acceptBtn=[[UIButton alloc] initWithFrame:CGRectMake(80, 70, 80, 30)];
         [self.acceptBtn setTitle:@"Accept" forState:UIControlStateNormal];
 
         
-        self.rejectBtn=[[UIButton alloc] initWithFrame:CGRectMake(170, 60, 80, 30)];
+        self.rejectBtn=[[UIButton alloc] initWithFrame:CGRectMake(170, 70, 80, 30)];
         [self.rejectBtn setTitle:@"Reject" forState:UIControlStateNormal];
 
         
@@ -95,6 +110,12 @@
         [self.rejectBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
         self.rejectBtn.titleLabel.font=[UIFont fontWithName:k_fontSemiBold size:14];
 
+        
+        [self.acceptBtn addTarget:self action:@selector(FriendShipAccepted:) forControlEvents:UIControlEventTouchUpInside];
+        
+        [self.rejectBtn addTarget:self action:@selector(FriendShipRejected:) forControlEvents:UIControlEventTouchUpInside];
+        
+        
         self.acceptBtn.layer.cornerRadius=15;
         self.rejectBtn.layer.cornerRadius=15;
         self.acceptBtn.clipsToBounds=YES;
@@ -115,7 +136,19 @@
     }
     return self;
 }
+-(void)FriendShipAccepted:(id)sender
+{
+    [targetCaller performSelector:onAcceptCallBack withObject:dataObj.userId afterDelay:0.01];
+    NSLog(@"Accepted");
+    
+}
+-(void)FriendShipRejected:(id)sender
+{
+    [targetCaller performSelector:onCancelCallBack withObject:dataObj.userId afterDelay:0.01];
 
+    NSLog(@"Rejected");
+    
+}
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];

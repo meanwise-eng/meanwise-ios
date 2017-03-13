@@ -11,6 +11,8 @@
 #import "Constant.h"
 #import "ProfileComponent.h"
 #import "APIManager.h"
+#import "SearchSuggestionsView.h"
+#import "EmptyView.h"
 
 
 @interface SearchComponent : UIView <UICollectionViewDelegate,UICollectionViewDataSource>
@@ -20,10 +22,15 @@
     APIManager *manager;
     NSArray *resultData;
 
+    UITextField *searchFieldTXT;
+    SearchSuggestionsView *suggestionBox;
+ 
+    UILabel *searchTypeLBL;
+    UIView *searchBaseView;
+    
     
     UICollectionView *galleryView;
 
-    UITextField *exploreTerm;
 
     UILabel *statusLabel;
     
@@ -36,9 +43,14 @@
     SEL hideBottomBarFunc;
     SEL showBottomBarFunc;
     
+    EmptyView *emptyView;
 
 }
 -(void)setUp;
 -(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2;
 
+
 @end
+
+
+

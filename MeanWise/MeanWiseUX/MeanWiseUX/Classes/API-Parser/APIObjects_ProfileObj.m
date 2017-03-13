@@ -7,7 +7,7 @@
 //
 
 #import "APIObjects_ProfileObj.h"
-
+#import "UserSession.h"
 @implementation APIObjects_ProfileObj
 
 -(void)setUpWithDict:(NSDictionary *)dict
@@ -16,20 +16,103 @@
     self.userId=[dict valueForKey:@"user_id"];
     self.idDetail=[dict valueForKey:@"id"];
     self.cover_photo=[dict valueForKey:@"cover_photo"];
-    self.bio=[dict valueForKey:@"bio"];
+    
+    if([[dict valueForKey:@"bio"] isKindOfClass:[NSNull class]])
+    {
+        self.bio=@"";
+    }
+    else
+    {
+        self.bio=[dict valueForKey:@"bio"];
+
+    }
+    
     self.email=[dict valueForKey:@"email"];
     self.first_name=[dict valueForKey:@"first_name"];
     self.last_name=[dict valueForKey:@"last_name"];
-    self.profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+    
+    if([[dict valueForKey:@"user_profession"] valueForKey:@"name"]==nil)
+    {
+        self.profession=@"";
+    }
+    else
+    {
+        self.profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+
+    }
+    
+    
     self.profile_photo_small=[dict valueForKey:@"profile_photo_small"];
     self.username=[dict valueForKey:@"username"];
     self.profile_photo=[dict valueForKey:@"profile_photo"];
-    self.dob=[dict valueForKey:@"dob"];
-    self.phone=[dict valueForKey:@"phone"];
     
-    self.profile_story_title=[dict valueForKey:@"profile_story_title"];
-    self.profile_story_description=[dict valueForKey:@"profile_story_description"];
-    self.city=[dict valueForKey:@"city"];
+    if([[dict valueForKey:@"phone"] isKindOfClass:[NSNull class]])
+    {
+        self.phone=@"";
+    }
+    else
+    {
+        self.phone=[dict valueForKey:@"phone"];
+        
+    }
+    
+    if([[dict valueForKey:@"dob"] isKindOfClass:[NSNull class]])
+    {
+        self.dob=@"";
+    }
+    else
+    {
+        self.dob=[dict valueForKey:@"dob"];
+        
+    }
+    
+    
+    if([[dict valueForKey:@"profile_story_title"] isKindOfClass:[NSNull class]])
+    {
+        self.profile_story_title=@"";
+    }
+    else
+    {
+        self.profile_story_title=[dict valueForKey:@"profile_story_title"];
+        
+    }
+    
+    if([[dict valueForKey:@"profile_story_description"] isKindOfClass:[NSNull class]])
+    {
+        self.profile_story_description=@"";
+    }
+    else
+    {
+        self.profile_story_description=[dict valueForKey:@"profile_story_description"];
+        
+    }
+    
+    
+    
+    if([[dict valueForKey:@"city"] isKindOfClass:[NSNull class]])
+    {
+        self.city=@"";
+    }
+    else
+    {
+        self.city=[dict valueForKey:@"city"];
+    }
+    
+    self.interests=[dict valueForKey:@"interests"];
+    self.skills=[dict valueForKey:@"skills"];
+    
+    self.userFriends=[dict valueForKey:@"user_friends"];
+    
+    self.friendShipStatus=@"";
+    
+    for (NSDictionary *dict in self.userFriends)
+    {
+        if([[dict valueForKey:@"friend_name"] isEqualToString:[UserSession getUserName]])
+        {
+            self.friendShipStatus=[dict valueForKey:@"status"];
+        }
+    }
+
     
 }
 - (void)encodeWithCoder:(NSCoder *)encoder
@@ -56,6 +139,10 @@
     [encoder encodeObject:self.profile_story_description forKey:@"profile_story_description"];
     [encoder encodeObject:self.profile_story_title forKey:@"profile_story_title"];
 
+    [encoder encodeObject:self.interests forKey:@"interests"];
+    [encoder encodeObject:self.skills forKey:@"skills"];
+
+    
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
@@ -84,6 +171,9 @@
         self.city = [decoder decodeObjectForKey:@"city"];
         self.profile_story_description = [decoder decodeObjectForKey:@"profile_story_description"];
         self.profile_story_title = [decoder decodeObjectForKey:@"profile_story_title"];
+
+        self.interests = [decoder decodeObjectForKey:@"interests"];
+        self.skills = [decoder decodeObjectForKey:@"skills"];
 
         
     }

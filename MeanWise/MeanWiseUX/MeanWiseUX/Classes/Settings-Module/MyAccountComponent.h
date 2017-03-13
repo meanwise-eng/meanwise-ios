@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
-#import "SettingComponent.h"
+#import "SettingsComponent.h"
 #import "MWNavBar.h"
 #import "UIImageHM.h"
 #import "ImageCropView.h"
@@ -36,7 +36,7 @@
     
     UITableView *listOfItems;
     
-    SettingComponent *settingCompo;
+    SettingsComponent *settingCompo;
     
     NSArray *items;
     

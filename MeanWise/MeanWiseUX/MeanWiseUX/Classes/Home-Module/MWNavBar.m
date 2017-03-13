@@ -7,6 +7,9 @@
 //
 
 #import "MWNavBar.h"
+#import "DataSession.h"
+#import "FTIndicator.h"
+#import "APIObjects_NotificationObj.h"
 
 @implementation MWNavBar
 
@@ -67,8 +70,70 @@
     self.rightBtn.center=[self rightPosition];
     self.centerLogo.center=[self centerPostion];
     
+    label=[[UILabel alloc] initWithFrame:CGRectMake(25/2,-10, 18, 18)];
+    [self.rightBtn addSubview:label];
+    label.adjustsFontSizeToFitWidth=YES;
+    label.textColor=[UIColor whiteColor];
+    label.backgroundColor=[UIColor redColor];
+    label.textAlignment=NSTextAlignmentCenter;
+    label.font=[UIFont fontWithName:k_fontBold size:8];
+    label.layer.cornerRadius=18/2;
+    label.clipsToBounds=YES;
+    
+    
+    [self setNotificationNumber:0];
+    [self setUpWatchForNotifications];
 
 }
+#pragma mark - Notification Watch
+
+- (void) dealloc
+{
+    // If you don't remove yourself as an observer, the Notification Center
+    // will continue to try and send notification objects to the deallocated
+    // object.
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
+}
+
+-(void)setUpWatchForNotifications
+{
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(checkIfNewNotificationReceived)
+                                                 name:@"NewNotificationDataReceived"
+                                               object:nil];
+    
+}
+-(void)checkIfNewNotificationReceived
+{
+    int no=[DataSession sharedInstance].noOfNewNotificationReceived.intValue;
+    [self setNotificationNumber:no];
+    
+    
+    
+    
+}
+
+-(void)setNotificationNumber:(int)number
+{
+    if(number>0)
+    {
+        label.text=[NSString stringWithFormat:@"%d",number];
+        label.hidden=false;
+    }
+    else
+    {
+        label.text=@"";
+        label.hidden=true;
+    }
+    
+}
+
+
+#pragma mark - Notification Watch End
+
+
 
 -(void)backBtnClicked:(id)sender
 {
@@ -93,6 +158,9 @@
 }
 -(void)messageBtnClicked:(id)sender
 {
+    [self setNotificationNumber:0];
+    [DataSession sharedInstance].noOfNewNotificationReceived=[NSNumber numberWithInt:0];
+    
   //  [self pushInto];
     
 //    [self AddOneStack:@"Message"];

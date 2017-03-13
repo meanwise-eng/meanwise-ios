@@ -13,9 +13,9 @@
 -(void)setUp
 {
     self.opaque=YES;
-    int sizeH=5;
-    int sizeV=5;
-    int gapH=2;
+    int sizeH=10;
+    int sizeV=10;
+    int gapH=4;
     
     int boundX=sizeH*0.1;
     //boundX=0;
@@ -24,20 +24,16 @@
     
     sizeW=boundX+sizeH+gapH+sizeH+gapH+sizeH+boundX;
     
-
-    //self.backgroundColor=[UIColor colorWithWhite:0.0 alpha:0.5f];
-    
-   // self.frame=CGRectMake(0, 0, sizeW, sizeV+boundX*2);
     
     self.frame=CGRectMake(self.frame.origin.x, self.frame.origin.y, sizeW, sizeV+boundX*2);
     
     
-//    shadow=[[UIImageView alloc] initWithFrame:self.bounds];
-//    [self addSubview:shadow];
-//    shadow.image=[UIImage imageNamed:@"squareDotGlow.png"];
-//    shadow.alpha=0.05;
+    //    shadow=[[UIImageView alloc] initWithFrame:self.bounds];
+    //    [self addSubview:shadow];
+    //    shadow.image=[UIImage imageNamed:@"squareDotGlow.png"];
+    //    shadow.alpha=0.05;
     
-
+    
     img1=[[UIImageView alloc] initWithFrame:CGRectMake(boundX, boundX, sizeH, sizeV)];
     img2=[[UIImageView alloc] initWithFrame:CGRectMake(sizeH+gapH+boundX, boundX, sizeH, sizeV)];
     img3=[[UIImageView alloc] initWithFrame:CGRectMake(sizeH*2+gapH*2+boundX, boundX, sizeH, sizeV)];
@@ -61,29 +57,29 @@
 }
 -(void)startAnimation
 {
-
+    
     float duration=0.2;
     
     if(state==0)
     {
         [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveLinear  animations:^{
-
+            
             
             img1.alpha=1;
             img3.alpha=0.2;
             img2.alpha=0.2;
-
-           // img1.transform=CGAffineTransformMakeScale(1, 1.3);
-            //img2.transform=CGAffineTransformMakeScale(1, 1);
-           // img3.transform=CGAffineTransformMakeScale(1, 1);
-
+            
+            img1.transform=CGAffineTransformMakeScale(1, 1.5);
+            img2.transform=CGAffineTransformMakeScale(1, 1);
+            img3.transform=CGAffineTransformMakeScale(1, 1);
+            
             
         } completion:^(BOOL finished) {
-
+            
         }];
-
+        
     }
-   else if(state==1)
+    else if(state==1)
     {
         [UIView animateWithDuration:duration delay:0 options:UIViewAnimationOptionCurveLinear  animations:^{
             
@@ -91,10 +87,10 @@
             img2.alpha=1;
             img1.alpha=0.2;
             img3.alpha=0.2;
-           // img2.transform=CGAffineTransformMakeScale(1, 1.3);
-           // img3.transform=CGAffineTransformMakeScale(1, 1);
-           // img1.transform=CGAffineTransformMakeScale(1, 1);
-
+            img2.transform=CGAffineTransformMakeScale(1, 1.5);
+            img3.transform=CGAffineTransformMakeScale(1, 1);
+            img1.transform=CGAffineTransformMakeScale(1, 1);
+            
             
             
         } completion:^(BOOL finished) {
@@ -110,9 +106,9 @@
             img3.alpha=1;
             img2.alpha=0.2;
             img1.alpha=0.2;
-           // img3.transform=CGAffineTransformMakeScale(1, 1.3);
-           // img2.transform=CGAffineTransformMakeScale(1, 1);
-           // img1.transform=CGAffineTransformMakeScale(1, 1);
+            img3.transform=CGAffineTransformMakeScale(1, 1.5);
+            img2.transform=CGAffineTransformMakeScale(1, 1);
+            img1.transform=CGAffineTransformMakeScale(1, 1);
             
             
             
@@ -121,10 +117,10 @@
         }];
         
     }
-
+    
     state=state+1;
     
-
+    
     if(state>2)
     {
         state=0;
@@ -132,9 +128,9 @@
     
     
     
-  
     
-  //  [self performSelector:@selector(startAnimation) withObject:nil afterDelay:duration];
+    
+    //  [self performSelector:@selector(startAnimation) withObject:nil afterDelay:duration];
     
 }
 @end

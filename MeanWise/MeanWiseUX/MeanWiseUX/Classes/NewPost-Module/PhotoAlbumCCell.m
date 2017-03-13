@@ -20,8 +20,8 @@
         
         
         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeFast;
-        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeFastFormat;
+        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     
     
    if(asset.mediaType==PHAssetMediaTypeVideo)
@@ -40,17 +40,23 @@
         
     
         [manager requestImageForAsset:asset
-                           targetSize:CGSizeMake(200, 200)
+                           targetSize:CGSizeMake(150, 150)
                           contentMode:PHImageContentModeAspectFill
                               options:requestOptions
                         resultHandler:^void(UIImage *image, NSDictionary *info) {
                             
-                            
+                            NSLog(@"Image size:%@",NSStringFromCGSize(image.size));
+
+
                             
                             
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 
                                 self.photoView.image=image;
+                              //  self.photoView.frame=CGRectMake(0, 0, image.size.width, image.size.height);
+                               // self.photoView.center=CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
+                               // self.photoView.contentMode=UIViewContentModeScaleAspectFit;
+                                
 
 //                                self.photoView.alpha=0;
 //                                //self.photoView.transform=CGAffineTransformMakeScale(0, 0);
@@ -77,6 +83,7 @@
         
         
         self.photoView=[[UIImageView alloc] initWithFrame:CGRectMake(1, 1, self.frame.size.width-2, self.frame.size.height-2)];
+        self.photoView.frame=self.bounds;
         
         [self addSubview:self.photoView];
         self.photoView.contentMode=UIViewContentModeScaleAspectFill;

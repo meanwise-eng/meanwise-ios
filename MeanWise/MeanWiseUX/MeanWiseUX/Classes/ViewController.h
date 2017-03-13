@@ -16,6 +16,7 @@
 #import "FirstLaunchScreen.h"
 #import "ConnectionBar.h"
 #import "PostUploadLoader.h"
+#import "NotificationBadgeView.h"
 
 @interface ViewController : UIViewController
 {

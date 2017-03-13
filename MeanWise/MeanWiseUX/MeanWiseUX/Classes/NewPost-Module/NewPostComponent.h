@@ -21,9 +21,12 @@
     UIButton *postBtn;
     
     
-    PreviewViewComponent *attachedImage;
     
     UITextView *statusView;
+    PreviewViewComponent *attachedImage;
+    
+    
+    
     UILabel *characterCountLBL;
     
     UILabel *replyToLBL;
@@ -36,8 +39,12 @@
     
     MediaCropper *cropperControl;
     
+    id target;
+    SEL closeCallBackfunc;
+    
 }
 -(void)setUpWithCellRect:(CGRect)rect;
+-(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
 
 @end
 

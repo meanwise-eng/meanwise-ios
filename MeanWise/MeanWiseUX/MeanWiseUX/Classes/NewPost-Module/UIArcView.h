@@ -13,8 +13,14 @@
     float progress;
     float radious;
     
+    UIColor *lineColor;
+    float lineThickness;
     
 }
+-(void)setLineColorCustom:(UIColor *)color;
+-(void)setLineThicknessCustom:(float)width;
+
+
 -(void)setProgress:(float)point;
 -(void)setRadious:(float)point;
 -(void)startAnimation:(id)sender;

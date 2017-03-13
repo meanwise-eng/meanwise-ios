@@ -7,6 +7,7 @@
 //
 
 #import "FTNotificationIndicator.h"
+#import "Constant.h"
 
 #pragma mark - Defines
 
@@ -17,8 +18,8 @@
 #define kFTNotificationImageSize                        (30.f)
 #define kFTNotificationStatusBarHeight                  ([[UIApplication sharedApplication] statusBarFrame].size.height)
 #define kFTNotificationDefaultAnimationDuration         (0.2f)
-#define kFTNotificationDefaultTitleFont                 [UIFont boldSystemFontOfSize:15]
-#define kFTNotificationDefaultMessageFont               [UIFont systemFontOfSize:13]
+#define kFTNotificationDefaultTitleFont                 [UIFont fontWithName:k_fontBold size:15]
+#define kFTNotificationDefaultMessageFont               [UIFont fontWithName:k_fontRegular size:13]
 #define kFTNotificationDefaultTextColor                 [UIColor blackColor]
 #define kFTNotificationDefaultTextColor_ForDarkStyle    [UIColor whiteColor]
 
@@ -224,7 +225,7 @@
     if (!self.shouldAutoDismiss) {
         return;
     }
-    CGFloat timeInterval = MAX(self.notificationMessage.length * 0.04 + 0.5, 2.0);
+    CGFloat timeInterval = MAX(self.notificationMessage.length * 0.04 + 0.5, 4.0f);
     _dismissTimer = [NSTimer scheduledTimerWithTimeInterval:timeInterval
                                                      target:self
                                                    selector:@selector(dismissingNotificationtView)
@@ -375,6 +376,9 @@
     CGFloat text_X = image ? kFTNotificationMargin_X*2 + kFTNotificationImageSize : kFTNotificationMargin_X;
     
     _iconImageView.frame = CGRectMake(kFTNotificationMargin_X, kFTNotificationStatusBarHeight + kFTNotificationMargin_Y, kFTNotificationImageSize, kFTNotificationImageSize);
+    
+    _iconImageView.layer.cornerRadius=kFTNotificationImageSize/2;
+    _iconImageView.clipsToBounds=YES;
     
     self.titleLabel.frame = CGRectMake(text_X, kFTNotificationStatusBarHeight, kFTScreenWidth - kFTNotificationMargin_X - text_X,  kFTNotificationTitleHeight);
     self.messageLabel.frame = CGRectMake(text_X, kFTNotificationStatusBarHeight+kFTNotificationTitleHeight, kFTScreenWidth - kFTNotificationMargin_X - text_X, messageSize.height);

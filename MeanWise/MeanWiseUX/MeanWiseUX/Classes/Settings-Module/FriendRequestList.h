@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
 #import "APIManager.h"
+#import "EmptyView.h"
 
 @interface FriendRequestList : UIView <UITableViewDelegate,UITableViewDataSource>
 {
@@ -29,7 +30,8 @@
     
     UITableView *friendListTableView;
 
-    
+    EmptyView *emptyView;
+
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;
 

@@ -497,13 +497,20 @@
     
     
     UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.minimumInteritemSpacing = 0;
-    layout.minimumLineSpacing = 0;
+    layout.minimumInteritemSpacing = 1;
+    layout.minimumLineSpacing = 1;
     layout.scrollDirection = UICollectionViewScrollDirectionVertical;
+    layout.sectionInset = UIEdgeInsetsMake(0, 1, 0, 1);
+
+/*    layout.minimumInteritemSpacing = 10;
+    layout.minimumLineSpacing = 10;
+    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
+*/
     
     photoGallery = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout];
     photoGallery.delegate = self;
     photoGallery.dataSource = self;
+    
     //  photoGallery.pagingEnabled = YES;
     photoGallery.backgroundColor=[UIColor clearColor];
     [photoGallery registerClass:[PhotoAlbumCCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
@@ -558,7 +565,6 @@
     arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
     [photoGallery reloadData];
     
-    
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
@@ -583,8 +589,8 @@
         
         
         NSURL *url = (NSURL *)[[(AVURLAsset *)avAsset URL] fileReferenceURL];
-        NSLog(@"url = %@", [url absoluteString]);
-        NSLog(@"url = %@", [url relativePath]);
+      //  NSLog(@"url = %@", [url absoluteString]);
+       // NSLog(@"url = %@", [url relativePath]);
         
         dispatch_async(dispatch_get_main_queue(), ^{
 
@@ -647,7 +653,9 @@
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return CGSizeMake(self.frame.size.width/4, self.frame.size.width/4);
+   
+    return CGSizeMake((self.frame.size.width-5)/4, (self.frame.size.width-5)/4);
+  
   //  return CGSizeMake(50, 50);
 
 }

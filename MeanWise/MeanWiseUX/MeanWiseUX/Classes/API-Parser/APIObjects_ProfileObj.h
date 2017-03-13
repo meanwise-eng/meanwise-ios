@@ -24,11 +24,16 @@
 @property (nonatomic, strong) NSString* dob;
 @property (nonatomic, strong) NSString* phone;
 
+@property (nonatomic,strong) NSArray *interests;
+@property (nonatomic,strong) NSArray *skills;
+
 @property (nonatomic, strong) NSString* accessToken;
 @property (nonatomic, strong) NSString* city;
 @property (nonatomic, strong) NSString* profile_story_title;
 @property (nonatomic, strong) NSString* profile_story_description;
 
+@property (nonatomic,strong) NSArray *userFriends;
+@property (nonatomic,strong) NSString *friendShipStatus;
 
 -(void)setUpWithDict:(NSDictionary *)dict;
 

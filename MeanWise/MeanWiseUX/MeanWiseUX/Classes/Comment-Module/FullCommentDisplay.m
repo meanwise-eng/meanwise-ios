@@ -161,7 +161,7 @@
     [[IQKeyboardManager sharedManager] setEnable:NO];
   //  [[IQKeyboardManager sharedManager] setEnableAutoToolbar:NO];
     
-    [newChatBox becomeFirstResponder];
+   // [newChatBox becomeFirstResponder];
 
     
     
@@ -174,6 +174,16 @@
 
     
     
+}
+-(void)setUpToWriteComment;
+{
+    [self performSelector:@selector(openUpKeyboard) withObject:nil afterDelay:1.0f];
+}
+-(void)openUpKeyboard
+{
+
+    [newChatMessageBox performSelector:@selector(becomeFirstResponder) withObject:nil afterDelay:0];
+
 }
 -(void)manuallyRefresh
 {

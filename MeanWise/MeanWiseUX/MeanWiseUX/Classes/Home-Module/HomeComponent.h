@@ -14,6 +14,7 @@
 #import <AVKit/AVKit.h>
 #import "MyAccountComponent.h"
 #import "MessageComponent.h"
+#import "NotificationsComponent.h"
 #import "MWNavBar.h"
 
 #import "APIManager.h"
@@ -27,14 +28,14 @@
     FullCommentDisplay *commentDisplay;
     ShareComponent *sharecompo;
 
-    NSMutableArray *dataRecords;
+   // NSMutableArray *dataRecords;
     
 
     MWNavBar *navBar;
 
     DetailViewComponent *detailPostView;
     MyAccountComponent *myAccountCompo;
-    MessageComponent *messageCompo;
+    NotificationsComponent *messageCompo;
     
     
     id delegate;
@@ -45,6 +46,8 @@
 
     UIRefreshControl *refreshControl;
     EmptyView *emptyView;
+    
+    NSString *screenIdentifier;
 
     
 }

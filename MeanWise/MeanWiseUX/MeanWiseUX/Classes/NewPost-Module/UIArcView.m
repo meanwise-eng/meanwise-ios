@@ -10,6 +10,30 @@
 
 @implementation UIArcView
 
+-(void)setLineColorCustom:(UIColor *)color
+{
+    lineColor=color;
+}
+-(void)setLineThicknessCustom:(float)width
+{
+    lineThickness=width;
+    
+}
+-(id)initWithFrame:(CGRect)frame
+{
+    self=[super initWithFrame:frame];
+    
+    if(self)
+    {
+        self.clipsToBounds=YES;
+        
+        lineColor=[UIColor colorWithRed:0.40 green:0.80 blue:1.00 alpha:0.5f];
+        lineThickness=10;
+       
+        
+    }
+    return self;
+}
 
 -(void)setProgress:(float)point
 {
@@ -44,8 +68,8 @@
     
     CGContextRef tx=UIGraphicsGetCurrentContext();
     CGContextBeginPath(tx);
-    CGContextSetLineWidth(tx, 10);
-    CGContextSetStrokeColorWithColor(tx, [UIColor colorWithRed:0.40 green:0.80 blue:1.00 alpha:0.5f].CGColor);
+    CGContextSetLineWidth(tx, lineThickness);
+    CGContextSetStrokeColorWithColor(tx, lineColor.CGColor);
     
     //    CGPatternRef pattern=CGPatternCreate(NULL, rect, CGAffineTransformIdentity, 24, 24, kCGPatternTilingConstantSpacing, true, &callbacks);
     

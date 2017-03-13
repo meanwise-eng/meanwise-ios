@@ -7,6 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <AVKit/AVKit.h>
+#import <QuartzCore/QuartzCore.h>
+#import "FTIndicator.h"
 
 @interface PreviewMedia_ImageController : UIView <UITextViewDelegate>
 {
@@ -14,6 +18,8 @@
     BOOL isVideo;
     
     UIImageView *keyImageView;
+    AVPlayerViewController *playerViewControl;
+
     UIImageView *shadowImageView;
     
     UIButton *editBtn;
@@ -22,8 +28,11 @@
     UIButton *EditingCancelBtn;
     
     
-    
+    UIView *fieldContainerView;
     UITextView *field;
+    float basicTransform;
+    float scaleField;
+    float rotationField;
     
     id target;
     SEL onSuccessFunc;
@@ -38,7 +47,11 @@
     UIButton *alignmentBtn;
     UIButton *fontSizeUpBtn;
     UIButton *fontSizeDownBtn;
-    int fontSize;
+    float fontSize;
+    
+    float fontSizeUpLimit;
+    float fontSizeDownLimit;
+    
     
     
 }

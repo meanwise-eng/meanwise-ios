@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
 
-@interface SettingComponent : UIView  <UITableViewDataSource,UITableViewDelegate>
+@interface SettingsComponent : UIView  <UITableViewDataSource,UITableViewDelegate>
 {
     
     int passed;

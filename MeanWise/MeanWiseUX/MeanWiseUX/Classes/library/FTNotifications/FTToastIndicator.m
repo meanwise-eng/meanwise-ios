@@ -7,6 +7,7 @@
 //
 
 #import "FTToastIndicator.h"
+#import "Constant.h"
 
 #pragma mark - Defines
 
@@ -14,10 +15,10 @@
 #define kFTToastMaxHeight                       (100.f)
 #define kFTToastMargin_X                        (20.f)
 #define kFTToastMargin_Y                        (10.f)
-#define kFTToastToBottom                        (20.f)
+#define kFTToastToBottom                        (100.f)
 #define kFTToastCornerRadius                    (8.f)
 #define kFTToastDefaultAnimationDuration        (0.2f)
-#define kFTToastDefaultFont                     [UIFont systemFontOfSize:15]
+#define kFTToastDefaultFont                     [UIFont fontWithName:k_fontRegular size:15]
 #define kFTToastDefaultTextColor                [UIColor blackColor]
 #define kFTToastDefaultTextColor_ForDarkStyle   [UIColor whiteColor]
 

@@ -7,6 +7,7 @@
 //
 
 #import "FTProgressIndicator.h"
+#import "Constant.h"
 
 #pragma mark - Defines
 
@@ -17,7 +18,7 @@
 #define kFTProgressImageToLabel                     (15.f)
 #define kFTProgressCornerRadius                     (10.f)
 #define kFTProgressDefaultAnimationDuration         (0.2f)
-#define kFTProgressDefaultFont                      [UIFont systemFontOfSize:15]
+#define kFTProgressDefaultFont                      [UIFont fontWithName:k_fontRegular size:15]
 #define kFTProgressDefaultTextColor                 [UIColor blackColor]
 #define kFTProgressDefaultTextColor_ForDarkStyle    [UIColor whiteColor]
 #define kFTProgressDefaultBackgroundColor           [UIColor clearColor]

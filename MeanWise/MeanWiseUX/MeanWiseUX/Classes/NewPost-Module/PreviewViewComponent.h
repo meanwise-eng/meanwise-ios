@@ -37,7 +37,8 @@
     
     UIButton *playBtn;
     
-    UIButton *editBtn;
+    UIButton *editBtn1;
+    UIButton *editBtn2;
     
     BOOL isPlayerPaused;
     

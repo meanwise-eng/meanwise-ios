@@ -106,7 +106,7 @@
     [ck setDelegate:self andFunc1:@selector(closeThisViewManuallyClicked:)];
     
 
-    [UIView animateKeyframesWithDuration:4.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeCubicPaced animations:^{
+    [UIView animateKeyframesWithDuration:4.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeCubicPaced | UIViewKeyframeAnimationOptionRepeat | UIViewKeyframeAnimationOptionAutoreverse animations:^{
         
         postIMGVIEW.transform=CGAffineTransformMakeScale(1.2, 1.2);
         

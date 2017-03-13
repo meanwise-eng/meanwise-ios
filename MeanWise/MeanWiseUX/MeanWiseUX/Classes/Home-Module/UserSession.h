@@ -30,6 +30,10 @@
 +(NSString *)getProfileStoryTitle;
 +(NSString *)getProfileStoryDesc;
 
++(NSArray *)getUserInterests;
++(NSArray *)getUserSkills;
+
+
 +(NSString *)getAccessToken;
 
 +(APIObjects_ProfileObj *)getUserObj;

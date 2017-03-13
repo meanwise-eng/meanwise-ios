@@ -31,8 +31,14 @@
 
 //HOME FEED
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestExploreWithInterestsName:(NSString *)string Withdelegate:(id)delegate andSelector:(SEL)selector;
+
 
 //Edit Profile
+
+-(void)sendRequestForChangePassword:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
+
 -(void)sendRequestForEditProfile:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForUpdateCoverPhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForUpdateProfilePhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
@@ -53,8 +59,9 @@
 
 
 //Friends
--(void)sendRequestGettingUsersFriends:(NSString *)userId delegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestGettingUsersFriends:(NSString *)userId status:(int)status delegate:(id)delegate andSelector:(SEL)selector;
 
+-(void)sendRequestForUpdateFriendshipStatus:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
 
 
 //LOGIN-SIGNUP
@@ -66,6 +73,9 @@
 
 //All Users
 -(void)sendRequestForAllUserData:(NSString *)token delegate:(id)delegate andSelector:(SEL)selector;
+
+//Search User
+-(void)sendRequestForUserSearch:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
 
 
 

@@ -9,17 +9,27 @@
 #import "DetailViewComponent.h"
 #import "PostFullCell.h"
 #import "APIObjects_FeedObj.h"
+#import "DataSession.h"
+#import "HMPlayerManager.h"
 
 
 @implementation DetailViewComponent
 
 -(void)setDataRecords:(NSMutableArray *)array;
 {
-    dataRecords=array;
-    [galleryView reloadData];
+  //  [galleryView reloadData];
+}
+-(void)setDelegate:(id)target andPageChangeCallBackFunc:(SEL)function1 andDownCallBackFunc:(SEL)function2;
+{
+    delegate=target;
+    pageChangeCallBackFunc=function1;
+    downCallBackFunc=function2;
+    
 }
 -(void)setUpWithCellRect:(CGRect)rect
 {
+    screenIdentifier=@"EXPLORE";
+
     self.backgroundColor=[UIColor clearColor];
     
     
@@ -63,6 +73,7 @@
     
 
 
+    [self feedReloadViaAutoPlay];
 
 
     [self zoomDownGestureDetected];
@@ -96,7 +107,18 @@
     globalPath=indexPath;
     [galleryView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:false];
     
-    [self performSelector:@selector(playFirstVideo) withObject:nil afterDelay:0.5];
+    
+}
+-(void)DetailViewScreenGoesBack
+{
+    NSLog(@"Home screen back");
+    [HMPlayerManager sharedInstance].Explore_isPaused=true;
+    
+}
+-(void)DetailViewScreenComesToFront
+{
+    NSLog(@"Home screen front");
+    [HMPlayerManager sharedInstance].Explore_isPaused=false;
     
 }
 
@@ -114,129 +136,79 @@
     postIMGVIEW.hidden=true;
     
 
+    [self performSelector:@selector(feedReloadViaAutoPlay) withObject:nil afterDelay:0.5];
 
 }
 -(void)zoomDownOut
 {
     
+
+    
+    [galleryView setDelegate:nil];
+    [galleryView setDataSource:nil];
+    [galleryView removeFromSuperview];
     [delegate performSelector:downCallBackFunc withObject:globalPath afterDelay:0.0001];
 
  
     
-    NSArray *array=galleryView.visibleCells;
-    for(int i=0;i<array.count;i++)
-    {
-        PostFullCell *cell=[array objectAtIndex:i];
-        [cell removeURL];
-    }
 
 }
+-(void)feedReloadViaAutoPlay
+{
+    [HMPlayerManager sharedInstance].Explore_urlIdentifier=@"";
+    [galleryView reloadData];
+    [galleryView performBatchUpdates:^{}
+                       completion:^(BOOL finished) {
+                           
+                           if(finished==true)
+                           {
+                           [self stoppedScrolling];
+                           }
+                           /// collection-view finished reload
+                       }];
+    
+    
+}
 
+
+#pragma mark - CollectionView
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     
     PostFullCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     
 
-    [cell setDataObj:[dataRecords objectAtIndex:indexPath.row]];
+    [cell setDataObj:[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row]];
     [cell setTarget:self shareBtnFunc:@selector(shareBtnClicked:) andCommentBtnFunc:@selector(commentBtnClicked:)];
 
-    /*
-    cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3]];
+    [cell setCallBackForCommentWrite:@selector(commentWriteBtnClicked:)];
+    cell.commentWriteBtn.hidden=false;
     
-    int mediaType=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
-    
-    int colorN=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
-    
-    
-    
-    [cell setUpMediaType:mediaType andColorNumber:colorN];
-    
-    if(mediaType==2)
-    {
-        NSString *videoURL=[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"videoURL"];
-        [cell setURL:videoURL];
-    }
-    else
-    {
-        [cell removeURL];
-    }
-    
-    if(mediaType!=0)
-    {
-        NSString *imgURL=[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
-        cell.postIMGVIEW.image=[UIImage imageNamed:imgURL];
-    }
-    else
-    {
-        
-    }
-    */
-    
+    [cell setPlayerScreenIdeantifier:screenIdentifier];
+//    cell.player.screenIdentifier=screenIdentifier;
+
     return cell;
     
 }
--(void)shareBtnClicked:(NSString *)senderId
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    if(sharecompo==nil)
-    {
-        
-        sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
-        [sharecompo setUp];
-        [sharecompo setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
-        
-        [self addSubview:sharecompo];
-    }
-    
+   
+    return [DataSession sharedInstance].exploreFeedResults.count;
+   
 }
--(void)commentBtnClicked:(NSString *)senderId
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if(commentDisplay==nil)
-    {
-        
-        
-        commentDisplay=[[FullCommentDisplay alloc] initWithFrame:CGRectMake(0, self.frame.size.height, self.frame.size.width, self.frame.size.height)];
-        [commentDisplay setUpWithPostId:[NSString stringWithFormat:@"%@",senderId]];
-        [self addSubview:commentDisplay];
-        [commentDisplay setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
-        
-        
-        
-        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
-            
-            commentDisplay.frame=self.bounds;
-            
-        } completion:^(BOOL finished) {
-            
-            
-            
-        }];
-    }
-    
+    return CGSizeMake(self.bounds.size.width, self.bounds.size.height);
 }
--(void)commentFullClosed:(id)sender
-{
-    
-    commentDisplay=nil;
-    sharecompo=nil;
-}
+
 -(void)setUpNewScrolledRect:(CGRect)rect
 {
     cellRect=rect;
 }
--(void)setDelegate:(id)target andPageChangeCallBackFunc:(SEL)function1 andDownCallBackFunc:(SEL)function2;
-{
-    delegate=target;
-    pageChangeCallBackFunc=function1;
-    downCallBackFunc=function2;
-    
-}
 
 
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-    return dataRecords.count;
-}
+#pragma mark - Scroll Manage
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     CGFloat pageWidth = galleryView.frame.size.width;
@@ -256,7 +228,7 @@
     NSLog(@"Page Number : %d", pageNumber);
     
     NSIndexPath *indexPath=[NSIndexPath indexPathForItem:pageNumber inSection:0];
-    APIObjects_FeedObj *obj=[dataRecords objectAtIndex:indexPath.row];
+    APIObjects_FeedObj *obj=[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row];
 
     [postIMGVIEW clearImageAll];
     
@@ -285,79 +257,137 @@
     [delegate performSelector:pageChangeCallBackFunc withObject:indexPath afterDelay:0.01];
     
    
-    [self playFirstVideo];
+    [self stoppedScrolling];
 
 }
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
 {
     if(decelerate==false)
     {
-        [self playFirstVideo];
+        [self stoppedScrolling];
     }
     
 }
--(void)collectionView:(UICollectionView *)collectionView didEndDisplayingCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    [(PostFullCell *)cell removeURL];
 
-}
-- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    return CGSizeMake(self.bounds.size.width, self.bounds.size.height);
-}
--(void)playFirstVideo
+-(void)stoppedScrolling
 {
         NSLog(@"cell Changed");
+    CGRect visibleRect = (CGRect){.origin = galleryView.contentOffset, .size = galleryView.bounds.size};
+    CGPoint visiblePoint = CGPointMake(CGRectGetMidX(visibleRect), CGRectGetMidY(visibleRect));
+    NSIndexPath *visibleIndexPath = [galleryView indexPathForItemAtPoint:visiblePoint];
+    
+    NSLog(@"Visible center - %d\n",(int)visibleIndexPath.row);
+    
+    NSArray *array=[galleryView visibleCells];
+    
+    for(UICollectionViewCell *cell in [galleryView visibleCells])
+    {
         
+        NSIndexPath *indexPath = [galleryView indexPathForCell:cell];
+        NSLog(@"visibleCells %d",(int)indexPath.row);
         
-        NSArray *visibleCells=[galleryView visibleCells];
-        
-        for(int i=0;i<visibleCells.count;i++)
+        if(indexPath==visibleIndexPath)
         {
-            PostFullCell *cell=[visibleCells objectAtIndex:i];
-            
-            [cell pausePlayer];
-            [cell setMute];
-            
-        }
-        
-        for(int i=0;i<visibleCells.count;i++)
-        {
-            PostFullCell *cell=[visibleCells objectAtIndex:i];
-            
-            CGRect rect=cell.frame;
-            
-            rect=CGRectMake(cell.frame.origin.x-galleryView.contentOffset.x, cell.frame.origin.y, cell.frame.size.width, cell.frame.size.height);
+            NSArray *array=[DataSession sharedInstance].exploreFeedResults;
+            APIObjects_FeedObj *obj=[array objectAtIndex:indexPath.row];
+            NSString *url=obj.video_url;
             
             
-            if(rect.origin.y<10 && rect.origin.y>-10)
+            if(![obj.video_url isEqualToString:[HMPlayerManager sharedInstance].Explore_urlIdentifier])
             {
-                [cell setUnMute];
                 
+                PostFullCell *cell=(PostFullCell *)[galleryView cellForItemAtIndexPath:visibleIndexPath];
+                [cell playVideoIfAvaialble];
                 
-                //   [cell playVideoIfAvaialble];
+                [HMPlayerManager sharedInstance].Explore_screenIdentifier=screenIdentifier;
+                [HMPlayerManager sharedInstance].Explore_urlIdentifier=url;
                 
-                
-                //        UIView *view=[[UIView alloc] initWithFrame:rect];
-                //        [self addSubview:view];
-                //        view.backgroundColor=[UIColor blackColor];
-                //        view.alpha=0.5;
-                //
-                //        [UIView animateWithDuration:0.5 animations:^{
-                //            view.alpha=0;
-                //            
-                //        } completion:^(BOOL finished) {
-                //            [view removeFromSuperview];
-                //        }];
             }
             
             
         }
-        
+    }
     
 
+    
 }
 
+
+
+#pragma mark - Actions
+-(void)shareBtnClicked:(NSString *)senderId
+{
+    if(sharecompo==nil)
+    {
+        [self DetailViewScreenGoesBack];
+        
+        sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
+        [sharecompo setUp];
+        [sharecompo setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+        
+        [self addSubview:sharecompo];
+    }
+    
+}
+-(void)commentWriteBtnClicked:(NSString *)senderId
+{
+    if(commentDisplay==nil)
+    {
+        
+        [self DetailViewScreenGoesBack];
+        
+        commentDisplay=[[FullCommentDisplay alloc] initWithFrame:CGRectMake(0, self.frame.size.height, self.frame.size.width, self.frame.size.height)];
+        [commentDisplay setUpWithPostId:[NSString stringWithFormat:@"%@",senderId]];
+        [self addSubview:commentDisplay];
+        [commentDisplay setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+        
+        
+        
+        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
+            
+            commentDisplay.frame=self.bounds;
+            
+        } completion:^(BOOL finished) {
+            
+            [commentDisplay setUpToWriteComment];
+            
+            
+        }];
+    }
+    
+}
+-(void)commentBtnClicked:(NSString *)senderId
+{
+    if(commentDisplay==nil)
+    {
+        [self DetailViewScreenGoesBack];
+        
+        
+        commentDisplay=[[FullCommentDisplay alloc] initWithFrame:CGRectMake(0, self.frame.size.height, self.frame.size.width, self.frame.size.height)];
+        [commentDisplay setUpWithPostId:[NSString stringWithFormat:@"%@",senderId]];
+        [self addSubview:commentDisplay];
+        [commentDisplay setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+        
+        
+        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
+            
+            commentDisplay.frame=self.bounds;
+            
+        } completion:^(BOOL finished) {
+            
+            
+            
+        }];
+    }
+    
+}
+-(void)commentFullClosed:(id)sender
+{
+    [self DetailViewScreenComesToFront];
+    
+    commentDisplay=nil;
+    sharecompo=nil;
+}
 
 
 @end

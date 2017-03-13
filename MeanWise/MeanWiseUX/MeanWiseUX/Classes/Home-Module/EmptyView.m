@@ -39,6 +39,7 @@
         [self addSubview:self.reloadBtn];
         [self.reloadBtn setTitle:@"Refresh" forState:UIControlStateNormal];
         [self.reloadBtn addTarget:self action:@selector(reloadBtnclicked:) forControlEvents:UIControlEventTouchUpInside];
+        self.reloadBtn.titleLabel.adjustsFontSizeToFitWidth=YES;
         
         self.reloadBtn.clipsToBounds=YES;
         self.reloadBtn.layer.cornerRadius=5;
@@ -66,7 +67,7 @@
     [super setFrame:frame];
     
     self.msgLBL.frame=CGRectMake(10,0, frame.size.width-20, 30);
-    self.reloadBtn.frame=CGRectMake(0,0, frame.size.width/3, 30);
+    self.reloadBtn.frame=CGRectMake(0,0, frame.size.width/3+100, 30);
 
     self.reloadBtn.center=CGPointMake(frame.size.width/2, frame.size.height/2+30);
     self.msgLBL.center=CGPointMake(frame.size.width/2, frame.size.height/2-30);

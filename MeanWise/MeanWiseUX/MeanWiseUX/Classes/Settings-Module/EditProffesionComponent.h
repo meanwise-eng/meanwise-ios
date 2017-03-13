@@ -10,9 +10,11 @@
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
 
-@interface EditProffesionComponent : UIView
+
+@interface EditProffesionComponent : UIView <UITableViewDataSource,UITableViewDelegate>
 {
-    
+    NSArray *dataArray;
+    NSArray *searchResult;
     
     UITextField *proffesionTXT;
     
@@ -26,6 +28,9 @@
     
     UILabel *instructionField;
     UIButton *saveBtn;
+    
+    UITableView *optionsTable;
+    NSString *selectedProffesionId;
     
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;

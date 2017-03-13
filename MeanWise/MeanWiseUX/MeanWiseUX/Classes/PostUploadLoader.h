@@ -30,4 +30,6 @@
 
 -(void)showProgress;
 -(void)hideProgress;
+-(void)FailedProgress;
+
 @end

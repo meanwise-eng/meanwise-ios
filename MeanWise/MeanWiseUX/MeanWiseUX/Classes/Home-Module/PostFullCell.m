@@ -8,6 +8,7 @@
 
 #import "PostFullCell.h"
 #import "FullCommentDisplay.h"
+#import "DataSession.h"
 
 @implementation PostFullCell
 
@@ -17,6 +18,17 @@
     [target performSelector:shareBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
     
 }
+-(void)setPlayerScreenIdeantifier:(NSString *)string
+{
+    [player setPlayerScreenIdeantifier:string];
+//    player.screenIdentifier=string;
+}
+-(void)commentWriteBtnClicked:(id)sender
+{
+    [target performSelector:commentWriteBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
+    
+}
+
 -(void)commentBtnClicked:(id)sender
 {
     [target performSelector:commentBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
@@ -28,36 +40,13 @@
      commentBtnClickedFunc=func2;
      shareBtnClickedFunc=func1;
 }
+-(void)setCallBackForCommentWrite:(SEL)func3
+{
+    commentWriteBtnClickedFunc=func3;
+}
 
--(void)setURL:(NSString *)stringURL
-{
 
-    [self.maxplayer setUpWithURLString:stringURL];
-    
-}
--(void)setUnMute
-{
-    [self.maxplayer setUnMute];
-    
-}
--(void)setMute
-{
-    [self.maxplayer setMute];
-    
-}
--(void)playVideoIfAvaialble
-{
-    [self.maxplayer playStart];
-}
--(void)removeURL
-{
-    [self.maxplayer cleanWhenGoOut];
-    
-}
--(void)pausePlayer
-{
-    [self.maxplayer pausePlayer];
-}
+
 -(id)initWithFrame:(CGRect)frame
 {
     self=[super initWithFrame:frame];
@@ -76,9 +65,9 @@
         self.postIMGVIEW.autoresizingMask=UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
 
         
-         self.maxplayer=[[MaxPlayer alloc] initWithFrame:self.bounds];
-         [self.contentView addSubview:self.maxplayer];
-         [self.maxplayer setUp];
+        player=[[HMPlayer alloc] initWithFrame:self.bounds];
+        [self.contentView addSubview:player];
+        [player setUp];
 
         
         self.autoresizingMask=UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
@@ -186,6 +175,16 @@
         [self.shareBtn setBackgroundImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
         [self.contentView addSubview:self.shareBtn];
         
+        
+        self.commentWriteBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, self.frame.size.height-40, self.frame.size.width, 40)];
+        [self.contentView addSubview:self.commentWriteBtn];
+        self.commentWriteBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:17];
+        self.commentWriteBtn.contentHorizontalAlignment=UIControlContentHorizontalAlignmentLeft;
+        [self.commentWriteBtn setTitleColor:[UIColor colorWithWhite:1.0f alpha:0.7f] forState:UIControlStateNormal];
+        [self.commentWriteBtn setTitle:@"Leave a comment ..." forState:UIControlStateNormal];
+        [self.commentWriteBtn addTarget:self action:@selector(commentWriteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+        self.commentWriteBtn.hidden=true;
+
 
         doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(likeBtnClicked:)];
         doubleTap.numberOfTapsRequired = 2;
@@ -213,7 +212,7 @@
 -(void)setDataObj:(APIObjects_FeedObj *)dict;
 {
     dataObj=dict;
-    liked=0;
+    liked=dict.IsUserLiked.intValue;
     
     [self.profileIMGVIEW setUp:dict.user_profile_photo_small];
     
@@ -237,19 +236,29 @@
     self.statusLBL.text=dict.text;
     self.timeLBL.text=dict.timeString;
     
-    
-    if(dict.mediaType.intValue==2)
-    {
-       // [self removeURL];
-        
-    [self setURL:dict.video_url];
-        
-    [self playVideoIfAvaialble];
 
+    if(liked==1)
+    {
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
     }
     else
     {
-        [self removeURL];
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+    }
+   
+    if(dict.mediaType.intValue==2)
+    {
+        
+        [player setURL:dict.video_url];
+        player.hidden=false;
+        
+        
+    }
+    else
+    {
+        [player setURL:nil];
+        player.hidden=true;
+
     }
     
     if(dict.mediaType.intValue!=0)
@@ -350,14 +359,20 @@
     {
         liked=1;
         [self callLikeAPI];
+        [[DataSession sharedInstance] postLiked:dataObj.postId];
         [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
         [self likeBtnAnimation];
+        self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
+
     }
     else
     {
         liked=0;
         [self callLikeAPI];
+        [[DataSession sharedInstance] postUnliked:dataObj.postId];
         [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+        self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
+
     }
     
 }
@@ -379,8 +394,6 @@
     
     
     
-    
-    //[manager sendRequestGettingUsersFriends:@"18" andAccessToke:@"e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" delegate:self andSelector:@selector(likeActionFinished:)];
     
     
     
@@ -454,7 +467,7 @@
 
 
    
-
+     self.commentWriteBtn.frame=CGRectMake(15, self.frame.size.height-heightBottom, self.frame.size.width-30, heightBottom-20);
 
     
 }
@@ -513,5 +526,16 @@
     
 }
 
+-(void)playVideoIfAvaialble
+{
+    
+    [player playerPlay];
+    
+    
+}
+-(void)dealloc
+{
+    
+}
 
 @end

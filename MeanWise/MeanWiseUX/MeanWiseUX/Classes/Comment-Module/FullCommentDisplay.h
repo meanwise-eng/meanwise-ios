@@ -41,6 +41,7 @@
 
 }
 -(void)setUpWithPostId:(NSString *)postIdString;
+-(void)setUpToWriteComment;
 -(void)setTarget:(id)delegate andCloseBtnClicked:(SEL)func1;
 
 @end

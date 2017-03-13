@@ -361,11 +361,11 @@
     int height=roundf(visibleRect.size.height);
     
     
-    if(width%2==0)
+    if(width%2==1)
     {
         width=width-1;
     }
-    if(height%2==0)
+    if(height%2==1)
     {
         height=height-1;
     }

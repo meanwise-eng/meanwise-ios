@@ -176,8 +176,8 @@
     
     [playerViewControl.player pause];
     playerViewControl.player=nil;
-    
     [target performSelector:onCancelFunc withObject:nil afterDelay:0.01];
+    
     
     [self removeFromSuperview];
 }

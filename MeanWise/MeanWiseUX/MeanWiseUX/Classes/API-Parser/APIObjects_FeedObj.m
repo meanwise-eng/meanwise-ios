@@ -12,11 +12,18 @@
 
 -(void)setUpWithDict:(NSDictionary *)dict
 {
+    
+   
     self.postId=[dict valueForKey:@"id"];
     
+    if(self.postId.class==[NSNull class])
+    {
+        return;
+    }
     int len=(int)[NSString stringWithFormat:@"%@",self.postId].intValue;
     
-    
+    self.postId=[NSString stringWithFormat:@"%@",[dict valueForKey:@"id"]];
+
 
     self.colorNumber=[NSNumber numberWithInt:len%13];
                       
@@ -61,25 +68,25 @@
         
     }
     
-    /*
-     
-     int mediaType1=1;
-     
-     if(dataImgURL!=nil && ![dataImgURL isEqualToString:@""])
-     {
-     }
-     else
-     {
-     mediaType1=0;
-     }
-     
-     
-     int num_comments=[[dict valueForKey:@"num_comments"] intValue];
-     int num_likes=[[dict valueForKey:@"num_likes"] intValue];
-     int interest_id=[[dict valueForKey:@"interest_id"] intValue];
-     
-
-     */
+    
+    NSArray *likedBy=[dict valueForKey:@"liked_by"];
+    
+    if(likedBy!=0)
+    {
+    int userId=[UserSession getUserId].intValue;
+        
+        if([likedBy containsObject:[NSNumber numberWithInt:userId]])
+        {
+            self.IsUserLiked=[NSNumber numberWithInt:1];
+        }
+        else
+        {
+            self.IsUserLiked=[NSNumber numberWithInt:0];
+        }
+        
+    }
+    
+    
 }
 -(NSString *)dateTimeSetup:(NSString *)dateString
 {

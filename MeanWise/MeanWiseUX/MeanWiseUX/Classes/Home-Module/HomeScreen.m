@@ -7,6 +7,7 @@
 //
 
 #import "HomeScreen.h"
+#import "HMPlayerManager.h"
 
 @implementation HomeScreen
 
@@ -18,6 +19,8 @@
     postBtn.hidden=true;
     exploreBtn.hidden=true;
     backBtn.hidden=true;
+    masterControl.scrollEnabled = NO;
+    
 }
 -(void)showBottomBar
 {
@@ -26,7 +29,7 @@
     postBtn.hidden=false;
     exploreBtn.hidden=false;
     backBtn.hidden=false;
-    
+    masterControl.scrollEnabled = true;
 }
 -(void)setUp
 {
@@ -38,7 +41,8 @@
     masterControl.pagingEnabled=true;
     masterControl.showsHorizontalScrollIndicator=false;
     masterControl.showsVerticalScrollIndicator=false;
-    
+    masterControl.bounces=false;
+
     
     homeComp=[[HomeComponent alloc] initWithFrame:CGRectMake(self.frame.size.width,0, self.frame.size.width, self.frame.size.height)];
     [homeComp setUp];
@@ -151,26 +155,89 @@
     
     
 }
+#pragma mark - By Scroll Screen Detect
+
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    [self stoppedScrolling];
+}
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                 willDecelerate:(BOOL)decelerate
+{
+    if (!decelerate) {
+        [self stoppedScrolling];
+    }
+}
+
+-(void)stoppedScrolling
+{
+    NSLog(@"\n\n\nScroll Event");
+    
+    
+    CGRect visibleRect = (CGRect){.origin = masterControl.contentOffset, .size = masterControl.bounds.size};
+    
+    CGPoint visiblePoint = CGPointMake(CGRectGetMidX(visibleRect), CGRectGetMidY(visibleRect));
+    
+    
+    if(visiblePoint.x<self.bounds.size.width)
+    {
+        NSLog(@"EXPLORE");
+       
+        [HMPlayerManager sharedInstance].Explore_isVisibleBounds=true;
+        [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
+
+    }
+    else if(visiblePoint.x<self.bounds.size.width*2)
+    {
+        [HMPlayerManager sharedInstance].Home_isVisibleBounds=true;
+        [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
+
+        NSLog(@"HOME");
+
+    }
+    else if(visiblePoint.x<self.bounds.size.width*3)
+    {
+        NSLog(@"SEARCH");
+        [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
+        [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
+
+    }
+    
+    
+    //NSIndexPath *visibleIndexPath = [feedList indexPathForItemAtPoint:visiblePoint];
+    
+    //    NSLog(@"Visible center - %d\n",(int)visibleIndexPath.row);
+}
+
+#pragma mark - Tab Main Event
 
 -(void)newPostBtnClicked:(UIButton *)sender
 {
     
     
+    [HMPlayerManager sharedInstance].Home_isPaused=true;
+
     [Constant setStatusBarColorWhite:false];
     
     NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.bounds];
     [self addSubview:cont];
-    [cont setUpWithCellRect:CGRectMake(0, self.frame.size.height, self.frame.size.width, 0)];
+    [cont setTarget:self onCloseEvent:@selector(newPostBackToHome:)];
     
-}
+    [cont setUpWithCellRect:CGRectMake(0, self.frame.size.height, self.frame.size.width, 0)];
+ 
 
+}
+-(void)newPostBackToHome:(id)sender
+{
+    [HMPlayerManager sharedInstance].Home_isPaused=false;
+}
 -(void)exploreBtnClicked:(UIButton *)sender
 {
+    [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
+    [HMPlayerManager sharedInstance].Explore_isVisibleBounds=true;
+
+
     [Constant setStatusBarColorWhite:YES];
-    
-
-    
-
     [UIView animateWithDuration:0.4 animations:^{
         
         [masterControl setContentOffset:CGPointMake(0,0)];
@@ -199,8 +266,12 @@
     
     
 }
+
 -(void)backBtnClicked:(id)sender
 {
+    
+    [HMPlayerManager sharedInstance].Home_isVisibleBounds=true;
+    [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
 
     [Constant setStatusBarColorWhite:true];
 
@@ -228,8 +299,13 @@
 }
 
 
+
+
 -(void)searchBtnClicked:(UIButton *)sender
 {
+    [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
+    [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
+
     [Constant setStatusBarColorWhite:YES];
 
     
@@ -253,6 +329,7 @@
 }
 
 
+#pragma mark - Creators
 
 -(ExploreComponent *)createExploreComponent
 {

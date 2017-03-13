@@ -435,7 +435,7 @@
                     
                     
                     float y=2*point.y/self.bounds.size.height;
-                    y=(point.y-topPoint)/cellRect.origin.y;
+                    y=(point.y-topPoint)/(cellRect.origin.y+1);
                     NSLog(@"%f",y);
                     NSLog(@"Top point=%f",topPoint);
                     

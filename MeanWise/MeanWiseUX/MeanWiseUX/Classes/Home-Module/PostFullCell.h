@@ -10,10 +10,10 @@
 #import "Constant.h"
 #import <AVKit/AVKit.h>
 #import "VideoCacheManager.h"
-#import "MaxPlayer.h"
 #import "APIObjects_FeedObj.h"
 #import "UIImageHM.h"
 #import "APIManager.h"
+#import "HMPlayer.h"
 
 @interface PostFullCell : UICollectionViewCell <UIGestureRecognizerDelegate>
 {
@@ -22,6 +22,7 @@
     id target;
     SEL commentBtnClickedFunc;
     SEL shareBtnClickedFunc;
+    SEL commentWriteBtnClickedFunc;
 
     
     int mediaType;
@@ -38,14 +39,19 @@
     
     int heightBottom;
 
+    HMPlayer *player;
+    
+    
 }
--(void)setUnMute;
--(void)setMute;
+-(void)setPlayerScreenIdeantifier:(NSString *)string;
+
 -(void)setTarget:(id)delegate shareBtnFunc:(SEL)func1 andCommentBtnFunc:(SEL)func2;
+-(void)setCallBackForCommentWrite:(SEL)func3;
 
 -(void)setDataObj:(APIObjects_FeedObj *)dict;
 
-@property (nonatomic, strong) MaxPlayer *maxplayer;
+-(void)playVideoIfAvaialble;
+
 
 @property (nonatomic, strong) UIImageView *shadowImage;
 
@@ -65,17 +71,13 @@
 @property (nonatomic, strong) UIButton *likeBtn;
 @property (nonatomic, strong) UIButton *commentBtn;
 @property (nonatomic, strong) UIButton *shareBtn;
+@property (nonatomic, strong) UIButton *commentWriteBtn;
 
 
--(void)playVideoIfAvaialble;
 
 -(void)setUpMediaType:(int)number andColorNumber:(int)Cnumber;
 
 -(void)setFrameX:(CGRect)frame;
 -(void)setImage:(NSString *)string;
-
--(void)setURL:(NSString *)urlString;
--(void)removeURL;
--(void)pausePlayer;
 
 @end

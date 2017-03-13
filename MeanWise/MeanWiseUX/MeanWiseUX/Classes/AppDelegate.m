@@ -43,9 +43,6 @@
    
     
     
-    
-   
-    
    /* NSUInteger cacheSizeMemory = 10*1024*1024; // 500 MB
     NSUInteger cacheSizeDisk = 10*1024*1024; // 500 MB
     NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:cacheSizeMemory diskCapacity:cacheSizeDisk diskPath:@"nsurlcache"];
@@ -54,6 +51,7 @@
 
     */
     
+
 
     
     // Override point for customization after application launch.

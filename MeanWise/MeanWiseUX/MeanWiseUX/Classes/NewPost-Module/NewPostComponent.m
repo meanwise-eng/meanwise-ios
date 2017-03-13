@@ -13,6 +13,16 @@
 
 @implementation NewPostComponent
 
+-(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
+{
+    target=targetReceived;
+    closeCallBackfunc=func1;
+    
+}
+-(void)zoomDownOut
+{
+    [target performSelector:closeCallBackfunc withObject:nil afterDelay:0.01];
+}
 -(void)setUpWithCellRect:(CGRect)rect
 {
     [self setUpCellRect:rect];
@@ -21,31 +31,90 @@
     
     containerView.clipsToBounds=YES;
     
-    profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectZero];
+    
+    
+    
+    
+    
+    UIView *navBar=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 65)];
+    [containerView addSubview:navBar];
+    navBar.backgroundColor=[UIColor whiteColor];
+    
+    UIView *seperator=[[UIView alloc] initWithFrame:CGRectMake(0,65,self.frame.size.width, 1)];
+    [containerView addSubview:seperator];
+    seperator.backgroundColor=[UIColor colorWithWhite:0.6 alpha:0.1];
+    
+   
+
+    
+//    UIButton *backBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 60, 25, 25)];
+//    [backBtn setShowsTouchWhenHighlighted:YES];
+//    //[backBtn addTarget:self action:@selector(backBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+//    [backBtn setBackgroundImage:[UIImage imageNamed:@"BackPlainForNav.png"] forState:UIControlStateNormal];
+//    [containerView addSubview:backBtn];
+//    
+//    backBtn.center=CGPointMake(10+25/2, 20+65/2-10);
+//    
+    
+    UIButton *backBtn=[[UIButton alloc] initWithFrame:CGRectMake(10,20, 70, 45)];
+    [backBtn setTitle:@"Cancel" forState:UIControlStateNormal];
+    [containerView addSubview:backBtn];
+    [backBtn setTitleColor:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00] forState:UIControlStateNormal];
+    backBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:18];
+    [backBtn setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
+    [backBtn addTarget:self action:@selector(cancelPostBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+
+    
+    postBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-70-10,20, 70, 45)];
+    [postBtn setTitle:@"Publish" forState:UIControlStateNormal];
+    [containerView addSubview:postBtn];
+    [postBtn setTitleColor:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00] forState:UIControlStateNormal];
+    postBtn.titleLabel.font=[UIFont fontWithName:k_fontSemiBold size:18];
+    [postBtn setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
+    [postBtn addTarget:self action:@selector(postBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectMake(15, 65+10, 50, 50)];
     [containerView addSubview:profileIMGVIEW];
     [profileIMGVIEW setUp:[UserSession getProfilePictureURL]];
     
     profileIMGVIEW.contentMode=UIViewContentModeScaleAspectFill;
     profileIMGVIEW.clipsToBounds=YES;
-    profileIMGVIEW.frame=CGRectMake(15, 30, 50, 50);
     profileIMGVIEW.layer.cornerRadius=25;
     
-    postBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-65,30, 50, 40)];
-    [postBtn setTitle:@"Post" forState:UIControlStateNormal];
-    [containerView addSubview:postBtn];
-    [postBtn setTitleColor:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00] forState:UIControlStateNormal];
-    postBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:20];
-    [postBtn setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
-    [postBtn addTarget:self action:@selector(postBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
 
-    statusView=[[UITextView alloc] initWithFrame:CGRectMake(15, 85, self.frame.size.width-30, 200)];
-   // statusView.backgroundColor=[UIColor grayColor];
+    
+    
+    statusView=[[UITextView alloc] initWithFrame:CGRectMake(15, 65+70, self.frame.size.width-40, 42)];
     [containerView addSubview:statusView];
     statusView.font=[UIFont fontWithName:k_fontRegular size:20];
     statusView.delegate=self;
-    
    
-    attachedImage=[[PreviewViewComponent alloc] initWithFrame:CGRectMake(15, 85+200, self.frame.size.width/2, 150)];
+    
+    int height=self.frame.size.height-statusView.frame.origin.y-statusView.frame.size.height-170;
+    
+    attachedImage=[[PreviewViewComponent alloc] initWithFrame:CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, height)];
+    attachedImage.backgroundColor=[UIColor grayColor];
     [containerView addSubview:attachedImage];
     attachedImage.hidden=true;
     attachedImage.clipsToBounds=YES;
@@ -59,10 +128,11 @@
     
     
 
-    characterCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(self.frame.size.width/2-50, 25, 100,50)];
+    characterCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(self.frame.size.width/2-50, 65+10, 100,50)];
     [containerView addSubview:characterCountLBL];
     characterCountLBL.font=[UIFont fontWithName:k_fontRegular size:20];
     characterCountLBL.text=@"200";
+    characterCountLBL.textColor=[UIColor grayColor];
     characterCountLBL.textAlignment=NSTextAlignmentCenter;
     
     
@@ -81,7 +151,6 @@
     replyToLBL.textColor=[UIColor colorWithRed:0.77 green:0.26 blue:0.78 alpha:1.00];
     replyToLBL.text=@"@topic";
     replyToLBL.textColor=[UIColor lightGrayColor];
-    
     
     
     UIView *seperator2=[[UIView alloc] initWithFrame:CGRectMake(0,self.frame.size.height-115, self.frame.size.width, 1)];
@@ -126,6 +195,7 @@
     
     
 }
+
 -(void)mediaManupulatorOpen:(id)sender
 {
     NSLog(@"openFull");
@@ -189,6 +259,65 @@
     [attachedImage openFullMode:nil];
     
 }
+-(void)cancelPostBtnClicked:(id)sender
+{
+    
+    [statusView resignFirstResponder];
+
+    FCAlertView *alert = [[FCAlertView alloc] init];
+    
+    [alert showAlertInView:self
+                 withTitle:@""
+              withSubtitle:@"Are you sure want to cancel this post?"
+           withCustomImage:nil
+       withDoneButtonTitle:@"Yes"
+                andButtons:nil];
+    
+    
+    [alert addButton:@"Cancel" withActionBlock:^{
+        // Put your action here
+    }];
+
+
+    [alert doneActionBlock:^{
+        
+        [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
+        [FTIndicator showToastMessage:@"Post Cancelled"];
+        
+        [UIView animateWithDuration:0.1 animations:^{
+            // statusLabel.alpha=0;
+            // galleryView.alpha=0;
+            // label.alpha=0;
+            
+            
+        } completion:^(BOOL finished) {
+            
+            
+            [UIView animateWithDuration:2 delay:0 usingSpringWithDamping:0.5 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveEaseIn animations:^{
+                containerView.frame=CGRectMake(0,self.frame.size.height, self.frame.size.width, 0);
+                self.backgroundColor=[UIColor clearColor];
+                
+                
+                
+            } completion:^(BOOL finished) {
+                [self removeFromSuperview];
+                [target performSelector:closeCallBackfunc withObject:nil afterDelay:0.01];
+
+            }];
+            
+            
+            
+        }];
+    }];
+
+ 
+
+    
+    
+    
+   
+
+}
 -(void)postBtnClicked:(id)sender
 {
     /*
@@ -206,13 +335,17 @@
     if(channelId==-1)
     {
         
-        [Constant okAlert:@"Alert!" withSubTitle:@"Please select the channel." onView:self andStatus:-1];
+        [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
+        [FTIndicator showToastMessage:@"Please select the channel"];
         return;
         
     }
     if([statusString isEqualToString:@""])
     {
-        [Constant okAlert:@"Alert!" withSubTitle:@"Please enter text to post." onView:self andStatus:-1];
+        [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
+        [FTIndicator showToastMessage:@"Please enter text to post."];
+        
+
         return;
     }
     
@@ -254,6 +387,7 @@
             
         } completion:^(BOOL finished) {
             [self removeFromSuperview];
+            [target performSelector:closeCallBackfunc withObject:nil afterDelay:0.01];
 
         }];
         
@@ -267,7 +401,23 @@
 
 -(void)textViewDidChange:(UITextView *)textView
 {
-   
+    
+    CGSize size = [textView sizeThatFits:CGSizeMake(statusView.frame.size.width, FLT_MAX)];
+    float height=size.height;
+    
+    if(height<42)
+    {
+        height=42;
+    }
+        
+    statusView.frame=CGRectMake(statusView.frame.origin.x, statusView.frame.origin.y, statusView.frame.size.width, height);
+
+    
+    int heightAttached=self.frame.size.height-statusView.frame.origin.y-statusView.frame.size.height-170;
+
+    attachedImage.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
+
+
     
     int len =(int)statusView.text.length;
     characterCountLBL.text=[NSString stringWithFormat:@"%i",200-len];

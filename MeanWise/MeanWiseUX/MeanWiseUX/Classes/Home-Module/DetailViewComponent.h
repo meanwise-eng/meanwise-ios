@@ -20,8 +20,7 @@
     FullCommentDisplay *commentDisplay;
     ShareComponent *sharecompo;
 
-    
-    NSMutableArray *dataRecords;
+  //  NSMutableArray *dataRecords;
 
 
     UIImageHM *postIMGVIEW;
@@ -36,6 +35,8 @@
     
     NSIndexPath *globalPath;
     
+
+    NSString *screenIdentifier;
 
 }
 

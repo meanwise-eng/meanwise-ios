@@ -12,16 +12,14 @@
 
 @interface ConnectionBar : NSObject
 {
-    Reachability *reachability;
-
-    UIView *statusBarNotifierView;
-    UILabel *statusBarNotifierText;
     
     UIWindow *window;
+
+    Reachability *reachability;
+
     
-    CGRect hiddenRect;
-    CGRect showingRect;
     
+    UIView *internetErrorView;
 
 
 }

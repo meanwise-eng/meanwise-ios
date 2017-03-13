@@ -13,6 +13,7 @@
 #import "UserSession.h"
 #import "APIObjectsParser.h"
 #import "APIObjects_ProfileObj.h"
+#import "FTIndicator.h"
 
 
 
@@ -59,7 +60,9 @@
     [self addSubview:friendListTableView];
     friendListTableView.delegate=self;
     friendListTableView.dataSource=self;
+    friendListTableView.tableFooterView = [[UIView alloc] init];
 
+    
     UIView *searchBox=[[UIView alloc] initWithFrame:CGRectMake(10, 65+10, self.frame.size.width-20, 40)];
     searchBox.backgroundColor=[UIColor colorWithWhite:0.85 alpha:1.0f];
     [self addSubview:searchBox];
@@ -79,18 +82,30 @@
     searchField.font=[UIFont fontWithName:k_fontSemiBold size:15];
 
     
-    
-    
-    manager=[[APIManager alloc] init];
-    [manager sendRequestGettingUsersFriends:[UserSession getUserId] delegate:self andSelector:@selector(userFriendsReceived:)];
-    
+    [self refreshAction];
+ 
+    emptyView=[[EmptyView alloc] initWithFrame:friendListTableView.frame];
+    [self addSubview:emptyView];
+    emptyView.hidden=true;
+    [emptyView setUIForWhite];
+    [emptyView setDelegate:self onReload:@selector(refreshAction)];
+
     
     // msgContactTable.bounces=false;
     
 }
+-(void)refreshAction
+{
+    
+    manager=[[APIManager alloc] init];
+    
+    [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:1 delegate:self andSelector:@selector(userFriendsReceived:)];
+    
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+}
 -(void)userFriendsReceived:(APIResponseObj *)responseObj
 {
-    NSLog(@"%@",responseObj.response);
+  //  NSLog(@"%@",responseObj.response);
     
     if([responseObj.response isKindOfClass:[NSArray class]])
     {
@@ -101,6 +116,20 @@
      //   int p=0;
         [friendListTableView reloadData];
     }
+    
+    if(resultData.count==0)
+    {
+        emptyView.hidden=false;
+        friendListTableView.hidden=true;
+    }
+    else
+    {
+        emptyView.hidden=true;
+        friendListTableView.hidden=false;
+   
+    }
+    
+    [FTIndicator dismissProgress];
 }
 
 -(void)setTarget:(id)target andBackFunc:(SEL)func
@@ -111,6 +140,8 @@
 }
 -(void)backBtnClicked:(id)sender
 {
+    [FTIndicator dismissProgress];
+
     [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{
@@ -136,7 +167,7 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 80;
+    return 90;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

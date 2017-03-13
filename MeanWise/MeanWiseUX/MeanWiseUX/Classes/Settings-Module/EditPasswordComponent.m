@@ -8,7 +8,9 @@
 
 #import "MessageContactCell.h"
 #import "ChatThreadComponent.h"
+#import "FTIndicator.h"
 #import "EditPasswordComponent.h"
+#import "ViewController.h"
 
 
 @implementation EditPasswordComponent
@@ -123,6 +125,50 @@
 }
 -(void)saveBtnClicked:(id)sender
 {
+//    UITextField *currentPswTXT;
+  //  UITextField *newPswTXT;
+  //  UITextField *reNewPswTXT;
+    
+    [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
+    
+    if ([currentPswTXT.text isEqualToString:@""]) {
+        [FTIndicator showErrorWithMessage:@"Please enter blank fields."];
+    }
+    else if ([newPswTXT.text isEqualToString:@""]) {
+        [FTIndicator showErrorWithMessage:@"Please enter blank fields."];
+    }
+    else if ([reNewPswTXT.text isEqualToString:@""]) {
+        [FTIndicator showErrorWithMessage:@"Please enter blank fields."];
+    }
+    else if(![newPswTXT.text isEqualToString:reNewPswTXT.text])
+    {
+        [FTIndicator showErrorWithMessage:@"Passwords do not match"];
+    }
+    else if(newPswTXT.text.length<8)
+    {
+        [FTIndicator showErrorWithMessage:@"Password must contain atleast 8 characters."];
+
+    }
+    else if(reNewPswTXT.text.length<8)
+    {
+        [FTIndicator showErrorWithMessage:@"Password must contain atleast 8 characters."];
+   
+    }
+    else
+    {
+        
+        
+        NSDictionary *dict=@{
+
+                             @"old_password":currentPswTXT.text,
+                             @"new_password":reNewPswTXT.text,
+                             };
+        
+        
+        UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+        ViewController *t=(ViewController *)vc.topViewController;
+        [t updateProfileWithDict:dict];
+    }
     
 }
 

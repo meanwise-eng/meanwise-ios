@@ -14,8 +14,9 @@
 
 -(void)setUp
 {
+    [self ExploreSearchViaInterestsAPI];
     
-    [self UserExistsAPI];
+    //[self UserNotificationAPI];
     
     //[self homeFeedAPI];
     
@@ -35,6 +36,44 @@
     
    // [self getLikeAPost];
 }
+-(void)ExploreSearchViaInterestsAPI
+{
+    manager=[[APIManager alloc] init];
+    [manager sendRequestExploreWithInterestsName:@"Sports" Withdelegate:self andSelector:@selector(homeFeedAPIReceived:)];
+//    [manager sendRequestExploreWithInterestsName:self andSelector:@selector(homeFeedAPIReceived:)];
+}
+-(void)UserNotificationAPI
+{
+    manager=[[APIManager alloc] init];
+    [manager sendRequestForNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
+
+}
+-(void)UserNotificationAPIReceived:(APIResponseObj *)responseObj
+{
+    NSLog(@"%@",responseObj.response);
+    
+    
+    if([responseObj.response isKindOfClass:[NSArray class]])
+    {
+        NSArray *array=(NSArray *)responseObj.response;
+        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+        NSArray *result=[parser parseObjects_NOTIFICATIONS:array];
+        
+//        NotificationScreen *screen=[[NotificationScreen alloc] initWithFrame:self.frame];
+//        [self addSubview:screen];
+//        [screen setUp:result];
+//        
+        int p=0;
+        
+    }
+    
+
+    
+
+    
+
+}
+
 -(void)homeFeedAPI
 {
     manager=[[APIManager alloc] init];
@@ -162,7 +201,6 @@
     [manager sendRequestForLikeAPostId:@"2" delegate:self andSelector:@selector(likeActionFinished:) andIsLike:YES];
 
     
-    //[manager sendRequestGettingUsersFriends:@"18" andAccessToke:@"e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" delegate:self andSelector:@selector(likeActionFinished:)];
 
 }
 -(void)likeActionFinished:(APIResponseObj *)responseObj
@@ -172,7 +210,8 @@
 -(void)getUsersFriends
 {
     manager=[[APIManager alloc] init];
-    [manager sendRequestGettingUsersFriends:@"18" delegate:self andSelector:@selector(usersFriendReceived:)];
+    [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:1 delegate:self andSelector:@selector(userFriendsReceived:)];
+    
 }
 -(void)usersFriendReceived:(APIResponseObj *)responseObj
 {
@@ -304,7 +343,7 @@
 }
 -(void)UsersPostReceived:(APIResponseObj *)responseObj
 {
-    NSLog(@"%@",responseObj.response);
+   // NSLog(@"%@",responseObj.response);
     
     if([responseObj.response isKindOfClass:[NSArray class]])
     {

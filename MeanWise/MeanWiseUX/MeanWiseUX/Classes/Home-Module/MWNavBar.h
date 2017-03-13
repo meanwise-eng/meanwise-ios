@@ -15,6 +15,7 @@
 //    UIButton *userNavBtn;
 //    UIButton *msgNavBtn;
     UIButton *backBtn;
+    UILabel *label;
     
     SEL rightFunc;
     SEL leftFunc;

@@ -166,25 +166,34 @@
     
     downloadBtn.alpha=0;
     
-    editBtn=[[UIButton alloc] initWithFrame:CGRectMake(fullPreviewRect.size.width-30-40/2, 25, 35, 35)];
-    [self addSubview:editBtn];
+    editBtn1=[[UIButton alloc] initWithFrame:CGRectMake(fullPreviewRect.size.width-30-40/2, 25, 35, 35)];
+    [self addSubview:editBtn1];
+    
+    editBtn2=[[UIButton alloc] initWithFrame:CGRectMake(fullPreviewRect.size.width-30-40/2, 25+50, 35, 35)];
+    [self addSubview:editBtn2];
+    
+    [editBtn1 setBackgroundImage:[UIImage imageNamed:@"0_NormalTextBtn.png"] forState:UIControlStateNormal];
+    [editBtn2 setBackgroundImage:[UIImage imageNamed:@"0_animtedTextBtn.png"] forState:UIControlStateNormal];
+
     
     if(isVideo==false)
     {
-        [editBtn setBackgroundImage:[UIImage imageNamed:@"0_NormalTextBtn.png"] forState:UIControlStateNormal];
+        editBtn2.hidden=true;
     }
     else
     {
-        [editBtn setBackgroundImage:[UIImage imageNamed:@"0_animtedTextBtn.png"] forState:UIControlStateNormal];
-        
+        editBtn2.hidden=false;
     }
     
     
-    editBtn.alpha=0;
+    editBtn1.alpha=0;
+    editBtn2.alpha=0;
     
     
-    [editBtn addTarget:self action:@selector(editBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-    
+    [editBtn1 addTarget:self action:@selector(editBtnClicked1:) forControlEvents:UIControlEventTouchUpInside];
+
+    [editBtn2 addTarget:self action:@selector(editBtnClicked2:) forControlEvents:UIControlEventTouchUpInside];
+
     self.clipsToBounds=YES;
 }
 -(void)downloadTheMedia:(id)sender
@@ -194,41 +203,61 @@
         
         // UISaveVideoAtPathToSavedPhotosAlbum(filePathStr, nil, NULL, NULL);
         
-        UIImageWriteToSavedPhotosAlbum(imageView.image, nil, nil, nil);
+        UIImageWriteToSavedPhotosAlbum(imageView.image,
+                                       self, // send the message to 'self' when calling the callback
+                                       @selector(thisImage:hasBeenSavedInPhotoAlbumWithError:usingContextInfo:), // the selector to tell the method to call on completion
+                                       NULL); // you generally won't need a contextInfo here
+
     }
     else
     {
-        UISaveVideoAtPathToSavedPhotosAlbum(filePathStr, nil, NULL, NULL);
         
+        UISaveVideoAtPathToSavedPhotosAlbum(filePathStr,
+                                       self, // send the message to 'self' when calling the callback
+                                       @selector(thisImage:hasBeenSavedInPhotoAlbumWithError:usingContextInfo:), // the selector to tell the method to call on completion
+                                       NULL); // you generally won't need a contextInfo here
+
         
     }
     
 }
--(void)editBtnClicked:(id)sender
-{
-    if(isVideo==false)
-    {
+- (void)thisImage:(UIImage *)image hasBeenSavedInPhotoAlbumWithError:(NSError *)error usingContextInfo:(void*)ctxInfo {
+    if (error) {
         
-        PreviewMedia_ImageController *sc=[[PreviewMedia_ImageController alloc] initWithFrame:self.bounds];
+        [FTIndicator showErrorWithMessage:@"Failed to Save"];
         
-        [self addSubview:sc];
-        [sc setUpWithString:filePathStr];
-        [sc setTarget:self OnSuccess:@selector(addedOverLay:) OnFail:@selector(cancelOverLay:)];
-    }
-    else
-    {
-        PreviewMedia_VideoController *sc=[[PreviewMedia_VideoController alloc] initWithFrame:self.bounds];
+    } else {
         
-        [self addSubview:sc];
-        [sc setUpWithString:filePathStr];
-        [sc setTarget:self OnSuccess:@selector(addedOverLay:) OnFail:@selector(cancelOverLay:)];
-        
-        [playerViewControl.player pause];
-        isPlayerPaused=true;
-        
-        
+        [FTIndicator showSuccessWithMessage:@"Saved to Gallery"];
     }
 }
+-(void)editBtnClicked1:(id)sender
+{
+  
+        PreviewMedia_ImageController *sc=[[PreviewMedia_ImageController alloc] initWithFrame:self.bounds];
+        [self addSubview:sc];
+        [sc setUpWithString:filePathStr];
+        [sc setTarget:self OnSuccess:@selector(addedOverLay:) OnFail:@selector(cancelOverLay:)];
+   
+    if(isVideo==true)
+    {
+        [playerViewControl.player pause];
+        isPlayerPaused=true;
+    }
+
+}
+-(void)editBtnClicked2:(id)sender
+{
+   
+        PreviewMedia_VideoController *sc=[[PreviewMedia_VideoController alloc] initWithFrame:self.bounds];
+        [self addSubview:sc];
+        [sc setUpWithString:filePathStr];
+        [sc setTarget:self OnSuccess:@selector(addedOverLay:) OnFail:@selector(cancelOverLay:)];
+        [playerViewControl.player pause];
+        isPlayerPaused=true;
+    
+}
+
 -(void)addedOverLay:(NSString *)string
 {
     
@@ -323,7 +352,9 @@
         imageView.frame=CGRectMake(0, 0, smallRect.size.width, smallRect.size.height);
         shadowImageView.frame=CGRectMake(0, 0, smallRect.size.width, smallRect.size.height);
         
-        editBtn.alpha=0;
+        editBtn1.alpha=0;
+        editBtn2.alpha=0;
+        
         downloadBtn.alpha=0;
         
         
@@ -363,7 +394,8 @@
         
         imageView.frame=fullPreviewRect;
         shadowImageView.frame=fullPreviewRect;
-        editBtn.alpha=1;
+        editBtn1.alpha=1;
+        editBtn2.alpha=1;
         downloadBtn.alpha=1;
         
         self.frame=fullRect;
@@ -394,7 +426,9 @@
             [playBtn addTarget:self action:@selector(replayBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
             playBtn.hidden=true;
             
-            [self bringSubviewToFront:editBtn];
+            [self bringSubviewToFront:editBtn1];
+            [self bringSubviewToFront:editBtn2];
+
             [self bringSubviewToFront:downloadBtn];
             
             isPlayerPaused=false;

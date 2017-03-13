@@ -15,8 +15,17 @@
 {
     APIObjects_ProfileObj *dataObj;
     
+    id targetCaller;
+    SEL onAcceptCallBack;
+    SEL onCancelCallBack;
+    
 }
 -(void)setDataDict:(APIObjects_ProfileObj *)obj;
+
+-(void)setTargetCaller:(id)targetReceived;
+-(void)setCallBackForAccept:(SEL)func;
+-(void)setCallBackForReject:(SEL)func;
+
 
 @property (nonatomic, strong) UIImageHM *profileIMGVIEW;
 @property (nonatomic, strong) UILabel *contactNameLBL;
@@ -24,5 +33,7 @@
 
 @property (nonatomic, strong) UIButton *acceptBtn;
 @property (nonatomic, strong) UIButton *rejectBtn;
+
+
 
 @end

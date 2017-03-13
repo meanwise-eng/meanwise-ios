@@ -27,10 +27,20 @@
 @end
 
 @interface DataSession : NSObject
-
+{
+  
+    
+}
 + (instancetype)sharedInstance;
+-(void)postLiked:(NSString *)postId;
+-(void)postUnliked:(NSString *)postId;
 
 @property (nonatomic, strong) SignupDataObjects* signupObject;
+@property (nonatomic, strong) NSMutableArray* homeFeedResults;
+@property (nonatomic, strong) NSMutableArray* exploreFeedResults;
+@property (nonatomic, strong) NSMutableArray* notificationsResults;
+@property (nonatomic, strong) NSNumber* noOfNewNotificationReceived;
+@property (nonatomic, strong) NSNumber* noOfInstantNotificationReceived;
 
 @end
 

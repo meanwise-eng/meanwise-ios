@@ -10,15 +10,51 @@
 #import "Constant.h"
 #import "VideoLoopPlayer.h"
 #import "APIObjects_ProfileObj.h"
-
+#import "MasterScrollView.h"
+#import "UIArcView.h"
 
 @interface ProfileAditionalScreen : UIView  <UIScrollViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate>
 {
     
-    APIObjects_ProfileObj *profileObj;
+    APIObjects_ProfileObj *dataObj;
+    
 
+    /*
+    
+     - name, Profession, City, number of connections,
+     - story title, story desc, skills, interests
+     - cover video url
+     - posts
+    
+     */
+    
+    NSString *firstNameStr;
+    NSString *proffesionCityStr;
+    NSString *noOfPosts;
+    
+    NSString *connectionCountStr;
+    NSString *storyTitleStr;
+    NSString *storyDescStr;
+    
+    NSArray *storySkillsArray;
+    NSArray *storyInterestsArray;
+    NSString *tagsArray;
+    NSString *storySkillsStr;
+    NSString *storyInterestsStr;
+    
+    
+    NSString *frienshipStatusStr;
+
+    
+    
+    
+    
+    
+    
+    
+ ////////
     UIView *coverView;
-    UIScrollView *masterScrollView;
+    MasterScrollView *masterScrollView;
     UIImageView *shadowImage;
 
     UIView *coverOverlayView;
@@ -28,6 +64,7 @@
 
     
     //Close Btn
+    UIArcView *closeProgressArcView;
     UIButton *closeBtn;
     id target;
     SEL closeBtnClickedFunc;
