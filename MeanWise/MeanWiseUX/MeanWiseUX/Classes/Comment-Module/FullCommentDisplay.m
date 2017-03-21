@@ -10,6 +10,7 @@
 #import "CommentCell.h"
 #import "APIObjects_CommentObj.h"
 #import "APIObjectsParser.h"
+#import "FTIndicator.h"
 
 @implementation FullCommentDisplay
 -(void)setTarget:(id)target andCloseBtnClicked:(SEL)func1;
@@ -409,6 +410,8 @@
     
     APIObjects_CommentObj *obj=[chatMessages objectAtIndex:indexPath.row];
     
+    cell.commentId=[NSString stringWithFormat:@"%@",obj.commentId];
+    [cell setTarget:self andOnDelete:@selector(onCommentDeleteBtnClicked:)];
    
     [cell setNameLBLText:obj.comment_text];
     
@@ -417,6 +420,18 @@
     [cell setProfileImageURLString:obj.user_profile_photo_small];
 
     cell.timeLBL.text=obj.timeString;
+    
+    if([[NSString stringWithFormat:@"%@",obj.user_id] isEqualToString:[NSString stringWithFormat:@"%@",[UserSession getUserId]]])
+    {
+        cell.customDeleteBtn.hidden=false;
+        cell.customDeleteBtn.enabled=true;
+    }
+    else
+    {
+        cell.customDeleteBtn.hidden=true;
+        cell.customDeleteBtn.enabled=false;
+
+    }
     
    // [cell setNameLBLText:[[chatMessages objectAtIndex:indexPath.row] valueForKey:@"msg"]];
     
@@ -427,7 +442,71 @@
 {
     return chatMessages.count;
 }
+-(void)onCommentDeleteBtnClicked:(NSString *)commentId
+{
+    
+    
+   APIManager  *manager1=[[APIManager alloc] init];
+    [manager1 sendRequestForDeleteComment:commentId postId:[NSString stringWithFormat:@"%@",postId] delegate:self andSelector:@selector(commnentDeleteResponse:)];
+    
+}
+-(void)commnentDeleteResponse:(NSArray *)array
+{
+    APIResponseObj *obj=[array objectAtIndex:0];
+    NSString *coId=[array objectAtIndex:1];
+    
+    if(obj.statusCode==200)
+    {
+        
+        
+        int index=-1;
+        for(int i=0;i<[chatMessages count];i++)
+        {
+            APIObjects_CommentObj *object=[chatMessages objectAtIndex:i];
+            
+            if([[NSString stringWithFormat:@"%@",coId] isEqualToString:[NSString stringWithFormat:@"%@",object.commentId]])
+            {
+                index=i;
+            }
+            
+        }
+        
+        
+        if(index!=-1)
+        {
+            
+            NSIndexPath *indexPath=[NSIndexPath indexPathForItem:index inSection:0];
+            
+            [commentList performBatchUpdates:^{
+                
+                NSArray *selectedItemsIndexPaths = @[indexPath];
+                
+                // Delete the items from the data source.
+                [chatMessages removeObjectAtIndex:indexPath.row];
+                
+                // Now delete the items from the collection view.
+                [commentList deleteItemsAtIndexPaths:selectedItemsIndexPaths];
+                
+            } completion:^(BOOL finished) {
+                
+                if(chatMessages.count==0)
+                {
+                    [self manuallyRefresh];
+                }
+                
+            }];
+        }
+        
+        [FTIndicator showToastMessage:@"Deleted"];
+        
+    }
+    else
+    {
+        [FTIndicator showToastMessage:@"Something went wrong"];
 
+    }
+    
+}
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {

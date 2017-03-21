@@ -18,6 +18,8 @@
 @interface ExploreComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate,UITextViewDelegate>
 {
     
+    int typeOfSearch;
+    NSString *currentSearchTerm;
     
     APIManager *manager;
 
@@ -36,6 +38,7 @@
     ExploreTopicView *topicView;
     
     UITextField *exploreTerm;
+    UIView *exploreTermBaseView;
     
     UICollectionView *ChannelList;
     UICollectionView *feedList;
@@ -48,6 +51,10 @@
 
     EmptyView *emptyView;
 
+    UIButton *backCloseBtn;
+    
+    UILabel *searchResultTitleLBL;
+    UILabel *searchResultContentLBL;
     
 }
 -(void)setUp;

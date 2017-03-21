@@ -28,6 +28,15 @@
         sharedInstance.Explore_urlIdentifier=@"";
         sharedInstance.Explore_isKilling=false;
         
+        sharedInstance.Profile_isPaused=false;
+        sharedInstance.Profile_isVisibleBounds=TRUE;
+        sharedInstance.Profile_screenIdentifier=@"";
+        sharedInstance.Profile_urlIdentifier=@"";
+        sharedInstance.Profile_isKilling=false;
+        
+        
+        sharedInstance.All_isPaused=false;
+        
         
         
         // Do any other initialisation stuff here
@@ -41,6 +50,15 @@
 -(void)StopKeepKillingExploreFeedVideosIfAvaialble;
 {
     self.Explore_isKilling=false;
+}
+
+-(void)StartKeepKillingProfileFeedVideosIfAvaialble
+{
+    self.Profile_isKilling=true;
+}
+-(void)StopKeepKillingProfileFeedVideosIfAvaialble
+{
+    self.Profile_isKilling=false;
 }
 
 @end

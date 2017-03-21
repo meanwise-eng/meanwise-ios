@@ -34,6 +34,8 @@
 
 -(void)setUp
 {
+    typeOfSearch=1;
+    currentSearchTerm=@"";
   //  [self setUpDataRecords];
     
     //    channelList=[[NSArray alloc] initWithObjects:@"Music",@"Travel",@"Lifestyle",@"Sports",@"Science & Technology",@"Politics",@"Fashion",@"Finance",@"Gamming",nil];
@@ -54,24 +56,23 @@
     backgroundImageOverLayView.alpha=0.3;
     
     
-    UIView *view=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
-    [self addSubview:view];
-    view.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
-    view.layer.cornerRadius=2;
-    view.clipsToBounds=YES;
+    exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
+    [self addSubview:exploreTermBaseView];
+    exploreTermBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
+    exploreTermBaseView.layer.cornerRadius=2;
+    exploreTermBaseView.clipsToBounds=YES;
     
 
 
     UIImageView *searchIcon=[[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 20, 20)];
     searchIcon.image=[UIImage imageNamed:@"ChannelSearchIcon.png"];
-    [view addSubview:searchIcon];
+    [exploreTermBaseView addSubview:searchIcon];
     searchIcon.contentMode=UIViewContentModeScaleAspectFill;
     
-    exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, view.frame.size.width-50, 40)];
-    [view addSubview:exploreTerm];
+    exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, exploreTermBaseView.frame.size.width-50, 40)];
+    [exploreTermBaseView addSubview:exploreTerm];
     exploreTerm.tintColor=[UIColor whiteColor];
     exploreTerm.textColor=[UIColor whiteColor];
-    exploreTerm.delegate=self;
     
     
     
@@ -119,6 +120,9 @@
     [topicView setChannelId:selectedChannel];
    
     [self updateBackground];
+    
+    
+    
 
     
     searchResultView=[[ExploreSearchComponent alloc] initWithFrame:CGRectMake(0, 80, self.frame.size.width, self.frame.size.height-80)];
@@ -126,6 +130,8 @@
     [self addSubview:searchResultView];
     searchResultView.hidden=true;
     searchResultView.alpha=0;
+    [searchResultView setTarget:self OnSearchItemSelectedFunc:@selector(searchAndAPICall:)];
+    
     [exploreTerm addTarget:self
                   action:@selector(SearchTermChanged:)
         forControlEvents:UIControlEventEditingChanged];
@@ -135,9 +141,74 @@
     emptyView.hidden=true;
     [emptyView setUIForBlack];
     [emptyView setDelegate:self onReload:@selector(refreshAction)];
+    emptyView.msgLBL.text=@"Nothing to display";
+    emptyView.reloadBtn.hidden=true;
 
+    searchResultTitleLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 100, self.frame.size.width-40, 20)];
+    searchResultContentLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 125, self.frame.size.width-40, 35)];
+    [self addSubview:searchResultContentLBL];
+    [self addSubview:searchResultTitleLBL];
+    searchResultTitleLBL.font=[UIFont fontWithName:k_fontSemiBold size:15];
+    searchResultContentLBL.font=[UIFont fontWithName:k_fontSemiBold size:30];
+    searchResultTitleLBL.text=@"YOU SEARCHED FOR";
+    searchResultContentLBL.text=@"MECHANISM";
+    searchResultTitleLBL.textColor=[UIColor whiteColor];
+    searchResultContentLBL.textColor=[UIColor whiteColor];
+    searchResultTitleLBL.hidden=true;
+    searchResultContentLBL.hidden=true;
+    
+    
+/*    exploreTerm.hidden=true;
+    exploreTermBaseView.hidden=true;
+    ChannelList.hidden=true;
+    topicView.hidden=true;*/
 
     
+    
+    backCloseBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-60, 10, 50, 50)];
+    [self addSubview:backCloseBtn];
+    [backCloseBtn addTarget:self action:@selector(backToChannelSearch) forControlEvents:UIControlEventTouchUpInside];
+    [backCloseBtn setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+
+    backCloseBtn.hidden=true;
+    [self refreshAction];
+
+}
+-(void)searchAndAPICall:(NSString *)searchTag
+{
+    NSLog(@"%@",searchTag);
+
+    backCloseBtn.hidden=false;
+    currentSearchTerm=searchTag;
+    exploreTerm.hidden=true;
+    exploreTermBaseView.hidden=true;
+    exploreTerm.text=@"";
+    [self SearchTermChanged:nil];
+    ChannelList.hidden=true;
+    topicView.hidden=true;
+    
+    searchResultTitleLBL.hidden=false;
+    searchResultContentLBL.hidden=false;
+    searchResultContentLBL.text=currentSearchTerm;
+    
+    [self refreshAction];
+    [exploreTerm resignFirstResponder];
+
+}
+-(void)backToChannelSearch
+{
+    backCloseBtn.hidden=true;
+exploreTerm.hidden=false;
+        exploreTermBaseView.hidden=false;
+    currentSearchTerm=@"";
+  ChannelList.hidden=false;
+    topicView.hidden=false;
+    exploreTerm.text=@"";
+    
+    searchResultTitleLBL.hidden=true;
+    searchResultContentLBL.hidden=true;
+    
+    [self SearchTermChanged:nil];
     [self refreshAction];
 
 }
@@ -153,17 +224,48 @@
 
 -(void)refreshAction
 {
+    if([currentSearchTerm isEqualToString:@""])
+    {
+        typeOfSearch=1;
+    }
+    else if([currentSearchTerm hasPrefix:@"#"])
+    {
+        typeOfSearch=2;
+    }
+    else
+    {
+        typeOfSearch=3;
+    }
+    
     manager=[[APIManager alloc] init];
     //[manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
     
     NSLog(@"Hello");
     // [feedList setContentOffset:CGPointMake(0, feedList.contentOffset.y-feedList.frame.size.height) animated:YES];
     
+    NSDictionary *dict;
     
+    if(typeOfSearch==1)
+    {
     NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
-    
-    [manager sendRequestExploreWithInterestsName:channelName Withdelegate:self andSelector:@selector(UsersPostReceived:)];
+    dict=@{@"type":[NSNumber numberWithInt:1],@"word":channelName};
+    }
+    if(typeOfSearch==2)
+    {
+        dict=@{@"type":[NSNumber numberWithInt:2],@"word":[currentSearchTerm substringFromIndex:1]};
 
+    }
+    if(typeOfSearch==3)
+    {
+        dict=@{@"type":[NSNumber numberWithInt:3],@"word":[currentSearchTerm substringFromIndex:1]};
+        
+    }
+    
+    
+    
+    [manager sendRequestExploreFeedWithKey:dict Withdelegate:self andSelector:@selector(UsersPostReceived:)];
+    
+    
     
     
     //[self performSelector:@selector(endRefreshControl) withObject:nil afterDelay:1.0f];
@@ -201,8 +303,11 @@
     if([exploreTerm.text length]>0)
     {
         
+        [searchResultView setSearchTerm:exploreTerm.text];
+        
         if(searchResultView.hidden==true)
         {
+         
             
             searchResultView.hidden=false;
 
@@ -501,6 +606,8 @@
 -(void)updateBackground
 {
     [topicView setChannelId:selectedChannel];
+    
+    [topicView setSearchTerm:[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"]];
 
 //    backgroundImageView.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",selectedChannel%5+3]];
     

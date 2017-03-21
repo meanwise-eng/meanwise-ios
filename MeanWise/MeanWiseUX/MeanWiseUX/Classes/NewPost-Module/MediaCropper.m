@@ -398,7 +398,7 @@
     
     AVAssetExportSession *exporter;
     
-    exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
+    exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
     
     exporter.videoComposition = mainCompositionInst;
     exporter.outputURL=url;

@@ -9,18 +9,45 @@
 #import "PostFullCell.h"
 #import "FullCommentDisplay.h"
 #import "DataSession.h"
+#import "HMPlayerManager.h"
+#import "MiniProfileComponent.h"
 
 @implementation PostFullCell
 
 -(void)shareBtnClicked:(id)sender
 {
 
+
     [target performSelector:shareBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
     
 }
 -(void)setPlayerScreenIdeantifier:(NSString *)string
 {
+    screenIdentifier=string;
     [player setPlayerScreenIdeantifier:string];
+    
+    if([string isEqualToString:@"PROFILE"])
+    {
+        if([[NSString stringWithFormat:@"%@",dataObj.user_id] isEqualToString:[NSString stringWithFormat:@"%@",[UserSession getUserId]]])
+        {
+            self.deleteBtn.hidden=false;
+            self.deleteBtn.userInteractionEnabled=true;
+            
+        }
+        else
+        {
+            self.deleteBtn.hidden=true;
+            self.deleteBtn.userInteractionEnabled=false;
+        }
+    }
+    else
+    {
+        self.deleteBtn.hidden=true;
+        self.deleteBtn.userInteractionEnabled=false;
+
+    }
+    
+    
 //    player.screenIdentifier=string;
 }
 -(void)commentWriteBtnClicked:(id)sender
@@ -33,6 +60,10 @@
 {
     [target performSelector:commentBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
     
+}
+-(void)onDeleteEvent:(SEL)func3;
+{
+    onDeleteClickedFunc=func3;
 }
 -(void)setTarget:(id)delegate shareBtnFunc:(SEL)func1 andCommentBtnFunc:(SEL)func2
 {
@@ -138,10 +169,12 @@
         self.timeLBL.textAlignment=NSTextAlignmentRight;
         self.timeLBL.font=[UIFont fontWithName:k_fontBold size:14];
         
-        self.profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectZero];
+        self.profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectMake(0, 0, 15, 15)];
         [self.contentView addSubview:self.profileIMGVIEW];
         self.profileIMGVIEW.contentMode=UIViewContentModeScaleAspectFill;
         self.profileIMGVIEW.clipsToBounds=YES;
+        
+        
         
         
         self.likeCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 15)];
@@ -184,12 +217,21 @@
         [self.commentWriteBtn setTitle:@"Leave a comment ..." forState:UIControlStateNormal];
         [self.commentWriteBtn addTarget:self action:@selector(commentWriteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
         self.commentWriteBtn.hidden=true;
+        
+        
+        self.deleteBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+        [self.deleteBtn addTarget:self action:@selector(deleteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+        [self.deleteBtn setBackgroundImage:[UIImage imageNamed:@"trashBtn.png"] forState:UIControlStateNormal];
+        [self.contentView addSubview:self.deleteBtn];
+        self.deleteBtn.hidden=true;
+        self.deleteBtn.userInteractionEnabled=false;
 
 
         doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(likeBtnClicked:)];
         doubleTap.numberOfTapsRequired = 2;
         [self.contentView addGestureRecognizer:doubleTap];
         doubleTap.delegate=self;
+        
         
         
         /*
@@ -208,13 +250,107 @@
     }
     return self;
 }
+-(void)deleteBtnClicked:(id)sender
+{
+    [HMPlayerManager sharedInstance].All_isPaused=YES;
+    
+    FCAlertView *alert = [[FCAlertView alloc] init];
+    //alert.blurBackground = YES;
+    [alert showAlertWithTitle:@"Delete post"
+                 withSubtitle:@"Are you sure want to delete?"
+              withCustomImage:nil
+          withDoneButtonTitle:@"Cancel"
+                   andButtons:nil];
+    [alert addButton:@"Delete" withActionBlock:^{
+        
+        [HMPlayerManager sharedInstance].All_isPaused=false;
+        
+        [target performSelector:onDeleteClickedFunc withObject:dataObj afterDelay:0.01];
+        NSLog(@"delete");
+
+        // Put your action here
+    }];
+    [alert doneActionBlock:^{
+        
+        [HMPlayerManager sharedInstance].All_isPaused=false;
+        
+        NSLog(@"done");
+        
+    }];
+    alert.titleColor=[UIColor redColor];
+    alert.firstButtonTitleColor = [UIColor redColor];
+
+}
+-(NSDictionary *)userDictFromPostDetail:(APIObjects_FeedObj *)feedData
+{
+
+    NSDictionary *dict=@{
+                         @"user_firstname":feedData.user_firstname,
+                         @"user_lastname":feedData.user_lastname,
+                         @"user_profile_photo_small":feedData.user_profile_photo_small,
+                         @"user_profession":feedData.user_profession,
+                         @"user_id":feedData.user_id,
+                         @"user_cover_photo":feedData.user_cover_photo
+                         };
+    
+    return dict;
+}
+-(void)profileBtnClicked:(NSDictionary *)userDict
+{
+    if(![screenIdentifier isEqualToString:@"PROFILE"])
+    {
+        if([screenIdentifier isEqualToString:@"EXPLORE"])
+        {
+            [HMPlayerManager sharedInstance].Explore_isPaused=true;
+        }
+        else if([screenIdentifier isEqualToString:@"HOME"])
+        {
+            [HMPlayerManager sharedInstance].Home_isPaused=true;
+        }
+        
+//    [HMPlayerManager sharedInstance].All_isPaused=true;
+    
+       CGRect rect=[self.profileIMGVIEW.superview convertRect:self.profileIMGVIEW.frame fromView:nil];
+    
+       MiniProfileComponent *compo=[[MiniProfileComponent alloc] initWithFrame:rect];
+        [compo setUp:userDict];
+        [compo setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
+    
+    
+    NSLog(@"%@",userDict);
+    }
+}
+-(void)ProfilecloseBtnClicked:(id)sender
+{
+    if([screenIdentifier isEqualToString:@"EXPLORE"])
+    {
+        [HMPlayerManager sharedInstance].Explore_isPaused=false;
+    }
+    else if([screenIdentifier isEqualToString:@"HOME"])
+    {
+        [HMPlayerManager sharedInstance].Home_isPaused=false;
+    }
+    
+    //    [HMPlayerManager sharedInstance].All_isPaused=false;
+    
+    NSLog(@"closed");
+    
+}
+    
 
 -(void)setDataObj:(APIObjects_FeedObj *)dict;
 {
     dataObj=dict;
     liked=dict.IsUserLiked.intValue;
     
+    
+    
+
     [self.profileIMGVIEW setUp:dict.user_profile_photo_small];
+    
+    [self.profileIMGVIEW setTarget:self OnClickFunc:@selector(profileBtnClicked:) WithObj:[self userDictFromPostDetail:dict]];
+    
+    
     
     if(dict.mediaType.intValue!=0)
     {
@@ -261,6 +397,9 @@
 
     }
     
+    
+    
+    
     if(dict.mediaType.intValue!=0)
     {
         
@@ -293,6 +432,8 @@
 
         
     }
+    
+    
 
  
     
@@ -449,6 +590,8 @@
    
     ////////////////////////
 
+    self.deleteBtn.frame=CGRectMake(frame.size.width-60, frame.size.height-195-heightBottom-70, 50, 50);
+    
     self.timeLBL.frame=CGRectMake(frame.size.width-60, self.frame.size.height-heightBottom-30, 50, 30);
     self.shareBtn.frame=CGRectMake(frame.size.width-60, frame.size.height-heightBottom-90, 50, 50);
     self.commentBtn.frame=CGRectMake(frame.size.width-60, frame.size.height-140-heightBottom, 50, 50);

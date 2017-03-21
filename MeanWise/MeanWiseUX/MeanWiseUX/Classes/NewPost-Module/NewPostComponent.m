@@ -320,14 +320,6 @@
 }
 -(void)postBtnClicked:(id)sender
 {
-    /*
-    NSDictionary *dict1=@{
-                          @"text":@"Sports, Sea",
-                          @"interest":@"1",
-                          };
-    
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"mag_app_reducedvid" ofType:@"mp4"];
-     */
     
     NSString *statusString=statusView.text;
     NSString *mediaPath=[attachedImage getCurrentPath];
@@ -350,14 +342,77 @@
     }
     
     
+    
+    
 
-    if(mediaPath==nil) mediaPath=@"";
+    if(mediaPath==nil) {
+     
+        mediaPath=@"";
+    }
+    else
+    {
+        
+        NSString *ext = [mediaPath pathExtension];
+        
+        
+        
+        if([ext.lowercaseString isEqualToString:@"png"])
+        {
+            mediaPath=[Constant getCompressedPathFromImagePath:mediaPath];
+        }
+        else
+        {
+            
+            int p=0;
+        }
+        
+        
+        NSData *data=[NSData dataWithContentsOfFile:mediaPath];
+        
+        [FTIndicator showToastMessage:[NSString stringWithFormat:@"final %d kb",(int)data.length/1024]];
+
+
+    }
+    
+    
+    NSString *topicValue=@"";
+    if(topicArray.count==0)
+    {
+        
+    }
+    else if(topicArray.count==1)
+    {
+        topicValue=[topicArray objectAtIndex:0];
+    }
+    else
+    {
+        topicValue=[topicArray componentsJoinedByString: @","];
+    }
+    
+    NSString *hashTagValue=@"[]";
+    if(hashTagArray.count==0)
+    {
+        
+    }
+    else if(hashTagArray.count==1)
+    {
+        hashTagValue=[hashTagArray objectAtIndex:0];
+        hashTagValue=[NSString stringWithFormat:@"[\"%@\"]",hashTagValue];
+    }
+    else
+    {
+        hashTagValue=[hashTagArray componentsJoinedByString: @"\",\""];
+        hashTagValue=[NSString stringWithFormat:@"[\"%@\"]",hashTagValue];
+        
+    }
     
     
     NSDictionary *dict=@{
                 @"text":statusString,
                 @"interest":[NSString stringWithFormat:@"%d",channelId],
-                @"media":mediaPath
+                @"media":mediaPath,
+                @"topic_names":topicValue,
+                @"tags":hashTagValue
                 };
         
    
@@ -446,8 +501,12 @@
     
    
 
+    topicArray=[[NSMutableArray alloc] init];
+    hashTagArray=[[NSMutableArray alloc] init];
 
-    for (NSTextCheckingResult *match in matches1) {
+
+    for (NSTextCheckingResult *match in matches1)
+    {
         NSRange wordRange = [match rangeAtIndex:0];
         NSString* word = [string substringWithRange:wordRange];
         NSLog(@"Found tag %@", word);
@@ -455,9 +514,15 @@
         [hogan addAttribute:NSForegroundColorAttributeName
                       value:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00]
                       range:wordRange];
+        
+        NSRange hashTagRange = [match rangeAtIndex:1];
+        NSString* hashTag = [string substringWithRange:hashTagRange];
+
+        [hashTagArray addObject:hashTag];
+        
     }
     
-    NSMutableArray *arrayTopic=[[NSMutableArray alloc] init];
+    
     for (NSTextCheckingResult *match in matches2) {
         NSRange wordRange = [match rangeAtIndex:0];
         NSString* word = [string substringWithRange:wordRange];
@@ -467,11 +532,14 @@
                       value:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00]
                       range:wordRange];
         
-        [arrayTopic addObject:word];
+        NSRange topicRange = [match rangeAtIndex:1];
+        NSString* topicName = [string substringWithRange:topicRange];
+
+        [topicArray addObject:topicName];
         
 
     }
-        [self setTopic:arrayTopic];
+        [self setTopic:topicArray];
     
     
     textView.attributedText=hogan;

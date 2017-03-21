@@ -11,6 +11,27 @@
 
 @implementation UIImageHM
 
+- (id)initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if (self) {
+        
+        userDict=nil;
+        
+        tapHolderBtn=[[UIButton alloc] initWithFrame:self.bounds];
+        [tapHolderBtn setBackgroundColor:[UIColor clearColor]];
+        [self addSubview:tapHolderBtn];
+        tapHolderBtn.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+        [tapHolderBtn addTarget:self action:@selector(tapPressed:) forControlEvents:UIControlEventTouchUpInside];
+        tapHolderBtn.enabled=false;
+        [tapHolderBtn setShowsTouchWhenHighlighted:YES];
+        self.userInteractionEnabled=false;
+
+        
+      
+    }
+    return self;
+}
 
 -(void)setUp:(NSString *)stringURL
 {
@@ -49,9 +70,31 @@
         
         [self setPlaceHolderImage];
     }
+  
+    
+}
+-(void)tapPressed:(id)sender
+{
+    [target performSelector:onClickFunc withObject:userDict afterDelay:0.01];
+
+ 
+    NSLog(@"clickEvent");
     
 }
 
+
+-(void)setTarget:(id)targetReceived OnClickFunc:(SEL)func WithObj:(NSDictionary *)obj;
+{
+    userDict=obj;
+
+    tapHolderBtn.enabled=true;
+    self.userInteractionEnabled=true;
+
+    target=targetReceived;
+    onClickFunc=func;
+
+    
+}
 -(BOOL)firstTime
 {
     if([[self userDefault] valueForKey:@"DATA_IMAGECACHE"]==nil)
@@ -137,6 +180,7 @@
         [self addSubview:progressBar];
         [progressBar setRadious:self.frame.size.width/9];
         [progressBar setProgress:0];
+        progressBar.userInteractionEnabled=false;
         [progressBar startAnimation:nil];
         progressBar.center=CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
         progressBar.backgroundColor=[UIColor clearColor];

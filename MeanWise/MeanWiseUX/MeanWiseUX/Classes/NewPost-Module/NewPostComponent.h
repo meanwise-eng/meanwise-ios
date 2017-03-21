@@ -39,6 +39,9 @@
     
     MediaCropper *cropperControl;
     
+    NSMutableArray *hashTagArray;
+    NSMutableArray *topicArray;
+    
     id target;
     SEL closeCallBackfunc;
     

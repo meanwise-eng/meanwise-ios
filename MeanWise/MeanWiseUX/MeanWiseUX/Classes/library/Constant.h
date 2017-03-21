@@ -66,6 +66,8 @@
 +(NSString *)FM_saveImageAtDocumentDirectory:(UIImage *)image;
 +(NSString *)FM_saveVideoAtDocumentDirectory:(NSURL *)pathURL;
 
++(NSString *)getCompressedPathFromImagePath:(NSString *)sourcePath;
+
 +(void)setStatusBarColorWhite:(BOOL)flag;
 + (UIViewController *) topMostController;
 

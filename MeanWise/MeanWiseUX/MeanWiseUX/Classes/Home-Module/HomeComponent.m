@@ -284,6 +284,7 @@
     [cell setPlayerScreenIdeantifier:screenIdentifier];
 
     
+    [cell onDeleteEvent:@selector(deleteAPost:)];
     
 
     
@@ -361,9 +362,17 @@
     commentDisplay=nil;
     sharecompo=nil;
 }
+-(void)deleteAPost:(APIObjects_FeedObj *)obj
+{
+  
+   
+    
+}
+
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    
    /* [self hideBottomBar];
     
     

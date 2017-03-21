@@ -262,6 +262,37 @@
     
     
 }
++(NSString *)getCompressedPathFromImagePath:(NSString *)sourcePath
+{
+    UIImage *inputImage=[UIImage imageWithContentsOfFile:sourcePath];
+    
+    CGFloat compression = 0.9f;
+    CGFloat maxCompression = 0.49f;
+    int maxFileSize = (int)(1024);
+    
+    NSData *imageData = UIImageJPEGRepresentation(inputImage, compression);
+    
+    while ([imageData length] > maxFileSize && compression > maxCompression)
+    {
+        NSLog(@"compression=%f",compression);
+        compression -= 0.1;
+        imageData = UIImageJPEGRepresentation(inputImage, compression);
+    }
+    
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *savedImagePath = [documentsDirectory stringByAppendingPathComponent:@"compressedFile.jpg"];
+    
+    
+    [imageData writeToFile:savedImagePath atomically:NO];
+    
+    NSLog(@"%@",savedImagePath);
+    
+    return savedImagePath;
+    
+}
+
 
 + (UIViewController *) topMostController
 {

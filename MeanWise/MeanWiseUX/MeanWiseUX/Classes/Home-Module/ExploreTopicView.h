@@ -16,7 +16,11 @@
     NSArray *arrayTopics;
     
     int selectedChannel;
+    NSString *searchTerm;
+
 }
 -(void)setUp:(int)height;
 -(void)setChannelId:(int)channelId;
+-(void)setSearchTerm:(NSString *)string;
+
 @end

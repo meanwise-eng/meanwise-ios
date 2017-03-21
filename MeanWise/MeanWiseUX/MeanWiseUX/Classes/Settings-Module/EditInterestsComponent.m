@@ -19,9 +19,8 @@
 {
     
     selectedArray=[[NSMutableArray alloc] init];
-    // arrayData=[[NSArray alloc] initWithObjects:@"Music",@"Travel",@"Lifestyle",@"Sports",@"Science & Technology",@"Politics",@"Fashion",@"Finance",@"Gamming",nil];
     
-    arrayData1=[[[APIPoster alloc] init] getInterestData];
+    dbData=[[[APIPoster alloc] init] getInterestData];
 
     [selectedArray addObjectsFromArray:[UserSession getUserInterests]];
     
@@ -98,22 +97,25 @@
     InterestCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     // cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",(int)indexPath.row%5+3]];
     
-    [cell.profileIMGVIEW setUp:[[arrayData1 objectAtIndex:indexPath.row] valueForKey:@"photo"]];
+    [cell.profileIMGVIEW setUp:[[dbData objectAtIndex:indexPath.row] valueForKey:@"photo"]];
     
     
     cell.shadowImage.backgroundColor=[Constant colorGlobal:(indexPath.row%13)];
     
     // cell.nameLBL.text=[[arrayData1 objectAtIndex:indexPath.row] uppercaseString];
     
-    cell.nameLBL.text=[[arrayData1 objectAtIndex:indexPath.row] valueForKey:@"name"];
+    cell.nameLBL.text=[[dbData objectAtIndex:indexPath.row] valueForKey:@"name"];
     
     cell.layer.cornerRadius=3;
     cell.clipsToBounds=YES;
     
-    int indexNo=(int)indexPath.row;
+   // int indexNo=(int)indexPath.row-1;
+    
 
-
-    if([selectedArray containsObject:[NSNumber numberWithInt:indexNo]])
+    NSNumber *cellChannelId=[NSNumber numberWithInt:[[[dbData objectAtIndex:indexPath.row] valueForKey:@"id"] intValue]];
+    
+    
+    if([selectedArray containsObject:cellChannelId])
     {
      
         cell.selected=YES;
@@ -121,27 +123,7 @@
 
     }
     
-    
-//    NSDictionary *dictObj=[arrayData1 objectAtIndex:indexPath.row];
-//
-//    BOOL selected=false;
-//    for (id dict in selectedArray) {
-//        
-//        
-//        int c1=[dict intValue];
-//        int c2=[[dictObj valueForKey:@"id"] intValue];
-//        
-//        if (c1==c2)
-//        {
-//           // NSLog(@"%@ %@",c1,c2);
-//            selected=true;
-//            cell.selected=YES;
-//            [collectionView selectItemAtIndexPath:indexPath animated:NO scrollPosition:UICollectionViewScrollPositionNone];
-//
-//        }
-//    }
-//
-//  
+
 
    
     
@@ -150,7 +132,7 @@
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return arrayData1.count;
+    return dbData.count;
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -161,44 +143,29 @@
 {
     
     
-    NSLog(@"add:%@",[[arrayData1 objectAtIndex:indexPath.row] valueForKey:@"name"]);
-    int indexNo=(int)indexPath.row;
+    NSLog(@"add:%@",[[dbData objectAtIndex:indexPath.row] valueForKey:@"name"]);
+    
+    
+    int newAddingId=[[[dbData objectAtIndex:indexPath.row] valueForKey:@"id"] intValue];
 
     
-    [selectedArray addObject:[NSNumber numberWithInt:indexNo]];
+    [selectedArray addObject:[NSNumber numberWithInt:newAddingId]];
     
     numberOfItemSelected++;
     [self updateUI];
+    
+    
 }
 -(void)collectionView:(UICollectionView *)collectionView didDeselectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     
 
     
-//    
-//    NSDictionary *dictObj=[arrayData1 objectAtIndex:indexPath.row];
-//    
-//    for (NSDictionary* dict in selectedArray) {
-//        
-//        
-//        NSString *c1=[dict valueForKey:@"name"];
-//        NSString *c2=[dictObj valueForKey:@"name"];
-//        
-//        if ([c1 isEqualToString:c2])
-//        {
-//            NSLog(@"%@ %@",c1,c2);
-//            [selectedArray removeObject:dict];
-//            break;
-//
-//            
-//        }
-//    }
-//
-   // NSLog(@"remove:%@",[[arrayData1 objectAtIndex:indexPath.row] valueForKey:@"name"]);
+    NSLog(@"remove:%@",[[dbData objectAtIndex:indexPath.row] valueForKey:@"name"]);
 
-    
-    int indexNo=(int)indexPath.row;
-    [selectedArray removeObject:[NSNumber numberWithInt:indexNo]];
+    int removeingId=[[[dbData objectAtIndex:indexPath.row] valueForKey:@"id"] intValue];
+
+    [selectedArray removeObject:[NSNumber numberWithInt:removeingId]];
 
     numberOfItemSelected--;
     [self updateUI];
@@ -299,15 +266,15 @@
 //    NSString *interestStr = [[selectedArray valueForKey:@"id"] componentsJoinedByString:@","];
 //    interestStr=[NSString stringWithFormat:@"[%@]",interestStr];
 
-    if(selectedArray.count>5)
+    if(selectedArray.count>4)
     {
-      /*  NSDictionary *dict=@{
+       NSDictionary *dict=@{
                          @"interests":selectedArray,
                          };
     
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
-    [t updateProfileWithDict:dict];*/
+    [t updateProfileWithDict:dict];
         
     }
 }

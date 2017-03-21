@@ -12,9 +12,17 @@
 #import "APIObjects_ProfileObj.h"
 #import "MasterScrollView.h"
 #import "UIArcView.h"
+#import "APIManager.h"
+#import "ShareComponent.h"
+#import "FullCommentDisplay.h"
+
 
 @interface ProfileAditionalScreen : UIView  <UIScrollViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate>
 {
+    
+    FullCommentDisplay *commentDisplay;
+    ShareComponent *sharecompo;
+
     
     APIObjects_ProfileObj *dataObj;
     
@@ -45,7 +53,6 @@
     
     NSString *frienshipStatusStr;
 
-    
     
     
     
@@ -91,9 +98,11 @@
     NSMutableArray *dataRecords;
     UICollectionView *galleryView;
 
+    NSString *screenIdentifier;
+
 }
 -(void)setUpProfileObj:(APIObjects_ProfileObj *)obj;
-
+-(void)removingComponent;
 -(void)setUp;
 -(void)setDelegate:(id)delegate andFunc1:(SEL)func1;
 

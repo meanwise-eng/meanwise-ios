@@ -411,12 +411,16 @@
             [AVPlayer playerWithURL:[NSURL fileURLWithPath:filePathStr]];
             [self addSubview:playerViewControl.view];
             //   [playerViewControl.player play];
-            playerViewControl.modalPresentationStyle = UIModalPresentationOverFullScreen;
-            
-            playerViewControl.showsPlaybackControls = false;
-            playerViewControl.videoGravity=AVLayerVideoGravityResizeAspectFill;
+           // playerViewControl.modalPresentationStyle = UIModalPresentationOverFullScreen;
             
             [self bringSubviewToFront:fullModeBtnDone];
+
+            playerViewControl.showsPlaybackControls = false;
+            playerViewControl.videoGravity=AVLayerVideoGravityResize;
+            playerViewControl.view.bounds=CGRectMake(0, 0, fullPreviewRect.size.width, fullPreviewRect.size.height);
+
+
+
             
             [playerViewControl.player play];
             

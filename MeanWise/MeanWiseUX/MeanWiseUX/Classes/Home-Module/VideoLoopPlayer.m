@@ -45,5 +45,13 @@
     [self performSelector:@selector(loopPlay:) withObject:nil afterDelay:0.2];
 
 }
+-(void)clearLoopPlayer
+{
+    
+    [playerViewController.player pause];
+    [playerViewController.player replaceCurrentItemWithPlayerItem:nil];
+    playerViewController.player=nil;
+
+}
 
 @end

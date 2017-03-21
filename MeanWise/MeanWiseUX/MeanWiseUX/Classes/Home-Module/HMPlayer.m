@@ -122,7 +122,12 @@
 }
 -(void)checkIfNeedsToStop
 {
-    if(![urlStr isEqualToString:@""])
+    if([screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Profile_screenIdentifier])
+    {
+        int p=0;
+    }
+
+    if(![urlStr isEqualToString:@""] && [HMPlayerManager sharedInstance].All_isPaused==false)
     {
         if([HMPlayerManager sharedInstance].Home_isPaused==false && [HMPlayerManager sharedInstance].Home_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Home_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Home_urlIdentifier])
         {
@@ -136,11 +141,17 @@
           //  self.hidden=false;
             isPlayerShouldPlay=true;
         }
+        else if([HMPlayerManager sharedInstance].Profile_isPaused==false && [HMPlayerManager sharedInstance].Profile_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Profile_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Profile_urlIdentifier])
+        {
+            
+            //  self.hidden=false;
+            isPlayerShouldPlay=true;
+        }
 
         else
         {
           //  self.hidden=true;
-            NSLog(@"NO %@,%@",screenIdentifier,debugNumber);
+         //   NSLog(@"NO %@,%@",screenIdentifier,debugNumber);
             isPlayerShouldPlay=false;
 
         }
@@ -152,7 +163,7 @@
        // self.hidden=true;
         isPlayerShouldPlay=false;
     }
-
+   
 }
 -(void)playerTimelineLoop:(id)sender
 {
@@ -168,6 +179,20 @@
          [playerViewController.view removeFromSuperview];
          playerViewController=nil;
 
+        [self removeFromSuperview];
+        
+    }
+    if([HMPlayerManager sharedInstance].Profile_isKilling==true && [[HMPlayerManager sharedInstance].Profile_screenIdentifier isEqualToString:screenIdentifier])
+    {
+        
+        NSLog(@"Kill Profile player");
+        
+        [self killPlayer];
+        urlStr=nil;
+        isPlayerShouldPlay=false;
+        [playerViewController.view removeFromSuperview];
+        playerViewController=nil;
+        
         [self removeFromSuperview];
         
     }

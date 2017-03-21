@@ -45,7 +45,7 @@
                               options:requestOptions
                         resultHandler:^void(UIImage *image, NSDictionary *info) {
                             
-                            NSLog(@"Image size:%@",NSStringFromCGSize(image.size));
+                          //  NSLog(@"Image size:%@",NSStringFromCGSize(image.size));
 
 
                             

@@ -166,6 +166,7 @@
 
     [self addTextBtnClicked:nil];
 }
+
 -(void)autoplayContinue:(id)sender
 {
     
@@ -370,6 +371,7 @@
     label.layer.shadowColor=field.layer.shadowColor;
     label.layer.shadowOpacity=field.layer.shadowOpacity;
     label.layer.shadowRadius=field.layer.shadowRadius;
+    label.layer.shadowOffset=field.layer.shadowOffset;
     
     
     view.opaque=false;
@@ -480,7 +482,7 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
     NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
     
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
     exportSession.videoComposition=videoComposition;
     
     exportSession.outputURL = [NSURL fileURLWithPath:destinationPath];

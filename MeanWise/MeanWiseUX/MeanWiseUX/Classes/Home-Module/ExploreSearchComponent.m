@@ -11,9 +11,19 @@
 
 @implementation ExploreSearchComponent
 
-
+-(void)setTarget:(id)targetReceived OnSearchItemSelectedFunc:(SEL)func
+{
+    target=targetReceived;
+    onSearchItemSelectedFunc=func;
+}
+-(void)setSearchTerm:(NSString *)string
+{
+    searchTerm=string;
+    [listofItems reloadData];
+}
 -(void)setUp
 {
+    searchTerm=@"";
     segmentView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 40)];
     [self addSubview:segmentView];
     segmentView.backgroundColor=[UIColor clearColor];
@@ -111,13 +121,13 @@
     
     if(selectedSegmentIndex==1)
     {
-    cell.hashtagOrTopic.text=@"@topics";
+    cell.hashtagOrTopic.text=[NSString stringWithFormat:@"@%@",searchTerm];
         cell.bgView.backgroundColor=[Constant colorGlobal:(indexPath.row%10)];
 
     }
     else if(selectedSegmentIndex==2)
     {
-    cell.hashtagOrTopic.text=@"#hashtags";
+    cell.hashtagOrTopic.text=[NSString stringWithFormat:@"#%@",searchTerm];
         cell.bgView.backgroundColor=[Constant colorGlobal:(indexPath.row%10)];
 
     }
@@ -128,6 +138,12 @@
 
     }
     return cell;
+}
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    ExploreSearchItemCell *cell=(ExploreSearchItemCell *)[collectionView cellForItemAtIndexPath:indexPath];
+    
+    [target performSelector:onSearchItemSelectedFunc withObject:cell.hashtagOrTopic.text afterDelay:0.01];
 }
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section

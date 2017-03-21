@@ -48,7 +48,7 @@
 
     
     
-    /*[UserSession setUserSessionIfExist];
+   /* [UserSession setUserSessionIfExist];
     NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:cont];
     [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
@@ -179,20 +179,32 @@
 
 -(void)newPostSubmit:(NSDictionary *)dict;
 {
-    
+//    NSDictionary *dict=@{
+//                         @"text":statusString,
+//                         @"interest":[NSString stringWithFormat:@"%d",channelId],
+//                         @"media":mediaPath,
+//                         @"topic_names":topicValue,
+//                         @"tags":hashTagArray
+//                         };
+//    
     
     NSString *mediaPath=[dict valueForKey:@"media"];
     NSString *text=[dict valueForKey:@"text"];
     NSString *interest=[dict valueForKey:@"interest"];
+    NSString *topic_names=[dict valueForKey:@"topic_names"];
+    NSString *tags=[dict valueForKey:@"tags"];
+    
     
     if([mediaPath isEqualToString:@""])
     {
         APIManager *manager=[[APIManager alloc] init];
         
-        
+       // if([topic_names ])
         NSDictionary *dict1=@{
                               @"text":text,
                               @"interest":interest,
+                              @"topic_names":topic_names,
+                              @"tags":tags
                               };
         
         [manager sendRequestForNewPost:dict1 delegate:self andSelector:@selector(addNewPostResponse:)];
@@ -207,6 +219,8 @@
         NSDictionary *dict1=@{
                               @"text":text,
                               @"interest":interest,
+                              @"topic_names":topic_names,
+                              @"tags":tags
                               };
         
         NSString *pathExtension=[[mediaPath pathExtension] lowercaseString];
@@ -336,6 +350,7 @@
 
         
     }
+   
     else
     {
        // NSString *stringPassword=[dict valueForKey:@"old_password"];

@@ -13,6 +13,7 @@
 #import "APIManager.h"
 #import "FTIndicator.h"
 #import "UIArcView.h"
+#import "APIObjectsParser.h"
 
 
 @implementation ProfileAditionalScreen
@@ -74,7 +75,12 @@
 }
 -(void)setUp
 {
+    commentDisplay=nil;
+    sharecompo=nil;
     
+    screenIdentifier=@"PROFILE";
+    [HMPlayerManager sharedInstance].Profile_urlIdentifier=@"";
+
     coverView=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, self.bounds.size.height)];
     [self addSubview:coverView];
 
@@ -158,29 +164,26 @@
     cover_addBtn.alpha=1;
     
 
-}
--(void)FriendShipBtnClicked:(id)sender
-{
+    if([[NSString stringWithFormat:@"%@",dataObj.userId] isEqualToString:[NSString stringWithFormat:@"%@",[UserSession getUserId]]])
+    {
+        cover_addBtn.alpha=0;
+        cover_addBtn.enabled=false;
+
+    }
+    else if([[dataObj.friendShipStatus lowercaseString] isEqualToString:@"accepted"])
+    {
+        cover_addBtn.alpha=0;
+        cover_addBtn.enabled=false;
+    }
+    else
+    {
+        cover_addBtn.alpha=1;
+        cover_addBtn.enabled=true;
+    }
     
-    NSDictionary *dict=@{@"friend_id":dataObj.userId,@"status":@"pending"};
-    
-    // {"friend_id":12, "status":"rejected"}
-    APIManager *manager=[[APIManager alloc] init];
-    
-    [manager sendRequestForUpdateFriendshipStatus:dict delegate:self andSelector:@selector(updateFriendshipStatus:)];
-    
-    
-    
+
 }
 
--(void)updateFriendshipStatus:(APIResponseObj *)responseObj
-{
-    NSString *msg=(NSString *)responseObj.response;
-    
-    [FTIndicator showSuccessWithMessage:msg];
-    
-    
-}
 
 -(void)closeBtnClicked:(id)sender
 {
@@ -354,53 +357,7 @@
 }
 
 
--(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-//    if(scrollView.contentOffset.y>100)
-//    {
-//        scrollView.canCancelContentTouches=true;
-//        
-//    }
-//    else
-//    {
-//        scrollView.canCancelContentTouches=false;
-//    }
-//    NSLog(@"ended %f",scrollView.contentOffset.y);
-// 
-   
-}
--(void)scrollViewDidScroll:(UIScrollView *)scrollView
-{
-    
-    if(scrollView==masterScrollView)
-    {
-        float progress=scrollView.contentOffset.y/scrollView.contentSize.height+0.25;
-        
-        [closeProgressArcView setProgress:progress];
-        
-        if(scrollView.contentOffset.y>self.frame.size.height-50)
-        {
-     
-            cover_addBtn.hidden=true;
-        }
-        else
-        {
-        cover_addBtn.hidden=false;
-        }
- 
-      /*  if(scrollView.contentOffset.y>self.frame.size.height*2)
-        {
-        
-        closeBtn.hidden=true;
-        }
-        else
-        {
-        closeBtn.hidden=false;
-        }*/
-    }
-    
-    
-}
+
 -(void)setUpPostViewItems
 {
     UILabel *label=[[UILabel alloc] initWithFrame:self.bounds];
@@ -431,6 +388,8 @@
 
     
 }
+#pragma mark - CollectionView
+
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     return CGSizeMake(self.bounds.size.width, self.bounds.size.height);
@@ -446,155 +405,334 @@
     PostFullCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     
     [cell setDataObj:[dataRecords objectAtIndex:indexPath.row]];
-    
+    [cell setPlayerScreenIdeantifier:screenIdentifier];
+    [cell setTarget:self shareBtnFunc:@selector(shareBtnClicked:) andCommentBtnFunc:@selector(commentBtnClicked:)];
+    [cell onDeleteEvent:@selector(deleteAPost:)];
+
    // [cell setTarget:self shareBtnFunc:@selector(shareBtnClicked:) andCommentBtnFunc:@selector(commentBtnClicked:)];
+    
     
 
     return cell;
     
 }
+#pragma mark - Cell Action
+-(void)deleteAPost:(APIObjects_FeedObj *)obj
+{
+    
+    APIManager *manager=[[APIManager alloc] init];
+    [manager sendRequestForDeletePost:obj.postId delegate:self andSelector:@selector(postDeletedCallBack:)];
+    
+    
+    [FTIndicator showToastMessage:@"Deleting.."];
+    
+    
+}
+-(void)postDeletedCallBack:(NSArray *)responseArray
+{
+    APIResponseObj *responseObj=[responseArray objectAtIndex:0];
+    NSString *postId=[responseArray objectAtIndex:1];
+    
+    if(responseObj.statusCode==200)
+    {
+        
+        NSArray *array=dataRecords;
+        
+        int index=-1;
+        for(int i=0;i<[array count];i++)
+        {
+            APIObjects_FeedObj *object=[array objectAtIndex:i];
+            
+            if([[NSString stringWithFormat:@"%@",postId] isEqualToString:[NSString stringWithFormat:@"%@",object.postId]])
+            {
+                index=i;
+            }
+            
+        }
+        
+        
+        if(index!=-1)
+        {
+            
+            NSIndexPath *indexPath=[NSIndexPath indexPathForItem:index inSection:0];
+            
+            [galleryView performBatchUpdates:^{
+                
+                NSArray *selectedItemsIndexPaths = @[indexPath];
+                
+                // Delete the items from the data source.
+                [dataRecords removeObjectAtIndex:indexPath.row];
 
+                // Now delete the items from the collection view.
+                [galleryView deleteItemsAtIndexPaths:selectedItemsIndexPaths];
+                
+            } completion:^(BOOL finished) {
+                cover_profileViewCount.text=[NSString stringWithFormat:@"%d",(int)[dataRecords count]];
 
+                [[NSNotificationCenter defaultCenter]
+                 postNotificationName:@"REFRESH_HOME"
+                 object:self];
+                
+
+                [self stoppedScrolling];
+            }];
+        }
+        
+        [FTIndicator showToastMessage:@"Deleted"];
+        
+    }
+    else
+    {
+        [FTIndicator showToastMessage:@"Something went wrong"];
+    }
+    
+}
+-(void)commentBtnClicked:(NSString *)senderId
+{
+    if(commentDisplay==nil)
+    {
+        [self feedScreenGoesBack];
+        
+        
+        commentDisplay=[[FullCommentDisplay alloc] initWithFrame:CGRectMake(0, self.frame.size.height, self.frame.size.width, self.frame.size.height)];
+        [commentDisplay setUpWithPostId:[NSString stringWithFormat:@"%@",senderId]];
+        [self addSubview:commentDisplay];
+        [commentDisplay setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+        
+        
+        [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
+            
+            commentDisplay.frame=self.bounds;
+            
+        } completion:^(BOOL finished) {
+            
+            
+            
+        }];
+    }
+    
+}
+
+-(void)shareBtnClicked:(NSString *)senderId
+{
+    if(sharecompo==nil)
+    {
+        [self feedScreenGoesBack];
+        
+        sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
+        [sharecompo setUp];
+        [sharecompo setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+        
+        [self addSubview:sharecompo];
+    }
+}
+
+-(void)feedScreenGoesBack
+{
+    [HMPlayerManager sharedInstance].Profile_isPaused=true;
+   
+}
+-(void)feedScreenComesToFront
+{
+    [HMPlayerManager sharedInstance].Profile_isPaused=false;
+   
+}
+-(void)commentFullClosed:(id)sender
+{
+    [self feedScreenComesToFront];
+    
+    commentDisplay=nil;
+    sharecompo=nil;
+}
+
+#pragma mark - API call
 
 -(void)setUpDataRecordsForPosts
 {
-//    dataRecords=[DataSession sharedInstance].homeFeedResults;
     
-    NSArray *array=[DataSession sharedInstance].homeFeedResults;
-  
-    dataRecords=[[NSMutableArray alloc] init];
+    APIManager *manager=[[APIManager alloc] init];
     
-
-    for(int i=0;i<array.count;i++)
-    {
-
-        APIObjects_FeedObj *obj=[array objectAtIndex:i];
-        
-        NSString *feedUserId=[NSString stringWithFormat:@"%@",obj.user_id];
-        NSString *comparingId=[NSString stringWithFormat:@"%@",dataObj.userId];
-        
-        if([feedUserId isEqualToString:comparingId] && (obj.mediaType.intValue)!=2)
-        {
-            [dataRecords addObject:obj];
-        }
-
-        
-    }
+    [manager sendRequestForPostOfUsersId:[NSString stringWithFormat:@"%@",dataObj.userId] delegate:self andSelector:@selector(UserPostReceived:)];
     
     
-    /*
-    for(int i=0;i<1;i++)
-    {
-        
-        
-        NSDictionary *dict1=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_3.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict1];
-        
-        NSDictionary *dict42=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr11.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_mxlga0gj0e1shsvoe.mp4"};
-        
-        [dataRecords addObject:dict42];
-        
-        
-        
-        
-        NSDictionary *dict2=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_4.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict2];
-        
-        NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                              @"imageURL":@"post_5.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict5];
-        
-        
-        NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                              @"imageURL":@"post_7.jpeg",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              @"videoURL":@""};
-        
-        [dataRecords addObject:dict3];
-        
-        
-        NSDictionary *dict41=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr1.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi00kfkvMq1vrn2g4_480.mp4"};
-        
-        [dataRecords addObject:dict41];
-        
-        NSDictionary *dict43=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr12.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi4mtbbrHS1vwm5np.mp4"};
-        
-        [dataRecords addObject:dict43];
-        
-        {
-            NSDictionary *dict5=@{@"postType":[NSNumber numberWithInt:0],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict5];
-        }
-        
-        NSDictionary *dict44=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr7.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3y37m7az1vo8xre_480.mp4"};
-        
-        [dataRecords addObject:dict44];
-        
-        
-        
-        NSDictionary *dict45=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr14.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_ohkwqixP5j1u3ehw5.mp4"};
-        
-        [dataRecords addObject:dict45];
-        
-        {
-            NSDictionary *dict3=@{@"postType":[NSNumber numberWithInt:1],
-                                  @"imageURL":@"post_5.jpeg",
-                                  @"color":[NSNumber numberWithInt:arc4random()%14],
-                                  @"videoURL":@""};
-            
-            [dataRecords addObject:dict3];
-            
-        }
-        
-        NSDictionary *dict46=@{@"postType":[NSNumber numberWithInt:2],
-                               @"imageURL":@"pqr8.jpg",
-                               @"color":[NSNumber numberWithInt:arc4random()%14],
-                               @"videoURL":@"https://vt.media.tumblr.com/tumblr_oi3vig8Lqp1qbct3j.mp4"};
-        
-        [dataRecords addObject:dict46];
-        
-        
-        NSDictionary *dict4=@{@"postType":[NSNumber numberWithInt:2],
-                              @"imageURL":@"thumb1.png",
-                              @"color":[NSNumber numberWithInt:arc4random()%14],
-                              
-                              @"videoURL":@"https://player.vimeo.com/external/121377179.hd.mp4?s=383ab10c2c3229be7e818ccf30888ba8dbb59b26&profile_id=119&oauth2_token_id=57447761"};
-        
-        [dataRecords addObject:dict4];
-        
-        
-    }
-    */
+    ////    dataRecords=[DataSession sharedInstance].homeFeedResults;
+    //
+    //    NSArray *array=[DataSession sharedInstance].homeFeedResults;
+    //
+    //    dataRecords=[[NSMutableArray alloc] init];
+    //
+    //
+    //    for(int i=0;i<array.count;i++)
+    //    {
+    //
+    //        APIObjects_FeedObj *obj=[array objectAtIndex:i];
+    //
+    //        NSString *feedUserId=[NSString stringWithFormat:@"%@",obj.user_id];
+    //        NSString *comparingId=[NSString stringWithFormat:@"%@",dataObj.userId];
+    //
+    //        if([feedUserId isEqualToString:comparingId] && (obj.mediaType.intValue)!=2)
+    //        {
+    //            [dataRecords addObject:obj];
+    //        }
+    //
+    //        
+    //    }
+    
 }
 
+-(void)FriendShipBtnClicked:(id)sender
+{
+    
+    NSDictionary *dict=@{@"friend_id":dataObj.userId,@"status":@"pending"};
+    
+    // {"friend_id":12, "status":"rejected"}
+    APIManager *manager=[[APIManager alloc] init];
+    
+    [manager sendRequestForUpdateFriendshipStatus:dict delegate:self andSelector:@selector(updateFriendshipStatus:)];
+    
+    
+    
+}
+-(void)updateFriendshipStatus:(APIResponseObj *)responseObj
+{
+    NSString *msg=(NSString *)responseObj.response;
+    
+    [FTIndicator showSuccessWithMessage:msg];
+    
+    
+}
+-(void)UserPostReceived:(APIResponseObj *)responseObj
+{
+    NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
+    
+    //  NSLog(@"%@",responseObj.response);
+    
+   
+    
+    
+    APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+    
+    dataRecords=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
+    
+    cover_profileViewCount.text=[NSString stringWithFormat:@"%d",(int)[dataRecords count]];
+    [galleryView reloadData];
+    
+
+}
+#pragma mark - Scroll
+
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+    if(masterScrollView.contentOffset.y>self.frame.size.height*2)
+    {
+        [HMPlayerManager sharedInstance].Profile_isVisibleBounds=true;
+            [self stoppedScrolling];
+        
+    }
+    else
+    {
+        [HMPlayerManager sharedInstance].Profile_isVisibleBounds=false;
+
+        
+    }
+}
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                 willDecelerate:(BOOL)decelerate
+{
+    if(masterScrollView.contentOffset.y>self.frame.size.height*2)
+    {
+        [HMPlayerManager sharedInstance].Profile_isVisibleBounds=true;
+
+        
+            if (!decelerate) {
+                [self stoppedScrolling];
+                }
+        
+    
+    }
+    else
+    {
+        [HMPlayerManager sharedInstance].Profile_isVisibleBounds=false;
+        
+        
+    }
+}
+
+-(void)stoppedScrolling
+{
+    NSLog(@"%f",masterScrollView.contentOffset.y);
+    NSLog(@"%f",galleryView.contentOffset.x);
+    
+    
+    CGRect visibleRect = (CGRect){.origin = galleryView.contentOffset, .size = galleryView.bounds.size};
+    CGPoint visiblePoint = CGPointMake(CGRectGetMidX(visibleRect), CGRectGetMidY(visibleRect));
+    NSIndexPath *visibleIndexPath = [galleryView indexPathForItemAtPoint:visiblePoint];
+    
+    NSLog(@"Visible center - %d\n",(int)visibleIndexPath.row);
+    
+    
+    
+    for(UICollectionViewCell *cell in [galleryView visibleCells])
+    {
+        
+        NSIndexPath *indexPath = [galleryView indexPathForCell:cell];
+        NSLog(@"visibleCells %d",(int)indexPath.row);
+        if(indexPath==visibleIndexPath)
+        {
+            NSArray *array=dataRecords;
+            APIObjects_FeedObj *obj=[array objectAtIndex:indexPath.row];
+            NSString *url=obj.video_url;
+            
+            
+            if(![obj.video_url isEqualToString:[HMPlayerManager sharedInstance].Profile_urlIdentifier])
+            {
+                
+                PostFullCell *cell=(PostFullCell *)[galleryView cellForItemAtIndexPath:visibleIndexPath];
+                [cell playVideoIfAvaialble];
+                
+                [HMPlayerManager sharedInstance].Profile_screenIdentifier=screenIdentifier;
+                [HMPlayerManager sharedInstance].Profile_urlIdentifier=url;
+                
+            }
+            
+            
+        }
+    }
+}
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    
+    if(scrollView==masterScrollView)
+    {
+        float progress=scrollView.contentOffset.y/scrollView.contentSize.height+0.25;
+        
+        [closeProgressArcView setProgress:progress];
+        
+        if(scrollView.contentOffset.y>self.frame.size.height-50)
+        {
+            
+            cover_addBtn.hidden=true;
+        }
+        else
+        {
+            cover_addBtn.hidden=false;
+        }
+       
+    }
+    
+    
+}
+-(void)removingComponent
+{
+    [player clearLoopPlayer];
+    
+    [[self subviews]
+     makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+    [galleryView setDelegate:nil];
+    [galleryView setDataSource:nil];
+    [galleryView removeFromSuperview];
+
+}
 @end

@@ -13,7 +13,7 @@
 @interface EditInterestsComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate>
 {
     
-    NSArray *arrayData1;
+    NSArray *dbData;
     NSMutableArray *selectedArray;
 
     UICollectionView *interestCollectionView;

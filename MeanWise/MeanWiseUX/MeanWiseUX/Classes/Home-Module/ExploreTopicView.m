@@ -11,10 +11,16 @@
 
 @implementation ExploreTopicView
 
+-(void)setSearchTerm:(NSString *)string;
+{
+    searchTerm=string;
+    [topicListView reloadData];
+}
 -(void)setUp:(int)height 
 {
+    searchTerm=@"";
     
-    arrayTopics=[NSArray arrayWithObjects:@"@travelList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList",@"@travelList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList",@"@travelList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList",@"@travelIdea",@"@sportsIdeasportsIdea",@"@sportsList", nil];
+    arrayTopics=[NSArray arrayWithObjects:@"List",@"Idea",@"Fun",@"Work",@"Game",@"Workout",@"Play", nil];
     
     UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumInteritemSpacing = 10;
@@ -42,7 +48,10 @@
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     TopicListCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
-    cell.nameLBL.text=[arrayTopics objectAtIndex:indexPath.row];
+    
+    NSString *string=[NSString stringWithFormat:@"@%@%@",searchTerm,[arrayTopics objectAtIndex:indexPath.row]];
+    cell.nameLBL.text=string;
+    
     cell.bgView.backgroundColor=[Constant colorGlobal:(selectedChannel%13)];
 
     return cell;
@@ -57,8 +66,8 @@
 {
     NSDictionary *dictAttributes=@{NSFontAttributeName:[UIFont fontWithName:k_fontSemiBold size:16]};
     
-    
-    NSString *dict = [arrayTopics objectAtIndex:indexPath.row];
+    NSString *dict=[NSString stringWithFormat:@"@%@%@",searchTerm,[arrayTopics objectAtIndex:indexPath.row]];
+
 
 
     CGSize calCulateSizze =[dict sizeWithAttributes:dictAttributes];

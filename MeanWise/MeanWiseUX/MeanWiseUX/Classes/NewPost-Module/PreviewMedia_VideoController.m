@@ -554,7 +554,7 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
     NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
     
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetHighestQuality];
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
     exportSession.videoComposition=videoComposition;
     
     exportSession.outputURL = [NSURL fileURLWithPath:destinationPath];

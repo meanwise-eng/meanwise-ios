@@ -197,6 +197,8 @@
 		5681A3BE1E23709800A4927F /* WalkthroughControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 5681A37F1E23709800A4927F /* WalkthroughControl.m */; };
 		5681A3C11E2370CB00A4927F /* LineProgressBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5681A3C01E2370CB00A4927F /* LineProgressBar.m */; };
 		568318461E29134100DDCCA9 /* VideoLoopPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 568318451E29134100DDCCA9 /* VideoLoopPlayer.m */; };
+		56899DAE1E7E91B900D70DC1 /* MiniProfileComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 56899DAD1E7E91B900D70DC1 /* MiniProfileComponent.m */; };
+		56899DB01E7F240C00D70DC1 /* trashBtn.png in Resources */ = {isa = PBXBuildFile; fileRef = 56899DAF1E7F240C00D70DC1 /* trashBtn.png */; };
 		568B4DAB1D61A88900B5FBD1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 568B4DAA1D61A88900B5FBD1 /* main.m */; };
 		568B4DB41D61A88900B5FBD1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 568B4DB21D61A88900B5FBD1 /* Main.storyboard */; };
 		568B4DB61D61A88900B5FBD1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 568B4DB51D61A88900B5FBD1 /* Assets.xcassets */; };
@@ -624,6 +626,9 @@
 		5681A3C01E2370CB00A4927F /* LineProgressBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LineProgressBar.m; sourceTree = "<group>"; };
 		568318441E29134100DDCCA9 /* VideoLoopPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoLoopPlayer.h; sourceTree = "<group>"; };
 		568318451E29134100DDCCA9 /* VideoLoopPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VideoLoopPlayer.m; sourceTree = "<group>"; };
+		56899DAC1E7E91B900D70DC1 /* MiniProfileComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MiniProfileComponent.h; sourceTree = "<group>"; };
+		56899DAD1E7E91B900D70DC1 /* MiniProfileComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MiniProfileComponent.m; sourceTree = "<group>"; };
+		56899DAF1E7F240C00D70DC1 /* trashBtn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = trashBtn.png; sourceTree = "<group>"; };
 		568B4DA61D61A88900B5FBD1 /* MeanWiseUX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MeanWiseUX.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		568B4DAA1D61A88900B5FBD1 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		568B4DB31D61A88900B5FBD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -864,6 +869,8 @@
 				56D3563C1E3A86F900954655 /* ConnectionBar.m */,
 				56D3563E1E3A8BE200954655 /* PostUploadLoader.h */,
 				56D3563F1E3A8BE200954655 /* PostUploadLoader.m */,
+				56899DAC1E7E91B900D70DC1 /* MiniProfileComponent.h */,
+				56899DAD1E7E91B900D70DC1 /* MiniProfileComponent.m */,
 				567F1B7A1E6DF5FC00094485 /* NotificationBadgeView.h */,
 				567F1B7B1E6DF5FC00094485 /* NotificationBadgeView.m */,
 				56D588C01E2383A600106D14 /* TestView.h */,
@@ -1001,12 +1008,12 @@
 		5681A3041E23709800A4927F /* Comment-Module */ = {
 			isa = PBXGroup;
 			children = (
-				5681A3051E23709800A4927F /* CommentCell.h */,
-				5681A3061E23709800A4927F /* CommentCell.m */,
 				5681A3071E23709800A4927F /* CommentViewComponent.h */,
 				5681A3081E23709800A4927F /* CommentViewComponent.m */,
 				5681A3091E23709800A4927F /* FlyCommentComponent.h */,
 				5681A30A1E23709800A4927F /* FlyCommentComponent.m */,
+				5681A3051E23709800A4927F /* CommentCell.h */,
+				5681A3061E23709800A4927F /* CommentCell.m */,
 				5681A30B1E23709800A4927F /* FullCommentDisplay.h */,
 				5681A30C1E23709800A4927F /* FullCommentDisplay.m */,
 				5681A30D1E23709800A4927F /* ShareComponent.h */,
@@ -1022,6 +1029,8 @@
 				5681A31F1E23709800A4927F /* HomeComponent.m */,
 				5681A3141E23709800A4927F /* DetailViewComponent.h */,
 				5681A3151E23709800A4927F /* DetailViewComponent.m */,
+				56083F091E28083400200B16 /* ProfileAditionalScreen.h */,
+				56083F0A1E28083400200B16 /* ProfileAditionalScreen.m */,
 				5681A3281E23709800A4927F /* PostFullCell.h */,
 				5681A3291E23709800A4927F /* PostFullCell.m */,
 				5674BFF21E7425CB00DAA78C /* HMPlayer.h */,
@@ -1032,6 +1041,12 @@
 				56B102F21E3F9E6A00C73F70 /* EmptyView.m */,
 				5681A3161E23709800A4927F /* ExploreComponent.h */,
 				5681A3171E23709800A4927F /* ExploreComponent.m */,
+				56F1EAF41E374358006CE61C /* ExploreSearchComponent.h */,
+				56F1EAF51E374358006CE61C /* ExploreSearchComponent.m */,
+				56F1EAF61E374358006CE61C /* ExploreSearchItemCell.h */,
+				56F1EAF71E374358006CE61C /* ExploreSearchItemCell.m */,
+				565A47D81E323679007237D9 /* ExploreTopicView.h */,
+				565A47D91E323679007237D9 /* ExploreTopicView.m */,
 				56071E781E2E2EF600E92A4F /* HomeFeedCell.h */,
 				56071E791E2E2EF600E92A4F /* HomeFeedCell.m */,
 				5681A3201E23709800A4927F /* HomeScreen.h */,
@@ -1044,16 +1059,10 @@
 				5681A3191E23709800A4927F /* FeedCell.m */,
 				5681A31A1E23709800A4927F /* FeedExpCell.h */,
 				5681A31B1E23709800A4927F /* FeedExpCell.m */,
-				56F1EAF41E374358006CE61C /* ExploreSearchComponent.h */,
-				56F1EAF51E374358006CE61C /* ExploreSearchComponent.m */,
-				56F1EAF61E374358006CE61C /* ExploreSearchItemCell.h */,
-				56F1EAF71E374358006CE61C /* ExploreSearchItemCell.m */,
 				5681A3101E23709800A4927F /* ChannelExploreCell.h */,
 				5681A3111E23709800A4927F /* ChannelExploreCell.m */,
 				5681A3321E23709800A4927F /* UIImageHM.h */,
 				5681A3331E23709800A4927F /* UIImageHM.m */,
-				565A47D81E323679007237D9 /* ExploreTopicView.h */,
-				565A47D91E323679007237D9 /* ExploreTopicView.m */,
 				565A47DA1E323679007237D9 /* TopicListCell.h */,
 				565A47DB1E323679007237D9 /* TopicListCell.m */,
 				5681A3121E23709800A4927F /* DetailPostComponent.h */,
@@ -1074,8 +1083,6 @@
 				567F1B7E1E6E270400094485 /* SearchSuggestionsView.m */,
 				56083F061E27FC4600200B16 /* ProfileFullScreen.h */,
 				56083F071E27FC4600200B16 /* ProfileFullScreen.m */,
-				56083F091E28083400200B16 /* ProfileAditionalScreen.h */,
-				56083F0A1E28083400200B16 /* ProfileAditionalScreen.m */,
 				564D4E051E71EE43009CB2FC /* MasterScrollView.h */,
 				564D4E061E71EE43009CB2FC /* MasterScrollView.m */,
 				568318441E29134100DDCCA9 /* VideoLoopPlayer.h */,
@@ -1291,6 +1298,7 @@
 				565A47CA1E321001007237D9 /* cameraSwitchBtn.png */,
 				565A47CB1E321001007237D9 /* photoSwitchBtn.png */,
 				56DCB0521E29FD2000390EB1 /* likeBtnBig.png */,
+				56899DAF1E7F240C00D70DC1 /* trashBtn.png */,
 				560EC53E1E1AFA3A00320532 /* placeholder.jpg */,
 				563695F21E118D6B00A749A0 /* cameraFlip.png */,
 				563695F31E118D6B00A749A0 /* FlashOff.png */,
@@ -1648,6 +1656,7 @@
 				56A923971DF2DD7800F0E1A8 /* profile10.jpg in Resources */,
 				5699FEA81D61E67D000AB0A4 /* Portfolio1.jpeg in Resources */,
 				5651198F1E0000FB0016C7C1 /* BackPlainBlack.png in Resources */,
+				56899DB01E7F240C00D70DC1 /* trashBtn.png in Resources */,
 				5699FEA01D61DDF0000AB0A4 /* share.png in Resources */,
 				5669AD021DEF861800B4EA7A /* CameraBtn.png in Resources */,
 				569DBC3B1DE613BD0097D4B6 /* post_1.jpeg in Resources */,
@@ -1664,6 +1673,7 @@
 				5681A38F1E23709800A4927F /* HMVideoPlayer.m in Sources */,
 				5681A38D1E23709800A4927F /* FeedCell.m in Sources */,
 				5681A3A61E23709800A4927F /* ProfileViewController.m in Sources */,
+				56899DAE1E7E91B900D70DC1 /* MiniProfileComponent.m in Sources */,
 				5681A3AD1E23709800A4927F /* TermsOfUse.m in Sources */,
 				5681A3B21E23709800A4927F /* ImageCropView.m in Sources */,
 				5669ACE51DEF33D800B4EA7A /* IQUITextFieldView+Additions.m in Sources */,

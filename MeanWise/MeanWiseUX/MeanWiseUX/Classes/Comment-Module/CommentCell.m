@@ -9,6 +9,12 @@
 #import "CommentCell.h"
 
 @implementation CommentCell
+-(void)setTarget:(id)targetReceived andOnDelete:(SEL)deleteFunc;
+{
+    target=targetReceived;
+    commentDeleteFunc=deleteFunc;
+    
+}
 
 -(id)initWithFrame:(CGRect)frame
 {
@@ -55,18 +61,58 @@
         self.timeLBL.font=[UIFont fontWithName:k_fontBold size:14];
         self.timeLBL.numberOfLines=0;
 
+        self.customDeleteBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-50, 25, 40, 40)];
+        [self.customDeleteBtn setTitle:@"..." forState:UIControlStateNormal];
+        [self addSubview:self.customDeleteBtn];
+        self.customDeleteBtn.backgroundColor=[UIColor clearColor];
+        [self.customDeleteBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+        self.customDeleteBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:20];
+        self.customDeleteBtn.clipsToBounds=YES;
+        self.customDeleteBtn.layer.cornerRadius=20;
+        self.customDeleteBtn.contentHorizontalAlignment=UIControlContentHorizontalAlignmentRight;
+        [self.customDeleteBtn addTarget:self action:@selector(deleteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
         
+        self.customDeleteBtn.hidden=true;
+        self.customDeleteBtn.enabled=false;
         
         self.separatorView=[[UIView alloc] initWithFrame:CGRectMake(0,0,self.frame.size.width,1)];
         [self addSubview:self.separatorView];
         self.separatorView.backgroundColor=[UIColor colorWithWhite:1 alpha:0.1];
         
+      
         
       //  self.layer.borderWidth=1;
         
     }
     return self;
 }
+-(void)deleteBtnClicked:(id)sender
+{
+    FCAlertView *alert = [[FCAlertView alloc] init];
+    //alert.blurBackground = YES;
+    [alert showAlertWithTitle:@"Delete Comment"
+                 withSubtitle:@"Are you sure want to delete this comment?"
+              withCustomImage:nil
+          withDoneButtonTitle:@"Cancel"
+                   andButtons:nil];
+    [alert addButton:@"Delete" withActionBlock:^{
+        
+        
+        [target performSelector:commentDeleteFunc withObject:self.commentId afterDelay:0.01];
+        NSLog(@"delete");
+        
+        // Put your action here
+    }];
+    [alert doneActionBlock:^{
+        
+        
+        NSLog(@"done");
+        
+    }];
+    alert.titleColor=[UIColor redColor];
+    alert.firstButtonTitleColor = [UIColor redColor];
+}
+
 -(void)setProfileImageURLString:(NSString *)stringPath
 {
     [self.profileIMGVIEW setUp:stringPath];

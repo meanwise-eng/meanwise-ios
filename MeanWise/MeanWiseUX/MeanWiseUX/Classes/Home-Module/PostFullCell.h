@@ -23,6 +23,7 @@
     SEL commentBtnClickedFunc;
     SEL shareBtnClickedFunc;
     SEL commentWriteBtnClickedFunc;
+    SEL onDeleteClickedFunc;
 
     
     int mediaType;
@@ -41,11 +42,15 @@
 
     HMPlayer *player;
     
+
+    NSString *screenIdentifier;
     
 }
 -(void)setPlayerScreenIdeantifier:(NSString *)string;
 
 -(void)setTarget:(id)delegate shareBtnFunc:(SEL)func1 andCommentBtnFunc:(SEL)func2;
+-(void)onDeleteEvent:(SEL)func3;
+
 -(void)setCallBackForCommentWrite:(SEL)func3;
 
 -(void)setDataObj:(APIObjects_FeedObj *)dict;
@@ -70,6 +75,8 @@
 
 @property (nonatomic, strong) UIButton *likeBtn;
 @property (nonatomic, strong) UIButton *commentBtn;
+@property (nonatomic, strong) UIButton *deleteBtn;
+
 @property (nonatomic, strong) UIButton *shareBtn;
 @property (nonatomic, strong) UIButton *commentWriteBtn;
 

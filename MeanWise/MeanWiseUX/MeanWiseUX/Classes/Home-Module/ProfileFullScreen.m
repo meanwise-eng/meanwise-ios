@@ -7,6 +7,7 @@
 //
 
 #import "ProfileFullScreen.h"
+#import "HMPlayerManager.h"
 
 @implementation ProfileFullScreen
 -(void)setUpProfileObj:(APIObjects_ProfileObj *)obj;
@@ -16,6 +17,9 @@
 }
 -(void)setUpWithCellRect:(CGRect)rect
 {
+    
+    [[HMPlayerManager sharedInstance] StopKeepKillingProfileFeedVideosIfAvaialble];
+    
     self.backgroundColor=[UIColor clearColor];
    
     
@@ -70,7 +74,11 @@
   
     
 }
+-(void)setClosingFrame:(CGRect)rect;
+{
+    cellRect=rect;
 
+}
 -(void)zoomDownGestureDetected
 {
         ck.hidden=true;
@@ -89,6 +97,7 @@
 }
 -(void)closeThisViewManuallyClicked:(id)sender
 {
+    
     postIMGVIEW.transform=CGAffineTransformMakeScale(1, 1);
 
     [self closeThisView];
@@ -128,6 +137,15 @@
 -(void)zoomDownOut
 {
     
+    
+    [ck removingComponent];
+    
+    [[self subviews]
+     makeObjectsPerformSelector:@selector(removeFromSuperview)];
+
+    
+    [[HMPlayerManager sharedInstance] StartKeepKillingProfileFeedVideosIfAvaialble];
+
     [delegate performSelector:downCallBackFunc withObject:globalPath afterDelay:0.0001];
     
     

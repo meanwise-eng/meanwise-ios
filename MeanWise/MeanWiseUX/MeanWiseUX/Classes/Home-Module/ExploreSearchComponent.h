@@ -21,6 +21,12 @@
 
     UIView *tableViewBgView;
     UICollectionView *listofItems;
+    NSString *searchTerm;
+    
+    id target;
+    SEL onSearchItemSelectedFunc;
 }
 -(void)setUp;
+-(void)setSearchTerm:(NSString *)string;
+-(void)setTarget:(id)targetReceived OnSearchItemSelectedFunc:(SEL)func;
 @end

@@ -17,6 +17,12 @@
 @property (nonatomic,assign) BOOL Home_isPaused;
 @property (nonatomic,assign) BOOL Home_isVisibleBounds;
 
+@property (nonatomic, strong) NSString *Profile_screenIdentifier;
+@property (nonatomic, strong) NSString *Profile_urlIdentifier;
+@property (nonatomic,assign) BOOL Profile_isPaused;
+@property (nonatomic,assign) BOOL Profile_isVisibleBounds;
+@property (nonatomic,assign) BOOL Profile_isKilling;
+
 
 @property (nonatomic, strong) NSString *Explore_screenIdentifier;
 @property (nonatomic, strong) NSString *Explore_urlIdentifier;
@@ -27,6 +33,8 @@
 
 
 
+@property (nonatomic,assign) BOOL All_isPaused;
+
 
 
 
@@ -35,5 +43,8 @@
 + (instancetype)sharedInstance;
 -(void)StartKeepKillingExploreFeedVideosIfAvaialble;
 -(void)StopKeepKillingExploreFeedVideosIfAvaialble;
+
+-(void)StartKeepKillingProfileFeedVideosIfAvaialble;
+-(void)StopKeepKillingProfileFeedVideosIfAvaialble;
 
 @end

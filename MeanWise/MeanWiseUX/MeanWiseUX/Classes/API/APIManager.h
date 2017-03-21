@@ -29,15 +29,20 @@
 //Accept friendlist
 //Send friendslist
 
-//HOME FEED
+
+#pragma mark - Home
+
+//HOME
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
--(void)sendRequestExploreWithInterestsName:(NSString *)string Withdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestExploreFeedWithKey:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector;
 
 
 //Edit Profile
+#pragma mark - Edit Profile
 
 -(void)sendRequestForChangePassword:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
+
 
 -(void)sendRequestForEditProfile:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForUpdateCoverPhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
@@ -98,6 +103,7 @@
 -(void)sendRequestForNewPost:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForComments:(NSString *)postId delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForChannel:(NSString *)channelName delegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForDeleteComment:(NSString *)commentId postId:(NSString *)postId delegate:(id)delegate andSelector:(SEL)selector;
 
 
 

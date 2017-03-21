@@ -39,7 +39,9 @@
 -(void)ExploreSearchViaInterestsAPI
 {
     manager=[[APIManager alloc] init];
-    [manager sendRequestExploreWithInterestsName:@"Sports" Withdelegate:self andSelector:@selector(homeFeedAPIReceived:)];
+    [manager sendRequestExploreFeedWithKey:nil Withdelegate:self andSelector:@selector(homeFeedAPIReceived)];
+    
+    //[manager sendRequestExploreWithInterestsName:@"Sports" Withdelegate:self andSelector:@selector(homeFeedAPIReceived:)];
 //    [manager sendRequestExploreWithInterestsName:self andSelector:@selector(homeFeedAPIReceived:)];
 }
 -(void)UserNotificationAPI

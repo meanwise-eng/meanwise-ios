@@ -14,8 +14,12 @@
 @interface CommentCell : UICollectionViewCell
 {
     
+    id target;
+    SEL commentDeleteFunc;
     
 }
+@property (nonatomic, strong) NSString *commentId;
+
 @property (nonatomic, strong) UIView *separatorView;
 
 @property (nonatomic, strong) UIImageHM *profileIMGVIEW;
@@ -23,8 +27,10 @@
 
 @property (nonatomic, strong) UILabel *nameLBL;
 @property (nonatomic, strong) UILabel *personNameLBL;
+@property (nonatomic, strong) UIButton *customDeleteBtn;
 
 -(void)setNameLBLText:(NSString *)string;
 -(void)setProfileImageURLString:(NSString *)stringPath;
+-(void)setTarget:(id)targetReceived andOnDelete:(SEL)deleteFunc;
 
 @end

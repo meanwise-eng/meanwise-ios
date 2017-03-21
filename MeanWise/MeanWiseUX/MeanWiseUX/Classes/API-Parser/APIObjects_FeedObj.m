@@ -30,12 +30,27 @@
     self.text=[dict valueForKey:@"text"];
     self.user_firstname=[dict valueForKey:@"user_firstname"];
     self.user_lastname=[dict valueForKey:@"user_lastname"];
-    self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
     self.user_profile_photo_small=[dict valueForKey:@"user_profile_photo_small"];
+    self.user_cover_photo=[dict valueForKey:@"user_cover_photo"];
+    
     self.video_url=[dict valueForKey:@"video_url"];
     self.video_thumb_url=[dict valueForKey:@"video_thumb_url"];
     self.image_url=[dict valueForKey:@"image_url"];
     self.user_id=[dict valueForKey:@"user_id"];
+    
+    
+   // self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+
+    
+    if([[dict valueForKey:@"user_profession"] valueForKey:@"name"]==nil)
+    {
+        self.user_profession=@"";
+    }
+    else
+    {
+        self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+        
+    }
     
     
     

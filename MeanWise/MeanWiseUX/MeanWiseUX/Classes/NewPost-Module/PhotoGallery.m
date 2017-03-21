@@ -9,6 +9,7 @@
 #import "PhotoGallery.h"
 #import <malloc/malloc.h>
 #import "PhotoAlbumCCell.h"
+#import "FTIndicator.h"
 
 
 @implementation PhotoGallery
@@ -219,6 +220,11 @@
             [camera stop];
             
             image=[self fixOrientationOfImage:image];
+            
+            NSData *data=UIImagePNGRepresentation(image);
+            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+
+            
             NSString *path=[Constant FM_saveImageAtDocumentDirectory:image];
             [self sendImage:path];
             
@@ -599,6 +605,10 @@
             
             [self fixTheOrientationOfVideo:[NSURL fileURLWithPath:path]];
 
+            NSData *data=[NSData dataWithContentsOfFile:path];
+            
+            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+
         //[self sendImage:path];
 
         });
@@ -618,6 +628,10 @@
                     resultHandler:^void(UIImage *image, NSDictionary *info) {
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
+                            
+                            
+                            NSData *data=UIImagePNGRepresentation(image);
+                            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
                             
                             NSString *path=[Constant FM_saveImageAtDocumentDirectory:image];
                             [self sendImage:path];
@@ -723,6 +737,11 @@
 }
 -(void)fixTheOrientationOfVideo:(NSURL *)outputFileUrl
 {
+    
+    NSData *data=[NSData dataWithContentsOfFile:outputFileUrl.path];
+    
+    [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+
     
     if(outputFileUrl!=nil)
     {

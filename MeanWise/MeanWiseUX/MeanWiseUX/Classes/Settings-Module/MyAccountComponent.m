@@ -287,6 +287,8 @@
 }
 -(void)updateProfilePhoto:(NSString *)path
 {
+    path=[Constant getCompressedPathFromImagePath:path];
+    
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
     [t updateProfilePicture:path];
@@ -294,6 +296,8 @@
 }
 -(void)updateCoverPhoto:(NSString *)path
 {
+    path=[Constant getCompressedPathFromImagePath:path];
+    
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
     [t updateCoverPicture:path];

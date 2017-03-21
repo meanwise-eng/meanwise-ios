@@ -18,9 +18,12 @@
 
 @property (nonatomic, strong) NSString* text;
 @property (nonatomic, strong) NSString* user_profile_photo_small;
+@property (nonatomic,strong) NSString *user_cover_photo;
+@property (nonatomic, strong) NSString* user_firstname;
+
 @property (nonatomic, strong) NSString* video_url;
 @property (nonatomic, strong) NSString* video_thumb_url;
-@property (nonatomic, strong) NSString* user_firstname;
+
 @property (nonatomic, strong) NSString* user_lastname;
 @property (nonatomic, strong) NSString* user_profession;
 @property (nonatomic, strong) NSString* user_id;

@@ -17,5 +17,6 @@
 }
 
 -(void)setUpWithURL:(NSString *)string;
+-(void)clearLoopPlayer;
 
 @end
