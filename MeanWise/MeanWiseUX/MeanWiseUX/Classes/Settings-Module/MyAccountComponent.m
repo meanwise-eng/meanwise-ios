@@ -24,7 +24,7 @@
     
     [Constant setStatusBarColorWhite:false];
     
-    items=[NSArray arrayWithObjects:@"Friend Requests",@"Manage Interests",@"My Friends",@"Interests",@"Terms of Use",@"Privacy Policy", nil];
+    items=[NSArray arrayWithObjects:@"Friend Requests",@"Manage Interests",@"My Friends",@"*Interests",@"Terms of Use",@"Privacy Policy", nil];
     
     self.blackOverLayView=[[UIImageView alloc] initWithFrame:CGRectMake(-self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
     

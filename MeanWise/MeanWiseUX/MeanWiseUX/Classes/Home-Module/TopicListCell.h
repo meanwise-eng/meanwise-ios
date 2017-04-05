@@ -17,5 +17,6 @@
 }
 @property (nonatomic, strong) UIView *bgView;
 @property (nonatomic, strong) UILabel *nameLBL;
+@property (nonatomic, strong) UIColor *topicColor;
 
 @end

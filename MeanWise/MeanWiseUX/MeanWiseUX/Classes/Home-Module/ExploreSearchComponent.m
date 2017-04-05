@@ -8,6 +8,7 @@
 
 #import "ExploreSearchComponent.h"
 #import "ExploreSearchItemCell.h"
+#import "APIManager.h"
 
 @implementation ExploreSearchComponent
 
@@ -19,8 +20,89 @@
 -(void)setSearchTerm:(NSString *)string
 {
     searchTerm=string;
-    [listofItems reloadData];
+    [self callAutoCompleteAPI];
 }
+-(void)callAutoCompleteAPI
+{
+    
+
+    CGRect frame=CGRectMake(0, 0, 40, 40);
+    
+    
+    APIManager *manager=[[APIManager alloc] init];
+    
+    NSString *keyValue=@"";
+    if(selectedSegmentIndex==0)
+    {
+        CGRect tempRect=segmentPostsBtn.frame;
+        
+        frame=CGRectMake(tempRect.origin.x+tempRect.size.width-40, 10, 20, 20);
+        
+        keyValue=@"post";
+    }
+    else if(selectedSegmentIndex==1)
+    {
+        CGRect tempRect=segmentTopicsBtn.frame;
+        frame=CGRectMake(tempRect.origin.x+tempRect.size.width-40, 10, 20, 20);
+        
+        keyValue=@"topic";
+    }
+    else
+    {
+        CGRect tempRect=segmentHashtagsBtn.frame;
+        frame=CGRectMake(tempRect.origin.x+tempRect.size.width-40, 10, 20, 20);
+
+        keyValue=@"tag";
+    }
+    
+    if(![searchTerm isEqualToString:@""])
+    {
+
+        activityView.frame=frame;
+                [self showLoader];
+        
+        suggestionArray=[NSArray array];
+        [listofItems reloadData];
+        [listofItems scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+
+        
+        NSDictionary *dict=@{keyValue:searchTerm};
+        [manager sendRequestExploreAutoCompleteAPI:dict Withdelegate:self andSelector:@selector(AutoCompleteAPIReceived:)];
+    }
+    else
+    {
+        suggestionArray=[NSArray array];
+        [listofItems reloadData];
+        [listofItems scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+
+    }
+  
+}
+-(void)showLoader
+{
+    [activityView startAnimating];
+
+}
+-(void)hideLoader
+{
+    [activityView stopAnimating];
+
+}
+-(void)AutoCompleteAPIReceived:(APIResponseObj *)obj
+{
+    
+    [self hideLoader];
+    
+    if([obj.response isKindOfClass:[NSArray class]])
+    {
+    suggestionArray=(NSArray *)obj.response;
+    [listofItems reloadData];
+    [listofItems scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+    }
+
+    
+}
+
 -(void)setUp
 {
     searchTerm=@"";
@@ -52,7 +134,7 @@
     
     segmentHashtagsBtn=[[UIButton alloc] initWithFrame:CGRectMake(2*self.frame.size.width/3, 0, self.frame.size.width/3, 40)];
     [self addSubview:segmentHashtagsBtn];
-    [segmentHashtagsBtn setTitle:@"HASHTAGS" forState:UIControlStateNormal];
+    [segmentHashtagsBtn setTitle:@"TAGS" forState:UIControlStateNormal];
     [segmentHashtagsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:1.0] forState:UIControlStateNormal];
     segmentHashtagsBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:11];
     
@@ -65,6 +147,19 @@
     [segmentHashtagsBtn addTarget:self action:@selector(setSegmentIndex:) forControlEvents:UIControlEventTouchUpInside];
     
     
+//    loaderView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+//    [self addSubview:loaderView];
+//    loaderView.hidden=true;
+//    loaderView.backgroundColor=[UIColor blackColor];
+//    [loaderView setImage:[UIImage imageNamed:@"video-loader.png"]];
+//    [loaderView setContentMode:UIViewContentModeScaleAspectFit];
+//    loaderView.layer.cornerRadius=20;
+    
+    
+    activityView = [[UIActivityIndicatorView alloc]
+                                             initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [self addSubview:activityView];
+
     
     [self setSegmentIndex:segmentPostsBtn];
     
@@ -110,8 +205,7 @@
 
     [button setTitleColor:[UIColor colorWithWhite:1.0 alpha:1.0] forState:UIControlStateNormal];
 
-    [listofItems reloadData];
-    [listofItems scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+    [self callAutoCompleteAPI];
 
 }
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -119,15 +213,18 @@
     ExploreSearchItemCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     [cell setType:selectedSegmentIndex];
     
+    NSString *title=[suggestionArray objectAtIndex:indexPath.row];
+
     if(selectedSegmentIndex==1)
     {
-    cell.hashtagOrTopic.text=[NSString stringWithFormat:@"@%@",searchTerm];
+        cell.hashtagOrTopic.text=[NSString stringWithFormat:@"@%@",title];
         cell.bgView.backgroundColor=[Constant colorGlobal:(indexPath.row%10)];
 
     }
     else if(selectedSegmentIndex==2)
     {
-    cell.hashtagOrTopic.text=[NSString stringWithFormat:@"#%@",searchTerm];
+        
+        cell.hashtagOrTopic.text=[NSString stringWithFormat:@"#%@",title];
         cell.bgView.backgroundColor=[Constant colorGlobal:(indexPath.row%10)];
 
     }
@@ -148,7 +245,7 @@
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return 15;
+    return suggestionArray.count;
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath

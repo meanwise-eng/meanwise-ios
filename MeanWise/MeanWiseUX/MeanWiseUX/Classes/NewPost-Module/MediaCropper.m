@@ -17,8 +17,9 @@
     
     
     
+    isPlayerPaused=false;
     
-    self.backgroundColor=[UIColor grayColor];
+    self.backgroundColor=[UIColor blackColor];
     
     filePathStr=stringPath;
     NSString *ext = [filePathStr pathExtension];
@@ -32,9 +33,13 @@
         isVideo=true;
     }
     
+    containerView=[[UIView alloc] initWithFrame:self.bounds];
+    [self addSubview:containerView];
+    containerView.clipsToBounds=false;
+    
     
     scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-    [self addSubview:scrollView];
+    [containerView addSubview:scrollView];
     scrollView.center=self.center;
     scrollView.showsHorizontalScrollIndicator=false;
     scrollView.showsVerticalScrollIndicator=false;
@@ -102,6 +107,9 @@
         [AVPlayer playerWithURL:[NSURL fileURLWithPath:filePathStr]];
         [playerViewControl.player play];
         playerViewControl.showsPlaybackControls=false;
+        playerStartTime=kCMTimeZero;
+        playerEndTime=playerViewControl.player.currentItem.duration;
+        
         //  playerViewControl.videoGravity=AVLayerVideoGravityResize;
         
         // CGSize mediaSize = track.naturalSize;
@@ -153,6 +161,7 @@
         playerViewControl.videoGravity=AVLayerVideoGravityResizeAspect;
         [self performSelector:@selector(autoplayContinue:) withObject:nil afterDelay:0.2f];
         
+        
     }
     
     [self setUpBoundriesAndGrid];
@@ -170,6 +179,12 @@
     else
     {
         title.text=@"Crop Video";
+        
+        trimSlider=[[TrimSlider alloc] initWithFrame:CGRectMake(0, self.frame.size.height-65, self.frame.size.width, 50)];
+        [self addSubview:trimSlider];
+        [trimSlider setUp:filePathStr];
+        [trimSlider setTarget:self andOnTrimmingDidChangeFunc:@selector(trimmingChange:)];
+
         //        CGSize mediaSize=[self getTheSizeFromVideoPath:filePathStr];
         //
         //        int orien=[self getOrientation_FromVideoPath:filePathStr];
@@ -204,17 +219,24 @@
         //VIDEO TRACK
         AVMutableCompositionTrack *firstTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
         
+        CMTime duration=firstAsset.duration;
+        CMTime startTime=kCMTimeZero;
+//        
+
+       /* CMTime duration=CMTimeSubtract(playerEndTime, playerStartTime);
+        CMTime startTime=playerStartTime;*/
         
-        [firstTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, firstAsset.duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:kCMTimeZero error:nil];
+        
+        [firstTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:startTime error:nil];
         
         AVMutableCompositionTrack *firstAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
         
-        [firstAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, firstAsset.duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:kCMTimeZero error:nil];
+        [firstAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:startTime error:nil];
         
         
         AVMutableVideoCompositionInstruction * MainInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
         
-        MainInstruction.timeRange = CMTimeRangeMake(kCMTimeZero, firstAsset.duration);
+        MainInstruction.timeRange = CMTimeRangeMake(kCMTimeZero, duration);
         
         //FIXING ORIENTATION//
         AVMutableVideoCompositionLayerInstruction *FirstlayerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:firstTrack];
@@ -272,6 +294,7 @@
         MainCompositionInst.frameDuration = CMTimeMake(1, 30);
         MainCompositionInst.renderSize = requiredVideoSize;
         
+        
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
         NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"fixOrientation-%d.mov",arc4random() % 1000]];
@@ -284,6 +307,8 @@
         exporter.outputFileType = AVFileTypeQuickTimeMovie;
         exporter.videoComposition = MainCompositionInst;
         exporter.shouldOptimizeForNetworkUse = YES;
+        exporter.timeRange=CMTimeRangeMake(playerStartTime, CMTimeSubtract(playerEndTime, playerStartTime));
+        
         [exporter exportAsynchronouslyWithCompletionHandler:^
          {
              dispatch_async(dispatch_get_main_queue(), ^{
@@ -296,7 +321,11 @@
                      
                      NSLog(@"DONE - %@",myPathDocs);
                  }
-                 
+                 else
+                 {
+                     NSLog(@"DONE - %@",myPathDocs);
+
+                 }
              });
          }];
     }
@@ -423,24 +452,110 @@
     
     
 }
+-(void)trimmingChange:(NSArray *)array
+{
+    
+    
+    float start=[[array objectAtIndex:0] floatValue];
+    float end=[[array objectAtIndex:1] floatValue];
+    int selected=[[array objectAtIndex:2] intValue];
+    int touch=[[array objectAtIndex:3] intValue];
+    
+    
+   // float timeScale=playerViewControl.player.currentTime.timescale;
+    
+    playerStartTime=CMTimeMakeWithSeconds(start, 1);
+    playerEndTime=CMTimeMakeWithSeconds(end, 1);
+    
+    if(selected==1)
+    {
+        [self playerSeekToTime:playerStartTime];
 
+    }
+    else
+    {
+        [self playerSeekToTime:playerEndTime];
+
+
+    }
+    
+    if(touch==1)
+    {
+        [UIView animateWithDuration:0.2 animations:^{
+            containerView.transform=CGAffineTransformMakeScale(0.75, 0.75);
+
+        }];
+        
+        isPlayerPaused=true;
+        [playerViewControl.player pause];
+
+    }
+    else
+    {
+        [UIView animateWithDuration:0.2 animations:^{
+            containerView.transform=CGAffineTransformMakeScale(1.0, 1.0);
+            
+        }];
+        
+        [self playerSeekToTime:playerStartTime];
+        isPlayerPaused=false;
+
+    }
+    
+
+    
+}
+-(void)playerSeekToTime:(CMTime)time
+{
+    NSTimeInterval currentTime = CMTimeGetSeconds(time);
+
+    int32_t timeScale = playerViewControl.player.currentItem.asset.duration.timescale;
+    CMTime time2 = CMTimeMakeWithSeconds(currentTime, timeScale);
+    [playerViewControl.player seekToTime:time2 toleranceBefore:kCMTimeZero toleranceAfter:kCMTimeZero];
+
+    
+//    CMTime currentT=CMTimeMakeWithSeconds(currentTime, 1);
+//
+//    [playerViewControl.player.currentItem seekToTime:currentT];
+
+}
 -(void)autoplayContinue:(id)sender
 {
     
+    if(isPlayerPaused==false)
+    {
     AVPlayerItem *currentItem = playerViewControl.player.currentItem;
     
     NSTimeInterval currentTime = CMTimeGetSeconds(currentItem.currentTime);
     
-    NSTimeInterval duration = CMTimeGetSeconds(currentItem.duration);
+        CMTime currentT=CMTimeMakeWithSeconds(currentTime, 1);
+        
+        
+    NSTimeInterval duration = CMTimeGetSeconds(playerEndTime);
+        if(CMTimeCompare(playerEndTime, kCMTimeIndefinite)==0)
+        {
+            playerEndTime=playerViewControl.player.currentItem.duration;
+            duration=CMTimeGetSeconds(playerEndTime);
+        }
     
+        
     if(currentTime>=duration)
     {
-        [playerViewControl.player seekToTime:kCMTimeZero];
+        [self playerSeekToTime:playerStartTime];
+
         
     }
     [playerViewControl.player play];
+        
+        [trimSlider updateProgress:playerStartTime endTime:playerEndTime andCurrentTime:currentItem.currentTime];
+        
     
+    }
+    else{
+        [playerViewControl.player pause];
+    }
     [self performSelector:@selector(autoplayContinue:) withObject:nil afterDelay:0.2f];
+
     
 }
 
@@ -582,13 +697,14 @@
 }
 -(void)replayBtnClicked:(id)sender
 {
-    [playerViewControl.player.currentItem seekToTime:kCMTimeZero];
+    [self playerSeekToTime:kCMTimeZero];
+
     [playerViewControl.player play];
     
 }
 -(void)cropFinished:(id)sender
 {
-    
+    isPlayerPaused=true;
     [FTIndicator showProgressWithmessage:@"Preparing.." userInteractionEnable:NO];
     CGRect visibleRect = [scrollView convertRect:scrollView.bounds toView:imageView];
     
@@ -650,7 +766,7 @@
 -(void)setUpBoundriesAndGrid
 {
     
-    UIColor *color=[UIColor colorWithWhite:0 alpha:0.7];
+    UIColor *color=[UIColor colorWithWhite:0.0f alpha:0.5f];
     UIColor *color1=[UIColor colorWithWhite:1.0f alpha:0.3];
     
     UIView *view1=[[UIView alloc] initWithFrame:CGRectZero];
@@ -662,10 +778,10 @@
     view3.backgroundColor=color;
     view4.backgroundColor=color;
     
-    [self addSubview:view1];
-    [self addSubview:view2];
-    [self addSubview:view3];
-    [self addSubview:view4];
+    [containerView addSubview:view1];
+    [containerView addSubview:view2];
+    [containerView addSubview:view3];
+    [containerView addSubview:view4];
     
     
     view1.frame=CGRectMake(0, 0, self.frame.size.width, scrollView.frame.origin.y);
@@ -674,6 +790,14 @@
     
     view2.frame=CGRectMake(0,scrollView.frame.origin.y, scrollView.frame.origin.x, self.frame.size.height-2*scrollView.frame.origin.y);
     view4.frame=CGRectMake(scrollView.frame.origin.x+scrollView.frame.size.width,scrollView.frame.origin.y, self.frame.size.width-(scrollView.frame.size.width+scrollView.frame.origin.x), self.frame.size.height-2*scrollView.frame.origin.y);
+    
+    view1.frame=CGRectMake(-300, -300, self.frame.size.width+300, 300);
+    view2.frame=CGRectMake(-300, self.frame.size.height, self.frame.size.width+300, 300);
+    view3.frame=CGRectMake(self.frame.size.width, -300, 300, self.frame.size.height+600);
+    view4.frame=CGRectMake(-300, 0, 300, self.frame.size.height);
+    
+    
+    
     
     UIView *gridView1=[[UIView alloc] initWithFrame:CGRectZero];
     UIView *gridView2=[[UIView alloc] initWithFrame:CGRectZero];
@@ -688,11 +812,11 @@
     gridView4.backgroundColor=color1;
     gridView5.backgroundColor=color1;
     
-    [self addSubview:gridView1];
-    [self addSubview:gridView2];
-    [self addSubview:gridView3];
-    [self addSubview:gridView4];
-    [self addSubview:gridView5];
+    [containerView addSubview:gridView1];
+    [containerView addSubview:gridView2];
+    [containerView addSubview:gridView3];
+    [containerView addSubview:gridView4];
+    [containerView addSubview:gridView5];
     
     
     CGSize size=scrollView.frame.size;

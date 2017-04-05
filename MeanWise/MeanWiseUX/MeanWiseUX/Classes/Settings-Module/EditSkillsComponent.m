@@ -9,6 +9,8 @@
 #import "MessageContactCell.h"
 #import "ChatThreadComponent.h"
 #import "EditSkillsComponent.h"
+#import "ViewController.h"
+
 
 
 @implementation EditSkillsComponent
@@ -23,11 +25,67 @@
     [self setUpNavBarAndAll];
     
     
+    NSArray *array1=[[APIPoster alloc] getSkillsData];
+    NSArray *array2=[UserSession getUserSkills];
+    
+    NSMutableArray *userTagList=[[NSMutableArray alloc] init];
+    
+    for(int i=0;i<[array2 count];i++)
+    {
+        NSNumber *n=[array2 objectAtIndex:i];
+        
+        for (NSDictionary *dict in array1)
+        {
+            if([dict valueForKey:@"id"]==n)
+            {
+                [userTagList addObject:dict];
+            }
+            
+        }
+        
+    }
+    
+    UIView *view1=[[UIView alloc] initWithFrame:CGRectMake(0, 66+70, self.frame.size.width, 60)];
+    [self addSubview:view1];
+    view1.backgroundColor=[UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.00];
     
     
-    // msgContactTable.bounces=false;
+    
+    tagSearchField=[[UITextField alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 60)];
+    tagSearchField.backgroundColor=[UIColor clearColor];
+    tagSearchField.textColor=[UIColor blackColor];
+    tagSearchField.font=[UIFont fontWithName:k_fontSemiBold size:18];
+    [view1 addSubview:tagSearchField];
+    tagSearchField.adjustsFontSizeToFitWidth=YES;
+    tagSearchField.placeholder=@"Enter skill";
+    [tagSearchField addTarget:self action:@selector(searchTermChanged:) forControlEvents:UIControlEventEditingChanged];
+    
+    
+    tagList=[[EditTagListControl alloc] initWithFrame:CGRectMake(0, 66+70+60, self.frame.size.width, self.frame.size.height-66-70-60-50)];
+    [tagList setUp:userTagList];
+    [self addSubview:tagList];
+    
+    autoCompleteResultComponent=[[EditTagSearchResultComponent alloc] initWithFrame:CGRectMake(0, 66+70+60, self.frame.size.width, self.frame.size.height-66-70-60-50)];
+    [autoCompleteResultComponent setUp:self OnTagSelectCallBack:@selector(onTagAdd:)];
+    [self addSubview:autoCompleteResultComponent];
+    [autoCompleteResultComponent setSearchTerm:@"" withCurrentArray:[tagList getCurrentTagList]];
+
     
 }
+-(void)onTagAdd:(NSDictionary *)dict
+{
+
+    [tagList addNewTag:dict];
+    tagSearchField.text=@"";
+    [tagSearchField resignFirstResponder];
+    [autoCompleteResultComponent setSearchTerm:@"" withCurrentArray:[tagList getCurrentTagList]];
+}
+-(void)searchTermChanged:(id)sender
+{
+    [autoCompleteResultComponent setSearchTerm:tagSearchField.text withCurrentArray:[tagList getCurrentTagList]];
+    
+}
+
 -(void)setUpNavBarAndAll
 {
     self.blackOverLayView=[[UIImageView alloc] initWithFrame:CGRectMake(-self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
@@ -82,6 +140,23 @@
 }
 -(void)saveBtnClicked:(id)sender
 {
+    NSArray *updatedSkillsArray=[tagList getCurrentTagList];
+        NSString *commaseperated = [[updatedSkillsArray valueForKey:@"id"] componentsJoinedByString:@","];
+    updatedSkillsArray = [commaseperated componentsSeparatedByString:@","];
+
+    
+    if(updatedSkillsArray.count>1)
+    {
+        NSDictionary *dict=@{
+                             @"skills":updatedSkillsArray,
+                             };
+        
+        UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+        ViewController *t=(ViewController *)vc.topViewController;
+        [t updateProfileWithDict:dict];
+        
+    }
+    
     
 }
 

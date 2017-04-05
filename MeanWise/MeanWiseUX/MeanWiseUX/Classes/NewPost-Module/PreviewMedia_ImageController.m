@@ -8,6 +8,7 @@
 
 #import "PreviewMedia_ImageController.h"
 
+
 @implementation PreviewMedia_ImageController
 
 -(void)setTarget:(id)targetReceived OnSuccess:(SEL)func1 OnFail:(SEL)func2;
@@ -44,10 +45,14 @@
     if([ext.lowercaseString isEqualToString:@"png"] || [ext.lowercaseString isEqualToString:@"jpg"] || [ext.lowercaseString isEqualToString:@"jpeg"])
     {
         
-        keyImageView=[[UIImageView alloc] initWithFrame:self.bounds];
+        keyImageView=[[UIFilterImageView alloc] initWithFrame:self.bounds];
         [self addSubview:keyImageView];
-        keyImageView.image=[UIImage imageWithContentsOfFile:filePathStr];
-        keyImageView.contentMode=UIViewContentModeScaleAspectFill;
+        [keyImageView setUpWithImage:filePathStr];
+        keyImageView.clipsToBounds=YES;
+        keyImageView.userInteractionEnabled=false;
+        
+//        keyImageView.image=[UIImage imageWithContentsOfFile:filePathStr];
+       // keyImageView.contentMode=UIViewContentModeScaleAspectFill;
         
 
         isVideo=false;
@@ -91,7 +96,7 @@
     shadowImageView.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     shadowImageView.alpha=0.1f;
     shadowImageView.transform=CGAffineTransformMakeScale(1, -1);
-    
+    shadowImageView.userInteractionEnabled=false;
     
     
     fontSize=30;
@@ -133,6 +138,12 @@
     [doneBtn setBackgroundImage:[UIImage imageNamed:@"1_doneBtn.png"] forState:UIControlStateNormal];
 
     
+    locationBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
+    [self addSubview:locationBtn];
+    locationBtn.center=CGPointMake(self.frame.size.width/2, 35);
+    [locationBtn setBackgroundImage:[UIImage imageNamed:@"locationMarkIcon.png"] forState:UIControlStateNormal];
+    [locationBtn addTarget:self action:@selector(locationBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    locationBtn.alpha=0.5;
 
     
     
@@ -165,6 +176,42 @@
     [self setState:0];
 
     [self addTextBtnClicked:nil];
+}
+-(void)locationBtnClicked:(id)sender
+{
+    [self setState:2];
+    
+    if(locationSticker==nil)
+    {
+        locationBtn.alpha=1;
+        locationSticker=[[LocationFilterView alloc] initWithFrame:self.bounds];
+        [self addSubview:locationSticker];
+        [locationSticker setTarget:self onLocationFail:@selector(locationFailed:)];
+        [locationSticker setUp];
+    }
+    else
+    {
+        [self locationFailed:@""];
+    }
+}
+-(void)locationFailed:(NSString *)message
+{
+    locationBtn.alpha=0.5;
+
+    [locationSticker removeFromSuperview];
+    locationSticker=nil;
+    
+    
+    if(![message isEqualToString:@""])
+    {
+        [Constant okAlert:@"Location is disabled." withSubTitle:message onView:self andStatus:1];
+        
+    }
+    
+    //location
+    //location+time
+    
+    
 }
 
 -(void)autoplayContinue:(id)sender
@@ -313,15 +360,22 @@
     {
         editBtn.hidden=true;
         doneBtn.hidden=true;
+        locationBtn.hidden=true;
         
+        UIGraphicsBeginImageContextWithOptions(self.bounds.size, NO, [UIScreen mainScreen].scale);
         
-        UIGraphicsBeginImageContextWithOptions(keyImageView.bounds.size, NO, 0.0); //retina res
-        [[self layer] renderInContext:UIGraphicsGetCurrentContext()];
+        [self drawViewHierarchyInRect:self.bounds afterScreenUpdates:YES];
+        
+        // old style [self.layer renderInContext:UIGraphicsGetCurrentContext()];
+        
         UIImage *capturedImage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
+
+        
         NSString *processedImagePath=[self FM_saveImageAtDocumentDirectory:capturedImage];
         editBtn.hidden=false;
         doneBtn.hidden=false;
+        locationBtn.hidden=false;
         
         [self redirectWithPath:processedImagePath];
     }
@@ -753,6 +807,22 @@
 
     }
     
+}
+-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+{
+    if(touches.count==1)
+    {
+        UITouch *touch=[touches anyObject];
+        CGPoint location=[touch locationInView:self];
+
+        if(touch.tapCount==2)
+        {
+            [self setState:2];
+            [keyImageView generateNewEffectPoint:location];
+        }
+        
+        
+    }
 }
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {

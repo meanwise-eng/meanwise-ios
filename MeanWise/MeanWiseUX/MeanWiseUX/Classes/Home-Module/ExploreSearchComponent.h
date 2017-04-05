@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Constant.h"
+#import "APIManager.h"
 
 @interface ExploreSearchComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate>
 {
@@ -25,6 +26,11 @@
     
     id target;
     SEL onSearchItemSelectedFunc;
+    
+    NSArray *suggestionArray;
+    
+    UIActivityIndicatorView *activityView;
+    
 }
 -(void)setUp;
 -(void)setSearchTerm:(NSString *)string;

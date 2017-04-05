@@ -36,8 +36,7 @@
 
 @property (nonatomic, strong) NSNumber* notificationIsNew;
 
-
-
+@property (nonatomic,strong) NSDictionary *postFeedObj;
 
 -(void)setUpWithDict:(NSDictionary *)dict;
 

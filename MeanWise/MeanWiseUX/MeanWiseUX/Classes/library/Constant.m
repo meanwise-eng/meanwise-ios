@@ -178,6 +178,13 @@
         color3=[UIColor colorWithHue:0.60 saturation:0.73 brightness:0.84 alpha:1.00];
         
     }
+    else if(number==201)
+    {
+        color1=[UIColor colorWithHue:0 saturation:1.00 brightness:0 alpha:1.00];
+        color2=[UIColor colorWithHue:0.2 saturation:0.90 brightness:0 alpha:1.00];
+        color3=[UIColor colorWithHue:0.3 saturation:0.80 brightness:0 alpha:1.00];
+        
+    }
     
     CAGradientLayer *gradient = [CAGradientLayer layer];
     
@@ -323,6 +330,25 @@
     }
 
 
+}
++(NSString *)static_getSKillFromId:(int)skillId
+{
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    
+    NSArray *ud1=[ud objectForKey:@"DATA_SKILLS"];
+    
+    NSArray *filtered = [ud1 filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(id == %d)", skillId]];
+    
+    if(filtered.count==1)
+    {
+        return [[filtered valueForKey:@"text"] objectAtIndex:0];
+    }
+    else
+    {
+        return @"";
+    }
+    
+    
 }
 
 

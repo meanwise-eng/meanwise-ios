@@ -33,7 +33,7 @@
 
     passed=0;
     
-    items1=[NSArray arrayWithObjects:@"Intro",@"Story",@"*Intro Video",@"*Skills",@"Profession",@"Location", nil];
+    items1=[NSArray arrayWithObjects:@"Intro",@"Story",@"*Intro Video",@"Skills",@"Profession",@"Location", nil];
     
     items2=[NSArray arrayWithObjects:@"Name",@"*UserName",@"Birthday",@"Mobile Number",@"*Email",@"Password",@"Logout", nil];
 

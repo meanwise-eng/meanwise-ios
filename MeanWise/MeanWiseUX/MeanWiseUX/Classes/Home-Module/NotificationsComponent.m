@@ -21,6 +21,10 @@
 -(void)setUp:(NSArray *)array;
 {
 
+    postView=nil;
+    friendListCompo=nil;
+    friendRequestListCompo=nil;
+    
     if(array==nil)
     {
         array=[DataSession sharedInstance].notificationsResults;
@@ -279,7 +283,84 @@
     return cell;
 }
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    APIObjects_NotificationObj *obj=[dataFeeds objectAtIndex:indexPath.row];
+    int typeNo=obj.notification_typeNo.intValue;
+
+    if(typeNo==1) //like
+    {
+        NSDictionary *dict=obj.postFeedObj;
+        [self openPost:dict withComment:false];
+
+    }
+    if(typeNo==2) //comment
+    {
+         NSDictionary *dict=obj.postFeedObj;
+        [self openPost:dict withComment:YES];
+        
+    }
+    if(typeNo==3) //accept
+    {
+        [self openFriendList];
+    }
+    if(typeNo==4) //request
+    {
+        [self openFriendRequestList];
+    }
+
+}
+-(void)openPost:(NSDictionary *)postObj withComment:(BOOL)flag
+{
+    postView=[[NotificationPostView alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
+    [self addSubview:postView];
+    [postView setUpWithPostId:postObj withComment:flag];
+    
+    [postView setTarget:self backBtnCallBack:@selector(backToNotifications:)];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        postView.frame=self.bounds;
+        postView.backgroundColor=[UIColor whiteColor];
+    }];
+    
+}
+-(void)openFriendList
+{
+    friendListCompo=[[FriendList alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+    [friendListCompo setUp];
+    [friendListCompo setTarget:self andBackFunc:@selector(backToNotifications:)];
+    [self addSubview:friendListCompo];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        friendListCompo.frame=self.bounds;
+        friendListCompo.backgroundColor=[UIColor whiteColor];
+    }];
+}
+-(void)openFriendRequestList
+{
+    friendRequestListCompo=[[FriendRequestList alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+    [friendRequestListCompo setUp];
+    [friendRequestListCompo setTarget:self andBackFunc:@selector(backToNotifications:)];
+    [self addSubview:friendRequestListCompo];
+    
+    
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        friendRequestListCompo.frame=self.bounds;
+        friendRequestListCompo.backgroundColor=[UIColor whiteColor];
+    }];
+    
+}
+-(void)backToNotifications:(id)sender
+{
+    [postView removeFromSuperview];
+    [friendListCompo removeFromSuperview];
+    [friendRequestListCompo removeFromSuperview];
+    
+    friendListCompo=nil;
+    friendRequestListCompo=nil;
+    postView=nil;
+    
     
 }
 @end

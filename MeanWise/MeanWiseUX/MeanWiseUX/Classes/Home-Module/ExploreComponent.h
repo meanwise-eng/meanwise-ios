@@ -20,6 +20,7 @@
     
     int typeOfSearch;
     NSString *currentSearchTerm;
+    NSString *topicNameForChannel;
     
     APIManager *manager;
 

@@ -74,5 +74,6 @@
 
 #pragma mark - File Manager
 +(NSString *)static_getInterstFromId:(int)interstId;
++(NSString *)static_getSKillFromId:(int)interstId;
 
 @end

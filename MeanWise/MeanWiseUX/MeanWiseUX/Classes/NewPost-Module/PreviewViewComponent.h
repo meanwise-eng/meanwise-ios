@@ -12,6 +12,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 
+
 @interface PreviewViewComponent : UIView
 {
     CGRect smallRect;

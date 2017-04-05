@@ -147,7 +147,12 @@
             //  self.hidden=false;
             isPlayerShouldPlay=true;
         }
-
+        else if([HMPlayerManager sharedInstance].NotificationPost_isPaused==false && [HMPlayerManager sharedInstance].NotificationPost_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].NotificationPost_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].NotificationPost_urlIdentifier])
+        {
+            
+            //  self.hidden=false;
+            isPlayerShouldPlay=true;
+        }
         else
         {
           //  self.hidden=true;
@@ -186,6 +191,20 @@
     {
         
         NSLog(@"Kill Profile player");
+        
+        [self killPlayer];
+        urlStr=nil;
+        isPlayerShouldPlay=false;
+        [playerViewController.view removeFromSuperview];
+        playerViewController=nil;
+        
+        [self removeFromSuperview];
+        
+    }
+    if([HMPlayerManager sharedInstance].NotificationPost_isKilling==true && [[HMPlayerManager sharedInstance].NotificationPost_screenIdentifier isEqualToString:screenIdentifier])
+    {
+        
+        NSLog(@"Kill Notification player");
         
         [self killPlayer];
         urlStr=nil;

@@ -14,7 +14,12 @@
 
 -(void)setUp
 {
-    [self ExploreSearchViaInterestsAPI];
+    
+    [self sendForgetPassword];
+    
+  //  [self trendingTopicsForChannel];
+    
+   // [self ExploreSearchViaInterestsAPI];
     
     //[self UserNotificationAPI];
     
@@ -36,6 +41,42 @@
     
    // [self getLikeAPost];
 }
+-(void)sendForgetPassword
+{
+    manager=[[APIManager alloc] init];
+    [manager sendRequestForForgetPasswordWithDelegate:self andSelector:@selector(forgetPasswordCallBack:)];
+    
+}
+-(void)forgetPasswordCallBack:(APIResponseObj *)responseObj
+{
+    
+}
+-(void)autoCompleteAPIForTag
+{
+    manager=[[APIManager alloc] init];
+   
+    
+    NSDictionary *dict=@{@"topic":@"to"};
+ //   NSDictionary *dict=@{@"tag":@"t"};
+    
+    
+    [manager sendRequestExploreAutoCompleteAPI:dict Withdelegate:self andSelector:@selector(autoCompleteAPIForTagReceived:)];
+    
+    
+}
+-(void)trendingTopicsForChannel
+{
+    manager=[[APIManager alloc] init];
+    [manager sendRequestExploreTopTrendingTopicsForChannel:@"2" Withdelegate:self andSelector:@selector(autoCompleteAPIForTagReceived:)];
+    
+
+}
+-(void)autoCompleteAPIForTagReceived:(APIResponseObj *)responseObj
+{
+    NSLog(@"%@",responseObj.response);
+
+}
+
 -(void)ExploreSearchViaInterestsAPI
 {
     manager=[[APIManager alloc] init];

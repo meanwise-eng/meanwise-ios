@@ -56,6 +56,13 @@
         
         
     }
+    if([self.notification_type isEqualToString:@"LikedPost"] || [self.notification_type isEqualToString:@"CommentedPost"])
+    {
+        self.postFeedObj=[dict valueForKey:@"post"];
+        
+    }
+    
+    
     if([self.notification_type isEqualToString:@"CommentedPost"])
     {
         self.commentId=[[dict valueForKey:@"comment"] valueForKey:@"id"];
@@ -67,6 +74,8 @@
         self.notifier_userLastName=[[dict valueForKey:@"comment"] valueForKey:@"user_last_name"];
         self.notifier_userThumbURL=[[dict valueForKey:@"comment"] valueForKey:@"user_profile_photo_small"];
 
+        
+        
         //self.commentText=[dict valueForKey:@"commentText"];
 
     }
@@ -90,18 +99,31 @@
     if([self.notification_type isEqualToString:@"FriendRequestAccepted"] || [self.notification_type isEqualToString:@"FriendRequestReceived"])
     {
         
-          self.notifier_userId=[[[dict valueForKey:@"user_friend"] valueForKey:@"friend"] valueForKey:@"id"];
+        NSString *notificationFromUser=@"friend";
         
-        self.notifier_userUserName=[[[[dict valueForKey:@"user_friend"] valueForKey:@"friend"] valueForKey:@"userprofile"] valueForKey:@"username"];
-        
-        self.notifier_userFirstName=[[[[dict valueForKey:@"user_friend"] valueForKey:@"friend"] valueForKey:@"userprofile"] valueForKey:@"first_name"];
-        
-        self.notifier_userLastName=
-        [[[[dict valueForKey:@"user_friend"] valueForKey:@"friend"] valueForKey:@"userprofile"] valueForKey:@"last_name"];
-        
-        self.notifier_userThumbURL=
-        [[[[dict valueForKey:@"user_friend"] valueForKey:@"friend"] valueForKey:@"userprofile"] valueForKey:@"profile_photo_small"];
+        if([self.notification_type isEqualToString:@"FriendRequestAccepted"])
+        {
+            notificationFromUser=@"user";
+        }
+        else
+        {
+            notificationFromUser=@"friend";
 
+        }
+        
+            self.notifier_userId=[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"id"];
+            
+            self.notifier_userUserName=[[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"username"];
+            
+            self.notifier_userFirstName=[[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"first_name"];
+            
+            self.notifier_userLastName=
+            [[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"last_name"];
+            
+            self.notifier_userThumbURL=
+            [[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"profile_photo_small"];
+
+       
         
         
     }

@@ -11,9 +11,18 @@
 #import "Constant.h"
 #import "APIObjects_NotificationObj.h"
 #import "EmptyView.h"
+#import "FriendList.h"
+#import "FriendRequestList.h"
+#import "NotificationPostView.h"
 
 @interface NotificationsComponent : UIView <UITableViewDataSource,UITableViewDelegate>
 {
+    
+    NotificationPostView *postView;
+    
+    
+    FriendList *friendListCompo;
+    FriendRequestList *friendRequestListCompo;
 
     NSMutableArray *dataFeeds;
     NSString *lastNotificationReceived;

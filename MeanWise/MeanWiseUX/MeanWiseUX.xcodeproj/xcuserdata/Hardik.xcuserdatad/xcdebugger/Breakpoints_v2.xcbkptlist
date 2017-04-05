@@ -9,13 +9,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Home-Module/FeedCell.m"
-            timestampString = "509019917.031961"
+            filePath = "MeanWiseUX/Classes/NewPost-Module/MediaCropper.m"
+            timestampString = "512766224.228656"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "437"
-            endingLineNumber = "437"
-            landmarkName = "-likeBtnClicked:"
+            startingLineNumber = "326"
+            endingLineNumber = "326"
+            landmarkName = "-saveNewVideo"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -25,12 +25,28 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Settings-Module/EditProffesionComponent.m"
-            timestampString = "510410181.659712"
+            filePath = "MeanWiseUX/Classes/library/Constant.m"
+            timestampString = "512854781.206268"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "222"
-            endingLineNumber = "222"
+            startingLineNumber = "348"
+            endingLineNumber = "348"
+            landmarkName = "+static_getSKillFromId:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MeanWiseUX/Classes/Settings-Module/EditInterestsComponent.m"
+            timestampString = "512714350.875957"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "269"
+            endingLineNumber = "269"
             landmarkName = "-saveBtnClicked:"
             landmarkType = "5">
          </BreakpointContent>
@@ -38,145 +54,33 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Home-Module/ZoomGestureView.m"
-            timestampString = "510608581.760726"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "156"
-            endingLineNumber = "156"
-            landmarkName = "-pinchGestureRecognizer:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Home-Module/ZoomGestureView.m"
-            timestampString = "510608599.142541"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "535"
-            endingLineNumber = "535"
-            landmarkName = "-panGesture_forPostDetail_Recognizer:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Comment-Module/FullCommentDisplay.m"
-            timestampString = "511654039.030097"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "327"
-            endingLineNumber = "327"
-            landmarkName = "-textView:shouldChangeTextInRange:replacementText:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Home-Module/PostFullCell.m"
-            timestampString = "511714229.16085"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "679"
-            endingLineNumber = "679"
-            landmarkName = "-dealloc"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MeanWiseUX/Classes/API/APIManager.m"
-            timestampString = "511557880.368768"
+            timestampString = "512923596.929372"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "528"
-            endingLineNumber = "528"
-            landmarkName = "-sendRequestForNewPostWithMedia:WithMediaURL:andTypeisVideo:delegate:andSelector:"
+            startingLineNumber = "1399"
+            endingLineNumber = "1399"
+            landmarkName = "-sendRequestExploreAutoCompleteAPI:Withdelegate:andSelector:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MeanWiseUX/Classes/API/APIManager.m"
-            timestampString = "511558960.150817"
+            timestampString = "512923596.929372"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "580"
-            endingLineNumber = "580"
-            landmarkName = "-sendRequestForNewPostWithMedia:WithMediaURL:andTypeisVideo:delegate:andSelector:"
+            startingLineNumber = "1400"
+            endingLineNumber = "1400"
+            landmarkName = "-sendRequestExploreAutoCompleteAPI:Withdelegate:andSelector:"
             landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Comment-Module/FullCommentDisplay.m"
-            timestampString = "511739840.49771"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "558"
-            endingLineNumber = "558"
-            landmarkName = "-scrollToLastItem:"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[FullCommentDisplay scrollToLastItem:]"
-                  moduleName = "MeanWiseUX"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/Hardik/Desktop/Meanwise-GitHub/meanwise-ios/MeanWise/MeanWiseUX/MeanWiseUX/Classes/Comment-Module/FullCommentDisplay.m"
-                  timestampString = "511772480.28917"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "558"
-                  endingLineNumber = "558"
-                  offsetFromSymbolStart = "48">
-               </Location>
-               <Location
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__39-[FullCommentDisplay scrollToLastItem:]_block_invoke"
-                  moduleName = "MeanWiseUX"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/Hardik/Desktop/Meanwise-GitHub/meanwise-ios/MeanWise/MeanWiseUX/MeanWiseUX/Classes/Comment-Module/FullCommentDisplay.m"
-                  timestampString = "511772480.289457"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "563"
-                  endingLineNumber = "563"
-                  offsetFromSymbolStart = "12">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

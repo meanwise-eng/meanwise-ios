@@ -115,6 +115,22 @@
         APIObjectsParser *parser=[[APIObjectsParser alloc] init];
         resultData=[parser parseObjects_PROFILES:array];
         
+        NSMutableArray *resultArray=[[NSMutableArray alloc] init];
+        
+        for(int i=0;i<[resultData count];i++)
+        {
+            
+            APIObjects_ProfileObj *obj=[resultData objectAtIndex:i];
+            
+            if([obj.friendShipStatus isEqualToString:@"Pending"])
+            {
+            [resultArray addObject:obj];
+            }
+        }
+        
+        resultData=[NSArray arrayWithArray:resultArray];
+        
+        
         //   int p=0;
         [friendListTableView reloadData];
     }
@@ -144,7 +160,6 @@
 {
     [FTIndicator dismissProgress];
 
-    [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{
         
@@ -153,6 +168,8 @@
         
     } completion:^(BOOL finished) {
         
+        [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
+
         [self removeFromSuperview];
         
     }];

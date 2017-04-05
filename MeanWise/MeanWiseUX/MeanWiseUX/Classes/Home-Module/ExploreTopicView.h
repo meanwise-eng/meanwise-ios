@@ -17,10 +17,16 @@
     
     int selectedChannel;
     NSString *searchTerm;
+    
+    UIActivityIndicatorView *activityView;
+
+    id target;
+    SEL onTopicSelectCallBack;
 
 }
 -(void)setUp:(int)height;
 -(void)setChannelId:(int)channelId;
 -(void)setSearchTerm:(NSString *)string;
+-(void)setTarget:(id)targetReceived OnTopicSelectCallBack:(SEL)func;
 
 @end

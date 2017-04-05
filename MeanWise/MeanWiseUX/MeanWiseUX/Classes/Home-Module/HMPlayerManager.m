@@ -34,6 +34,14 @@
         sharedInstance.Profile_urlIdentifier=@"";
         sharedInstance.Profile_isKilling=false;
         
+        sharedInstance.NotificationPost_isPaused=false;
+        sharedInstance.NotificationPost_isVisibleBounds=TRUE;
+        sharedInstance.NotificationPost_screenIdentifier=@"";
+        sharedInstance.NotificationPost_urlIdentifier=@"";
+        sharedInstance.NotificationPost_isKilling=false;
+        
+        
+        
         
         sharedInstance.All_isPaused=false;
         
@@ -60,5 +68,14 @@
 {
     self.Profile_isKilling=false;
 }
+-(void)StartKeepKillingNotificationVideosIfAvaialble
+{
+    self.NotificationPost_isKilling=true;
+}
+-(void)StopKeepKillingNotificationVideosIfAvaialble
+{
+    self.NotificationPost_isKilling=false;
+}
+
 
 @end

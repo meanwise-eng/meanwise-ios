@@ -8,9 +8,16 @@
 
 #import "ExploreTopicView.h"
 #import "TopicListCell.h"
+#import "APIManager.h"
 
 @implementation ExploreTopicView
 
+-(void)setTarget:(id)targetReceived OnTopicSelectCallBack:(SEL)func
+{
+    target=targetReceived;
+    onTopicSelectCallBack=func;
+    
+}
 -(void)setSearchTerm:(NSString *)string;
 {
     searchTerm=string;
@@ -20,7 +27,8 @@
 {
     searchTerm=@"";
     
-    arrayTopics=[NSArray arrayWithObjects:@"List",@"Idea",@"Fun",@"Work",@"Game",@"Workout",@"Play", nil];
+    //arrayTopics=[NSArray arrayWithObjects:@"List",@"Idea",@"Fun",@"Work",@"Game",@"Workout",@"Play", nil];
+    arrayTopics=[NSArray array];
     
     UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumInteritemSpacing = 10;
@@ -37,23 +45,86 @@
     topicListView.backgroundColor=[UIColor clearColor];
     [topicListView registerClass:[TopicListCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [self addSubview:topicListView];
+    
+
+    activityView = [[UIActivityIndicatorView alloc]
+                    initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    [self addSubview:activityView];
+    activityView.frame=CGRectMake(20, 10, 20, 20);
+    activityView.userInteractionEnabled=false;
+    
 
 }
 -(void)setChannelId:(int)channelId
 {
     selectedChannel=channelId;
     [topicListView reloadData];
+ 
+    [self callTrendingTopicsForChannelId:selectedChannel];
     
 }
+-(void)callTrendingTopicsForChannelId:(int)channelNo
+{
+    
+    NSArray *channelList=[[[APIPoster alloc] init] getInterestData];
+    
+    
+    int channelId=[[[channelList objectAtIndex:channelNo] valueForKey:@"id"] intValue];
+
+    
+    arrayTopics=[NSArray array];
+    [topicListView reloadData];
+    [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+
+
+    [self showActivity];
+    
+    APIManager *manager=[[APIManager alloc] init];
+    
+    [manager sendRequestExploreTopTrendingTopicsForChannel:[NSString stringWithFormat:@"%d",channelId] Withdelegate:self andSelector:@selector(responseReceived:)];
+    
+    
+}
+-(void)responseReceived:(APIResponseObj *)obj
+{
+    [self hideActivity];
+    
+    if([obj.response isKindOfClass:[NSArray class]])
+    {
+        
+        
+        
+        
+        arrayTopics=(NSArray *)obj.response;
+        
+        [topicListView reloadData];
+        [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+    }
+    
+    NSLog(@"%@",obj.response);
+}
+-(void)showActivity
+{
+    activityView.hidden=false;
+        [activityView startAnimating];
+}
+-(void)hideActivity
+{
+     activityView.hidden=false;
+    [activityView stopAnimating];
+}
+
+
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     TopicListCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     
-    NSString *string=[NSString stringWithFormat:@"@%@%@",searchTerm,[arrayTopics objectAtIndex:indexPath.row]];
+    NSString *string=[NSString stringWithFormat:@"@%@",[arrayTopics objectAtIndex:indexPath.row]];
     cell.nameLBL.text=string;
     
     cell.bgView.backgroundColor=[Constant colorGlobal:(selectedChannel%13)];
-
+    cell.topicColor=[Constant colorGlobal:(selectedChannel%13)];
+    
     return cell;
 }
 
@@ -66,7 +137,7 @@
 {
     NSDictionary *dictAttributes=@{NSFontAttributeName:[UIFont fontWithName:k_fontSemiBold size:16]};
     
-    NSString *dict=[NSString stringWithFormat:@"@%@%@",searchTerm,[arrayTopics objectAtIndex:indexPath.row]];
+    NSString *dict=[NSString stringWithFormat:@"@%@",[arrayTopics objectAtIndex:indexPath.row]];
 
 
 
@@ -74,6 +145,9 @@
 
     return CGSizeMake(calCulateSizze.width+20, self.frame.size.height);
 }
-
+-(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    [target performSelector:onTopicSelectCallBack withObject:[arrayTopics objectAtIndex:indexPath.row] afterDelay:0.01];
+}
 
 @end

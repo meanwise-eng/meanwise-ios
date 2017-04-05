@@ -105,12 +105,42 @@
     
     self.friendShipStatus=@"";
     
-    for (NSDictionary *dict in self.userFriends)
+    
+    NSString *watchingUserId=[NSString stringWithFormat:@"%@",[dict valueForKey:@"user_id"]];
+
+  
+    
+    
+    for (NSDictionary *dictTemp in self.userFriends)
     {
-        if([[dict valueForKey:@"friend_name"] isEqualToString:[UserSession getUserName]])
+        
+        NSString *currentUserId=[NSString stringWithFormat:@"%@",[UserSession getUserId]];
+        NSString *senderId=[NSString stringWithFormat:@"%@",[dictTemp valueForKey:@"friend_sender_id"]];
+        NSString *receiverId=[NSString stringWithFormat:@"%@",[dictTemp valueForKey:@"friend_receiver_id"]];
+        NSString *status=[NSString stringWithFormat:@"%@",[dictTemp valueForKey:@"status"]];
+
+        if([senderId isEqualToString:currentUserId] || [receiverId isEqualToString:currentUserId])
         {
-            self.friendShipStatus=[dict valueForKey:@"status"];
+        
+        if([status isEqualToString:@"Pending"])
+        {
+            if([senderId isEqualToString:watchingUserId] && [receiverId isEqualToString:currentUserId])
+            {
+                self.friendShipStatus=@"Pending";
+            }
+            if([senderId isEqualToString:currentUserId] && [receiverId isEqualToString:watchingUserId])
+            {
+                self.friendShipStatus=@"Sent";
+            }
         }
+        else
+        {
+            self.friendShipStatus=status;
+        }
+        }
+
+        
+        
     }
 
     

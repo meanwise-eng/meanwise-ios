@@ -11,19 +11,25 @@
 #import <AVKit/AVKit.h>
 #import <QuartzCore/QuartzCore.h>
 #import "FTIndicator.h"
+#import "UIFilterImageView.h"
+#import "LocationFilterView.h"
 
 @interface PreviewMedia_ImageController : UIView <UITextViewDelegate>
 {
     NSString *filePathStr;
     BOOL isVideo;
     
-    UIImageView *keyImageView;
+    LocationFilterView *locationSticker;
+    
+    
+    UIFilterImageView *keyImageView;
     AVPlayerViewController *playerViewControl;
 
     UIImageView *shadowImageView;
     
     UIButton *editBtn;
     UIButton *doneBtn;
+    UIButton *locationBtn;
     UIButton *EditingCorrectBtn;
     UIButton *EditingCancelBtn;
     

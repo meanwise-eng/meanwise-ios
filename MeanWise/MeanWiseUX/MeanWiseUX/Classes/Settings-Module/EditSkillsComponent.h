@@ -9,12 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
+#import "EditTagListControl.h"
+#import "EditTagSearchResultComponent.h"
 
-@interface EditSkillsComponent : UIView
+@interface EditSkillsComponent : UIView 
 {
     
     
     
+    EditTagListControl *tagList;
+    EditTagSearchResultComponent *autoCompleteResultComponent;
+    UITextField *tagSearchField;
     
     UIView *navBar;
     UILabel *navBarTitle;

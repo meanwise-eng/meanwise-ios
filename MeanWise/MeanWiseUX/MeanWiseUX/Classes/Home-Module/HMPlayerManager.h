@@ -30,6 +30,12 @@
 @property (nonatomic,assign) BOOL Explore_isVisibleBounds;
 @property (nonatomic,assign) BOOL Explore_isKilling;
 
+@property (nonatomic, strong) NSString *NotificationPost_screenIdentifier;
+@property (nonatomic, strong) NSString *NotificationPost_urlIdentifier;
+@property (nonatomic,assign) BOOL NotificationPost_isPaused;
+@property (nonatomic,assign) BOOL NotificationPost_isVisibleBounds;
+@property (nonatomic,assign) BOOL NotificationPost_isKilling;
+
 
 
 
@@ -46,5 +52,9 @@
 
 -(void)StartKeepKillingProfileFeedVideosIfAvaialble;
 -(void)StopKeepKillingProfileFeedVideosIfAvaialble;
+
+-(void)StartKeepKillingNotificationVideosIfAvaialble;
+-(void)StopKeepKillingNotificationVideosIfAvaialble;
+
 
 @end

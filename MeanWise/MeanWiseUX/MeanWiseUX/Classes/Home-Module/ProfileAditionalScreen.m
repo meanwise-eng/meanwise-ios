@@ -55,7 +55,20 @@
     NSString *interestStr=[listOfInterestsArray componentsJoinedByString:@" #"];
     interestStr=[NSString stringWithFormat:@"#%@",interestStr];
     
-    NSString *skillsStr=[[storySkillsArray valueForKey:@"name"] componentsJoinedByString:@" #"];
+    
+    NSMutableArray *listOfSkillsArrays=[[NSMutableArray alloc] init];
+    
+    for(int i=0;i<storySkillsArray.count;i++)
+    {
+        int skillId=[[storySkillsArray objectAtIndex:i] intValue];
+        
+        NSString *skillName=[Constant static_getSKillFromId:skillId];
+        
+        [listOfSkillsArrays addObject:skillName];
+    }
+    
+    
+    NSString *skillsStr=[listOfSkillsArrays componentsJoinedByString:@" #"];
     skillsStr=[NSString stringWithFormat:@"#%@",skillsStr];
 
     
@@ -166,19 +179,23 @@
 
     if([[NSString stringWithFormat:@"%@",dataObj.userId] isEqualToString:[NSString stringWithFormat:@"%@",[UserSession getUserId]]])
     {
+        //user-
         cover_addBtn.alpha=0;
         cover_addBtn.enabled=false;
 
     }
-    else if([[dataObj.friendShipStatus lowercaseString] isEqualToString:@"accepted"])
+    else if([[dataObj.friendShipStatus lowercaseString] isEqualToString:@""])
     {
-        cover_addBtn.alpha=0;
-        cover_addBtn.enabled=false;
+        //no
+        cover_addBtn.alpha=1;
+        cover_addBtn.enabled=true;
     }
     else
     {
-        cover_addBtn.alpha=1;
-        cover_addBtn.enabled=true;
+        //rejected, accepted,pending
+        cover_addBtn.alpha=0;
+        cover_addBtn.enabled=false;
+
     }
     
 

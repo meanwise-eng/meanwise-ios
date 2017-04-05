@@ -34,6 +34,7 @@
 
 -(void)setUp
 {
+    topicNameForChannel=@"";
     typeOfSearch=1;
     currentSearchTerm=@"";
   //  [self setUpDataRecords];
@@ -118,6 +119,7 @@
     [self addSubview:topicView];
     [topicView setUp:40];
     [topicView setChannelId:selectedChannel];
+    [topicView setTarget:self OnTopicSelectCallBack:@selector(onTopicForChannelChanged:)];
    
     [self updateBackground];
     
@@ -174,6 +176,13 @@
     [self refreshAction];
 
 }
+-(void)onTopicForChannelChanged:(NSString *)topicName
+{
+    topicNameForChannel=topicName;
+    typeOfSearch=4;
+    [self refreshAction];
+
+}
 -(void)searchAndAPICall:(NSString *)searchTag
 {
     NSLog(@"%@",searchTag);
@@ -226,7 +235,14 @@ exploreTerm.hidden=false;
 {
     if([currentSearchTerm isEqualToString:@""])
     {
-        typeOfSearch=1;
+        if([topicNameForChannel isEqualToString:@""])
+        {
+            typeOfSearch=1;
+        }
+        else
+        {
+            typeOfSearch=4;
+        }
     }
     else if([currentSearchTerm hasPrefix:@"#"])
     {
@@ -259,6 +275,12 @@ exploreTerm.hidden=false;
     {
         dict=@{@"type":[NSNumber numberWithInt:3],@"word":[currentSearchTerm substringFromIndex:1]};
         
+    }
+    if(typeOfSearch==4)
+    {
+        NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
+        dict=@{@"type":[NSNumber numberWithInt:4],@"word":channelName,@"topic":topicNameForChannel};
+   
     }
     
     
@@ -326,6 +348,8 @@ exploreTerm.hidden=false;
     }
     else
     {
+        [searchResultView setSearchTerm:exploreTerm.text];
+
         
         if(searchResultView.hidden==false)
         {
@@ -596,6 +620,7 @@ exploreTerm.hidden=false;
     }
     else
     {
+        topicNameForChannel=@"";
         selectedChannel=(int)indexPath.row;
         [self updateBackground];
         [self refreshAction];

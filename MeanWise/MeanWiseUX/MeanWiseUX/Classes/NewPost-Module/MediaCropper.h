@@ -12,12 +12,19 @@
 #import <QuartzCore/QuartzCore.h>
 #import "FTIndicator.h"
 #import "Constant.h"
+#import "TrimSlider.h"
 
 @interface MediaCropper : UIView <UIScrollViewDelegate>
 {
+    UIView *containerView;
     UIScrollView *scrollView;
     UIImageView *imageView;
+    
     AVPlayerViewController *playerViewControl;
+    BOOL isPlayerPaused;
+    TrimSlider *trimSlider;
+    CMTime playerStartTime;
+    CMTime playerEndTime;
     
     
     id target;

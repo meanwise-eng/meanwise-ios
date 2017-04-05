@@ -142,7 +142,6 @@
 {
     [FTIndicator dismissProgress];
 
-    [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{
         
@@ -151,6 +150,8 @@
         
     } completion:^(BOOL finished) {
         
+        [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
+
         [self removeFromSuperview];
         
     }];

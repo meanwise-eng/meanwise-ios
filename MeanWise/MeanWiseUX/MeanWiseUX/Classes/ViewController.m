@@ -16,6 +16,7 @@
 #import "EditInterestsComponent.h"
 #import "SearchComponent.h"
 #import "NewPostComponent.h"
+#import "EditSkillsComponent.h"
 
 @interface ViewController ()
 
@@ -48,7 +49,30 @@
 
     
     
+  /*  [UserSession setUserSessionIfExist];
+    ExploreComponent *compo=[[ExploreComponent alloc] initWithFrame:self.view.bounds];
+    [compo setUp];
+    [self.view addSubview:compo];
+    */
+    
    /* [UserSession setUserSessionIfExist];
+    
+    EditSkillsComponent *Compo=[[EditSkillsComponent alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    
+    [Compo setUp];
+    Compo.blackOverLayView.image=[Constant takeScreenshot];
+    Compo.blackOverLayView.alpha=1;
+    //  [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+    
+    [self.view addSubview:Compo];
+    
+    [UIView animateWithDuration:0.001 animations:^{
+        Compo.frame=self.view.bounds;
+        Compo.backgroundColor=[UIColor whiteColor];
+    }];*/
+    
+    
+  /*  [UserSession setUserSessionIfExist];
     NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
     [self.view addSubview:cont];
     [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
@@ -91,11 +115,11 @@
    
   
 
-   /*[UserSession setUserSessionIfExist];
+  /* [UserSession setUserSessionIfExist];
       APITesterView *tester=[[APITesterView alloc] initWithFrame:self.view.bounds];
      [tester setUp];
-     [self.view addSubview:tester];
-*/
+     [self.view addSubview:tester];*/
+
 
 //    [UserSession setUserSessionIfExist];
 //    ExploreComponent *compo=[[ExploreComponent alloc] initWithFrame:self.view.bounds];
@@ -195,37 +219,35 @@
     NSString *tags=[dict valueForKey:@"tags"];
     
     
+    NSDictionary *dict1;
+    if([topic_names isEqualToString:@""])
+    {
+        dict1=@{
+                @"text":text,
+                @"interest":interest,
+                @"tags":tags
+                };
+    }
+    else
+    {
+        dict1=@{
+                @"text":text,
+                @"interest":interest,
+                @"topic_names":topic_names,
+                @"tags":tags
+                };
+    }
+    
     if([mediaPath isEqualToString:@""])
     {
         APIManager *manager=[[APIManager alloc] init];
-        
-       // if([topic_names ])
-        NSDictionary *dict1=@{
-                              @"text":text,
-                              @"interest":interest,
-                              @"topic_names":topic_names,
-                              @"tags":tags
-                              };
-        
         [manager sendRequestForNewPost:dict1 delegate:self andSelector:@selector(addNewPostResponse:)];
-        
-        
         
     }
     else
     {
         APIManager *manager=[[APIManager alloc] init];
-        
-        NSDictionary *dict1=@{
-                              @"text":text,
-                              @"interest":interest,
-                              @"topic_names":topic_names,
-                              @"tags":tags
-                              };
-        
         NSString *pathExtension=[[mediaPath pathExtension] lowercaseString];
-        
-        
         BOOL isVideo;
         if([pathExtension isEqualToString:@"png"] || [pathExtension isEqualToString:@"jpg"])
         {
@@ -235,10 +257,7 @@
         {
             isVideo=true;
         }
-        
         [manager sendRequestForNewPostWithMedia:dict1 WithMediaURL:mediaPath andTypeisVideo:isVideo delegate:self andSelector:@selector(addNewPostResponse:)];
-        
-        
         
     }
     
@@ -440,7 +459,7 @@
     [manager sendRequestForNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
     }
     
-    [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:45.0f];
+    [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:60.0f];
 }
 -(void)UserNotificationAPIReceived:(APIResponseObj *)responseObj
 {

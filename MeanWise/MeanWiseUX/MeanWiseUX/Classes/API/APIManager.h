@@ -36,6 +36,8 @@
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestExploreFeedWithKey:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestExploreAutoCompleteAPI:(NSDictionary *)term Withdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestExploreTopTrendingTopicsForChannel:(NSString *)channelId Withdelegate:(id)delegate andSelector:(SEL)selector;
 
 
 //Edit Profile
@@ -48,6 +50,7 @@
 -(void)sendRequestForUpdateCoverPhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForUpdateProfilePhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
 
+-(void)sendRequestForForgetPasswordWithDelegate:(id)delegate andSelector:(SEL)selector;
 
 
 //Signup API

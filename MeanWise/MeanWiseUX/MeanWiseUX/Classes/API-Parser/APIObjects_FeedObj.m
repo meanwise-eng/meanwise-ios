@@ -69,7 +69,17 @@
     if(self.video_url!=nil && ![self.video_url isEqualToString:@""])
     {
         self.mediaType=[NSNumber numberWithInt:2];
+        
         self.image_url=[dict valueForKey:@"video_thumb_url"];
+        
+        if([self.image_url isKindOfClass:[NSNull class]])
+        {
+            self.image_url=@"";
+        }
+        if(self.image_url==nil)
+        {
+            int p=0;
+        }
 
     }
     else if(self.image_url!=nil && ![self.image_url isEqualToString:@""])
