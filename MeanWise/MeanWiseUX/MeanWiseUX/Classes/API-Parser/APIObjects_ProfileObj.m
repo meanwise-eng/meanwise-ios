@@ -17,6 +17,36 @@
     self.idDetail=[dict valueForKey:@"id"];
     self.cover_photo=[dict valueForKey:@"cover_photo"];
     
+    if([[dict valueForKey:@"profile_background_color"] isKindOfClass:[NSNull class]])
+    {
+        self.profile_background_color=@"#888888";
+    }
+    else
+    {
+        self.profile_background_color=[dict valueForKey:@"profile_background_color"];
+        if([self.profile_background_color isEqualToString:@"#FFFFFF"])
+        {
+            self.profile_background_color=@"#536DFE";
+        }
+    }
+    
+    
+    self.user_type=[NSNumber numberWithInt:[[dict valueForKey:@"user_type"] intValue]];
+    
+    if([[dict valueForKey:@"profession_text"] isKindOfClass:[NSNull class]])
+    {
+        self.profession_text=@"";
+    }
+    else
+    {
+        self.profession_text=[dict valueForKey:@"profession_text"];
+    }
+    
+    int len=(int)[NSString stringWithFormat:@"%@",self.userId].intValue;
+    self.colorNumber=[NSNumber numberWithInt:len%13];
+    
+    self.skill_List=[dict valueForKey:@"skills_list"];
+    
     if([[dict valueForKey:@"bio"] isKindOfClass:[NSNull class]])
     {
         self.bio=@"";
@@ -27,17 +57,19 @@
 
     }
     
+    
+    
     self.email=[dict valueForKey:@"email"];
     self.first_name=[dict valueForKey:@"first_name"];
     self.last_name=[dict valueForKey:@"last_name"];
     
     if([[dict valueForKey:@"user_profession"] valueForKey:@"name"]==nil)
     {
-        self.profession=@"";
+        self.professionX=@"";
     }
     else
     {
-        self.profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+        self.professionX=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
 
     }
     
@@ -99,7 +131,7 @@
     }
     
     self.interests=[dict valueForKey:@"interests"];
-    self.skills=[dict valueForKey:@"skills"];
+    self.skillsX=[dict valueForKey:@"skills"];
     
     self.userFriends=[dict valueForKey:@"user_friends"];
     
@@ -156,7 +188,7 @@
     [encoder encodeObject:self.first_name forKey:@"first_name"];
     [encoder encodeObject:self.last_name forKey:@"last_name"];
 
-    [encoder encodeObject:self.profession forKey:@"profession"];
+    [encoder encodeObject:self.professionX forKey:@"professionX"];
     [encoder encodeObject:self.profile_photo_small forKey:@"profile_photo_small"];
 
     [encoder encodeObject:self.username forKey:@"username"];
@@ -170,7 +202,16 @@
     [encoder encodeObject:self.profile_story_title forKey:@"profile_story_title"];
 
     [encoder encodeObject:self.interests forKey:@"interests"];
-    [encoder encodeObject:self.skills forKey:@"skills"];
+    [encoder encodeObject:self.skillsX forKey:@"skillsX"];
+
+    
+    [encoder encodeObject:self.skill_List forKey:@"skill_List"];
+    [encoder encodeObject:self.profile_background_color forKey:@"profile_background_color"];
+    [encoder encodeObject:self.profession_text forKey:@"profession_text"];
+    [encoder encodeObject:self.user_type forKey:@"user_type"];
+    [encoder encodeObject:self.userFriends forKey:@"userFriends"];
+
+    
 
     
 }
@@ -190,7 +231,7 @@
         
         self.last_name = [decoder decodeObjectForKey:@"last_name"];
         self.profile_photo_small = [decoder decodeObjectForKey:@"profile_photo_small"];
-        self.profession = [decoder decodeObjectForKey:@"profession"];
+        self.professionX = [decoder decodeObjectForKey:@"professionX"];
         
         self.profile_photo = [decoder decodeObjectForKey:@"profile_photo"];
         self.username = [decoder decodeObjectForKey:@"username"];
@@ -203,7 +244,14 @@
         self.profile_story_title = [decoder decodeObjectForKey:@"profile_story_title"];
 
         self.interests = [decoder decodeObjectForKey:@"interests"];
-        self.skills = [decoder decodeObjectForKey:@"skills"];
+        self.skillsX = [decoder decodeObjectForKey:@"skillsX"];
+
+        self.skill_List = [decoder decodeObjectForKey:@"skill_List"];
+        self.profile_background_color = [decoder decodeObjectForKey:@"profile_background_color"];
+        self.profession_text = [decoder decodeObjectForKey:@"profession_text"];
+        self.user_type = [decoder decodeObjectForKey:@"user_type"];
+        self.userFriends = [decoder decodeObjectForKey:@"userFriends"];
+
 
         
     }

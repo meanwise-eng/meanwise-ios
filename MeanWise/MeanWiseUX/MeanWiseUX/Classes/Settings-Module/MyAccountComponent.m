@@ -16,6 +16,7 @@
 #import "UserSession.h"
 #import "ViewController.h"
 #import "EditInterestsComponent.h"
+#import "DataSession.h"
 
 @implementation MyAccountComponent
 
@@ -24,7 +25,7 @@
     
     [Constant setStatusBarColorWhite:false];
     
-    items=[NSArray arrayWithObjects:@"Friend Requests",@"Manage Interests",@"My Friends",@"*Interests",@"Terms of Use",@"Privacy Policy", nil];
+    items=[NSArray arrayWithObjects:@"Friend Requests",@"Manage Interests",@"My Friends",@"Terms of Use",@"Privacy Policy", nil];
     
     self.blackOverLayView=[[UIImageView alloc] initWithFrame:CGRectMake(-self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
     
@@ -38,7 +39,6 @@
     coverPhoto.contentMode=UIViewContentModeScaleAspectFill;
     coverPhoto.clipsToBounds=YES;
 
- 
     
     navBar=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 65)];
     [self addSubview:navBar];
@@ -84,7 +84,7 @@
 //    [profileChangeBtn setImageEdgeInsets:UIEdgeInsetsMake(20, 20, 20, 20)];
 
     
-    int height=65;
+    int height=80;
     height=height+40;
     profilePhoto=[[UIImageHM alloc] initWithFrame:CGRectMake(self.frame.size.width/2-40, height, 80, 80)];
     [self addSubview:profilePhoto];
@@ -113,7 +113,7 @@
     height=height+22;
     
     userNameLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, height, self.frame.size.width, 20)];
-    userNameLBL.text=[UserSession getUserName];
+    userNameLBL.text=[NSString stringWithFormat:@"@%@",[UserSession getUserName]];
     [self addSubview:userNameLBL];
     userNameLBL.textColor=[UIColor whiteColor];
     userNameLBL.textAlignment=NSTextAlignmentCenter;
@@ -195,6 +195,9 @@
 }
 -(void)coverPhotoLibrary
 {
+
+    [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:1];
+
     picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
     picker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
@@ -209,14 +212,17 @@
 }
 -(void)coverPhotoCamera
 {
+    
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         
         [Constant okAlert:@"Sorry" withSubTitle:@"Camera not available" onView:self andStatus:-1];
     }
     else
     {
+        [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:1];
+
         imageForCover=1;
-        
+
         picker = [[UIImagePickerController alloc] init];
         picker.delegate = self;
         picker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -230,6 +236,8 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker1 didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
+    [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:0];
+
     [self cropImage:info];
     //    if(picker1.allowsEditing==false)
     //    {
@@ -270,6 +278,7 @@
 }
 -(void)cropFinished:(UIImage *)image
 {
+    
     NSString *path=[Constant FM_saveImageAtDocumentDirectory:image];
     
     if(imageForCover==1)
@@ -319,7 +328,8 @@
         
     }
     else {
-        
+        [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:1];
+
         picker = [[UIImagePickerController alloc] init];
         picker.delegate = self;
         picker.sourceType = UIImagePickerControllerSourceTypeCamera;
@@ -334,6 +344,8 @@
 -(void)profilePhotoLibrary
 {
     imageForCover=0;
+    [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:1];
+
     
     picker = [[UIImagePickerController alloc] init];
     picker.delegate = self;
@@ -463,7 +475,7 @@
     }];
     }
 
-    if(indexPath.row==4)
+    if(indexPath.row==3)
     {
         TermsOfUse *Compo=[[TermsOfUse alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
         [Compo setUp];
@@ -482,7 +494,7 @@
         }];
     }
 
-    if(indexPath.row==5)
+    if(indexPath.row==4)
     {
         PrivacyPolicy *Compo=[[PrivacyPolicy alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
         [Compo setUp];

@@ -389,6 +389,8 @@ NSString *const LLSimpleCameraErrorDomain = @"LLSimpleCameraErrorDomain";
         [self enableTorch:YES];
     }
     
+
+    
     // set video orientation
     for(AVCaptureConnection *connection in [self.movieFileOutput connections]) {
         for (AVCaptureInputPort *port in [connection inputPorts]) {

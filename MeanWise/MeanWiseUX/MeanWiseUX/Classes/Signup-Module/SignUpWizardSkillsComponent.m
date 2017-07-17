@@ -7,6 +7,7 @@
 //
 
 #import "SignUpWizardSkillsComponent.h"
+#import "FTIndicator.h"
 
 @implementation SignUpWizardSkillsComponent
 
@@ -15,12 +16,11 @@
     self.backgroundColor=[UIColor clearColor];
     [Constant setUpGradient:self style:6];
     
-    
-    APIPoster *tester=[[APIPoster alloc] init];
-    skillDBTagsArray=[tester getSkillsData];
+    [self addSubview:[Constant createProgressSignupViewWithWidth:self.frame.size.width andProgress:0.4 toPercentage:0.6]];;
 
-   // skillTagsArray=[[NSArray alloc] initWithObjects:@"java",@"javascript",@"objective c",@"data entry",@"SEO",@"Android",@"NodeJS",@"Social Media",@"Logo Design",@"Marketting",@"PR",@"Consulting",@"Data Analysis",@"Database",@"Quality",@"Photography",@"Assitance",@"illustrations",@"Photoshop",@"Translations",@"WebTraffic",@"Graphics",@"C",@"C++",@"Twitter",@"Facebook",@"Writting",@"Dancing",@"Painting", nil];
     
+
+    int heightTop=100;
     
 //    
     headLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 40)];
@@ -29,17 +29,16 @@
     headLBL.textColor=[UIColor whiteColor];
     headLBL.textAlignment=NSTextAlignmentLeft;
     headLBL.font=[UIFont fontWithName:k_fontAvenirNextHeavy size:28];
-    headLBL.center=CGPointMake(self.frame.size.width/2, 140);
-    
+    headLBL.center=CGPointMake(self.frame.size.width/2, heightTop);
+
     subHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 60)];
     [self addSubview:subHeadLBL];
     subHeadLBL.numberOfLines=2;
-   // subHeadLBL.text=@"Let your friends know you are here.";
+    subHeadLBL.text=@"Got any cool skills? List them here.";
     subHeadLBL.textColor=[UIColor whiteColor];
     subHeadLBL.textAlignment=NSTextAlignmentLeft;
     subHeadLBL.font=[UIFont fontWithName:k_fontSemiBold size:15];
-    subHeadLBL.center=CGPointMake(self.frame.size.width/2, 180);
-    
+    subHeadLBL.center=CGPointMake(self.frame.size.width/2, heightTop+40);
     
     backBtn=[[UIButton alloc] initWithFrame:CGRectMake(20,35, 23*1.2, 16*1.2)];
     [backBtn setBackgroundImage:[UIImage imageNamed:@"BackButton.png"] forState:UIControlStateNormal];
@@ -66,24 +65,26 @@
     
     
     
-    emailHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
-    [self addSubview:emailHeadLBL];
-    emailHeadLBL.text=@"ADD SKILL";
-    emailHeadLBL.textColor=[UIColor whiteColor];
-    emailHeadLBL.textAlignment=NSTextAlignmentLeft;
-    emailHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
-    emailHeadLBL.center=CGPointMake(self.frame.size.width/2, 230);
+    skillHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
+    [self addSubview:skillHeadLBL];
+    skillHeadLBL.text=@"ADD SKILL";
+    skillHeadLBL.textColor=[UIColor whiteColor];
+    skillHeadLBL.textAlignment=NSTextAlignmentLeft;
+    skillHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
+    skillHeadLBL.center=CGPointMake(self.frame.size.width/2, heightTop+90);
     
     skillField=[Constant textField_Style1_WithRect:CGRectMake(20, 0, self.frame.size.width-40, 50)];
     [self addSubview:skillField];
-    skillField.center=CGPointMake(self.frame.size.width/2, 230+45);
-    skillField.delegate=self;
+    skillField.center=CGPointMake(self.frame.size.width/2, heightTop+90+45);
     skillField.returnKeyType=UIReturnKeyGo;
     [skillField addTarget:self
-                      action:@selector(textFieldDidChange:)
+                      action:@selector(searchTermChanged:)
             forControlEvents:UIControlEventEditingChanged];
 
-    
+    skillField.returnKeyType=UIReturnKeyGo;
+
+    skillField.delegate=self;
+
     addSkillBtn=[[UIButton alloc] initWithFrame:CGRectMake(0,0, 40, 40)];
     [self addSubview:addSkillBtn];
     [addSkillBtn setTitle:@"+" forState:UIControlStateNormal];
@@ -91,126 +92,96 @@
 
     [addSkillBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [addSkillBtn addTarget:self action:@selector(newSkillBtnAdd:) forControlEvents:UIControlEventTouchUpInside];
-    addSkillBtn.center=CGPointMake(self.frame.size.width-40, 230+45);
+    addSkillBtn.center=CGPointMake(self.frame.size.width-40, heightTop+90+45);
 
     
-    emailBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 1)];
-    emailBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.2f];
-    [self addSubview:emailBaseView];
-    emailBaseView.center=CGPointMake(self.frame.size.width/2, 300);
+    skillBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 1)];
+    skillBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.2f];
+    [self addSubview:skillBaseView];
+    skillBaseView.center=CGPointMake(self.frame.size.width/2, heightTop+160);
 
-    selectedTagListView=[[HMTagList alloc] initWithFrame:CGRectMake(20, skillField.center.y+25+100, self.frame.size.width-40, 200)];
-    [self addSubview:selectedTagListView];
-    [selectedTagListView setUp];
+  
+    int height=skillField.frame.origin.y+50;
     
-    skillSearchTableView=[[UITableView alloc] initWithFrame:CGRectMake(20, skillField.center.y+25, self.frame.size.width-40, 80)];
-    skillSearchTableView.backgroundColor=[UIColor clearColor];
-    [self addSubview:skillSearchTableView];
-    skillSearchTableView.delegate=self;
-    skillSearchTableView.dataSource=self;
-    skillSearchTableView.separatorStyle=UITableViewCellSeparatorStyleNone;
+    tagListControl=[[EditSCTagListControl alloc] initWithFrame:CGRectMake(skillField.frame.origin.x, height, skillField.frame.size.width,self.frame.size.height-height-60)];
+    [self addSubview:tagListControl];
+//    NSString *currentTag=@"Adobe Photoshop,illustrator,Idea";
+//    NSArray *array=[currentTag componentsSeparatedByString:@","];
+//    
+   // array=[UserSession getUserCustomSkills];
+    [tagListControl setUp:[NSMutableArray arrayWithArray:[[NSArray alloc] init]]];
+    tagListControl.backgroundColor=[UIColor clearColor];
     
-   
-    skillSearchTableView.hidden=true;
+
+    suggestionBox=[[EditSCSuggestionsComponent alloc] initWithFrame:tagListControl.frame];
     
+    [suggestionBox setUp];
+    [suggestionBox setUp:self OnTagSelectCallBack:@selector(NewTagAddedFromSuggestion:)];
+    [suggestionBox setTerm:@""];
     
+    [self addSubview:suggestionBox];
+
 }
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [filteredTagsArray count];
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 40;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    static NSString* cellIdentifier = @"CellIdentifier";
-    UITableViewCell* cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
-    if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
-    }
-    cell.selectionStyle=UITableViewCellSelectionStyleNone;
-    cell.backgroundColor=[UIColor colorWithWhite:1 alpha:0.1];
-    cell.textLabel.text = [[filteredTagsArray objectAtIndex:indexPath.row] valueForKey:@"text"];
-    cell.textLabel.textColor=[UIColor whiteColor];
-    
-    cell.textLabel.font=[UIFont fontWithName:k_fontRegular size:20];
-    
-    return cell;
-}
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    
-    skillField.text=@"";
-    skillSearchTableView.hidden=true;
-
-    [selectedTagListView addNewTag:[filteredTagsArray objectAtIndex:indexPath.row]];
-    
-    
-}
-
-
-
-
--(void)newSkillBtnAdd:(id)sender
+- (BOOL)textFieldShouldReturn:(UITextField *)textField;
 {
-    [skillField becomeFirstResponder];
-    skillSearchTableView.hidden=true;
-
+    NSString *string=[textField.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
     
-}
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField
-{
-    [textField resignFirstResponder];
-    return YES;
-}
-
-
-- (void)textFieldDidChange:(id)sender
-{
-    NSLog(@"%@",skillField.text);
-    
-    if(skillField.text.length==0)
+    if(![string isEqualToString:@""])
     {
-        skillSearchTableView.hidden=true;
-
+        [self NewTagAdded:string];
+        return false;
+        
     }
     else
     {
-        skillSearchTableView.hidden=false;
-        
-        NSMutableArray *tempArray=[[NSMutableArray alloc] init];
-        
-        for(int i=0;i<[skillDBTagsArray count];i++)
-        {
-            
-            
-            if([[[[skillDBTagsArray objectAtIndex:i] valueForKey:@"text"] lowercaseString] hasPrefix:[skillField.text lowercaseString]])
-            {
-                [tempArray addObject:[skillDBTagsArray objectAtIndex:i]];
-            }
-            
-        }
-        
-
-        
-        filteredTagsArray=[NSArray arrayWithArray:tempArray];
-        [skillSearchTableView reloadData];
-        
-
-       
-        
+        return true;
     }
+}
+-(void)searchTermChanged:(id)sender
+{
+    NSString *term=[skillField.text lowercaseString];
+    [suggestionBox setTerm:term];
+}
+
+-(void)newSkillBtnAdd:(id)sender
+{
+ 
+    [self textFieldShouldReturn:skillField];
     
 }
 
+
+-(void)NewTagAddedFromSuggestion:(NSString *)string
+{
+    [self NewTagAdded:string];
+}
+
+
+-(void)NewTagAdded:(NSString *)tagName
+{
+    
+    [tagListControl addNewTag:tagName];
+    NSLog(@"New Tag : %@",tagName);
+    skillField.text=@"";
+    [suggestionBox setTerm:@""];
+    [skillField resignFirstResponder];
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+#pragma mark - Navigation
 -(void)setTarget:(id)target andFunc1:(SEL)func;
 {
     delegate=target;
@@ -223,21 +194,33 @@
     Func_nextBtnClicked=func;
     
 }
-
 -(void)nextBtnClicked:(id)sender
 {
-    NSArray *array=[selectedTagListView getNumberOfTagsSelected];
+    
+    NSArray *array=[tagListControl getCurrentTagList];
     
     if(array.count>0)
     {
         [DataSession sharedInstance].signupObject.skills=array;
-
+        
         [delegate performSelector:Func_nextBtnClicked withObject:nil afterDelay:0.01];
+
+    }
+    else
+    {
+        [FTIndicator showToastMessage:@"Please enter atleast one skill."];
+        [skillField becomeFirstResponder];
+        
+    }
+  /*  NSArray *array=[selectedTagListView getNumberOfTagsSelected];
+    
+    if(array.count>0)
+    {
     }
     else
     {
         [Constant okAlert:@"Alert!" withSubTitle:@"Please enter atleast one skill." onView:self andStatus:-1];
-    }
+    }*/
 
    
 }
@@ -248,9 +231,6 @@
 
 }
 
--(void)forgetPassBtnClicked:(id)sender
-{
-    
-}
+
 
 @end

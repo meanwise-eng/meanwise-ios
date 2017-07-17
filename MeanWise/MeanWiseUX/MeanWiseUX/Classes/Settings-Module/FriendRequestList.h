@@ -11,6 +11,7 @@
 #import "MWNavBar.h"
 #import "APIManager.h"
 #import "EmptyView.h"
+#import "API_PAGESManager.h"
 
 @interface FriendRequestList : UIView <UITableViewDelegate,UITableViewDataSource>
 {
@@ -31,6 +32,7 @@
     UITableView *friendListTableView;
 
     EmptyView *emptyView;
+    API_PAGESManager *pManager;
 
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;

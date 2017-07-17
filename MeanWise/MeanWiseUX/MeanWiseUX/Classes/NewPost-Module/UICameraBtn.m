@@ -38,6 +38,56 @@
     borderView.clipsToBounds=YES;
     borderView.layer.cornerRadius=(wi-10)/2;
     
+    arcView=[[UIArcView alloc] initWithFrame:CGRectMake(12.5, 12.5, wi-25, hi-25)];
+    [self addSubview:arcView];
+    [arcView setProgress:0];
+    [arcView setLineThicknessCustom:4.0];
+    [arcView setLineColorCustom:[UIColor colorWithRed:102/255.0 green:204/255.0 blue:255/255.0f alpha:1.0]];
+    arcView.backgroundColor=[UIColor clearColor];
+    [arcView setRadious:(wi-35)/2];
+    
+    cameraBtn=[[UIButton alloc] initWithFrame:CGRectMake(20, 20, wi-40, hi-40)];
+    cameraBtn.backgroundColor=[[UIColor whiteColor] colorWithAlphaComponent:0];;
+    cameraBtn.clipsToBounds=YES;
+    cameraBtn.layer.cornerRadius=(wi-40)/2;;
+    cameraBtn.layer.borderColor = [[UIColor whiteColor] colorWithAlphaComponent:0.5].CGColor;
+    cameraBtn.layer.borderWidth = 4.0;
+    [self addSubview:cameraBtn];
+    
+    
+    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+    blurEffectView.frame = borderView.bounds;
+    blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    // [borderView addSubview:blurEffectView];
+    
+    
+    
+    
+    [cameraBtn addTarget:self action:@selector(cameraBtnTapDown:) forControlEvents:UIControlEventTouchDown];
+    [cameraBtn addTarget:self action:@selector(cameraBtnTapUp:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    //    self.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.5];
+    //    self.clipsToBounds=YES;
+    //    self.layer.cornerRadius=30;
+    
+}
+
+-(void)setUp1
+{
+    
+    
+    int wi=self.frame.size.width;
+    int hi=self.frame.size.height;
+    
+    
+    borderView=[[UIView alloc] initWithFrame:CGRectMake(5, 5, wi-10, hi-10)];
+    [self addSubview:borderView];
+    borderView.backgroundColor=[UIColor clearColor];
+    borderView.clipsToBounds=YES;
+    borderView.layer.cornerRadius=(wi-10)/2;
+    
     arcView=[[UIArcView alloc] initWithFrame:CGRectMake(0, 0, wi, hi)];
     [self addSubview:arcView];
     [arcView setProgress:0];

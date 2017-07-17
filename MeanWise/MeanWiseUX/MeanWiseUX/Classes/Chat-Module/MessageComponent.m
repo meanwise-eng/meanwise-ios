@@ -9,6 +9,8 @@
 #import "MessageComponent.h"
 #import "MessageContactCell.h"
 #import "ChatThreadComponent.h"
+#import "GUIScaleManager.h"
+
 
 
 @implementation MessageComponent
@@ -190,7 +192,7 @@
     CGRect rect=CGRectMake(0, tableView.frame.origin.y+myRect.origin.y+self.frame.origin.y, myRect.size.width, myRect.size.height);
     rect = CGRectOffset(rect, -tableView.contentOffset.x, -tableView.contentOffset.y);
 
-    CGRect rectFull=[UIScreen mainScreen].bounds;
+    CGRect rectFull=RX_mainScreenBounds;
     rectFull=CGRectMake(rectFull.origin.x,-self.frame.origin.y, rectFull.size.width, rectFull.size.height);
     
     ChatThreadComponent *t=[[ChatThreadComponent alloc] initWithFrame:rectFull];

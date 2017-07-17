@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
+#import "SAMTextView.h"
 
 @interface EditStoryComponent : UIView <UITextViewDelegate>
 {
+    int noOfCharacters;
+    UILabel *limitIndicatorLBL;
+
     
-    UIView *storyTitleBGV;
     UIView *storyDescBGV;
     
-    UITextView *storyTitleTV;
-    UITextView *storyDescTV;
+    SAMTextView *storyDescTV;
     
     
     UIView *navBar;

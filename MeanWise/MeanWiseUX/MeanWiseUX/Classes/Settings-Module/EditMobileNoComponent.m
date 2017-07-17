@@ -89,7 +89,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Enter your mobile number";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;

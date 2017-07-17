@@ -17,15 +17,21 @@
 #import "ConnectionBar.h"
 #import "PostUploadLoader.h"
 #import "NotificationBadgeView.h"
+#import "VersionUtility.h"
 
 @interface ViewController : UIViewController
 {
+    
+    UIView *mainKeyView;
+    
     FirstLaunchScreen *c;
     
     
     BOOL statusBarHide;
     ConnectionBar *connection;
     PostUploadLoader *postUploader;
+    
+    
     
 }
 @property (nonatomic, strong) APIObjects_ProfileObj *sessionMain;
@@ -34,11 +40,13 @@
 -(void)MasterlogoutBtnClicked:(id)sender;
 -(void)setStatusBarHide:(BOOL)flag;
 -(void)newPostSubmit:(NSDictionary *)dict;
+-(void)renderVideoAndPost:(NSDictionary *)dict witPath:(NSString *)path overlayImage:(UIImage *)image;
 
 
 -(void)updateProfilePicture:(NSString *)path;
 -(void)updateCoverPicture:(NSString *)path;
 -(void)updateProfileWithDict:(NSDictionary *)dict;
+
 
 @end
 

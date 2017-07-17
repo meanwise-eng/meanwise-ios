@@ -7,6 +7,8 @@
 //
 
 #import "NotificationCell.h"
+#import "GUIScaleManager.h"
+#import "MiniProfileComponent.h"
 
 @implementation NotificationCell
 
@@ -18,7 +20,7 @@
         self.backgroundColor=[UIColor clearColor];
         
         self.opaque=YES;
-        float cellWidth=[UIScreen mainScreen].bounds.size.width;
+        float cellWidth=RX_mainScreenBounds.size.width;
         
         //        @property (nonatomic, strong) UIImageView *profileIMGVIEW;
         //        @property (nonatomic, strong) UILabel *contactNameLBL;
@@ -116,7 +118,7 @@
 -(void)setUpObj:(APIObjects_NotificationObj *)obj;
 {
     dataObj=obj;
-    float cellWidth=[UIScreen mainScreen].bounds.size.width;
+    float cellWidth=RX_mainScreenBounds.size.width;
 
 //
 //    if(obj.notificationIsNew.intValue==1)
@@ -192,8 +194,102 @@
     }
     
     self.messageSubTextLBL.frame=CGRectMake(rect.origin.x, rect.origin.y, rect.size.width,height);
+    [self.profileIMGVIEW setTarget:self OnClickFunc:@selector(profileBtnClicked:) WithObj:[self userDictDetail:dataObj]];
 
 }
+-(NSDictionary *)userDictDetail:(APIObjects_NotificationObj *)feedData
+{
+    
+    NSString *userCover;
+    
+    if(feedData.notifier_userCoverURL==nil)
+    {
+        userCover=@"";
+    }
+    
+
+    
+    NSDictionary * dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                          feedData.notifier_userFirstName,@"user_firstname",
+                          feedData.notifier_userLastName,@"user_lastname",
+                          @"",@"user_profession",
+                          feedData.notifier_userThumbURL,@"user_profile_photo_small",
+                          feedData.notifier_userId,@"user_id",
+                          userCover,@"user_cover_photo",
+                          
+                          nil];
+
+//    NSDictionary *dict=@{
+//                         @"user_firstname":feedData.notifier_userFirstName,
+//                         @"user_lastname":feedData.notifier_userLastName,
+//                         @"user_profile_photo_small":feedData.notifier_userThumbURL,
+//                         @"user_profession":@"",
+//                         @"user_id":feedData.notifier_userId,
+//                         @"user_cover_photo":userCover,
+//                         };
+    
+    return dict;
+}
+
+-(void)profileBtnClicked:(NSDictionary *)userDict
+{
+    [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen from Notifications"];
+
+    NSString *screenIdentifier=@"FLIST";
+    
+    if(RX_isiPhone4Res)
+    {
+        return;
+    }
+    
+    if(![screenIdentifier isEqualToString:@"PROFILE"] && ![screenIdentifier isEqualToString:@"DEEPLINKPOST"] && ![screenIdentifier isEqualToString:@"NOTIFICATIONPOST"])
+    {
+        if([screenIdentifier isEqualToString:@"EXPLORE"])
+        {
+            [HMPlayerManager sharedInstance].Explore_isPaused=true;
+        }
+        else if([screenIdentifier isEqualToString:@"HOME"])
+        {
+            [HMPlayerManager sharedInstance].Home_isPaused=true;
+        }
+        
+        //    [HMPlayerManager sharedInstance].All_isPaused=true;
+        
+        CGRect rect=[self.profileIMGVIEW convertRect:self.profileIMGVIEW.superview.frame fromView:self];
+        
+        CGPoint p=[self.profileIMGVIEW convertPoint:self.profileIMGVIEW.center toView:nil];
+        rect=CGRectMake(p.x-self.profileIMGVIEW.bounds.size.width/2, p.y-self.profileIMGVIEW.bounds.size.height/2, self.profileIMGVIEW.bounds.size.width, self.profileIMGVIEW.bounds.size.width);
+        
+        
+        // CGRect rect=CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, 0);
+        MiniProfileComponent *compo=[[MiniProfileComponent alloc] initWithFrame:rect];
+        [compo setUp:userDict];
+        [compo setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
+        
+        
+        NSLog(@"%@",userDict);
+    }
+    
+}
+-(void)ProfilecloseBtnClicked:(id)sender
+{
+    NSString *screenIdentifier=@"FLIST";
+    
+    if([screenIdentifier isEqualToString:@"EXPLORE"])
+    {
+        [HMPlayerManager sharedInstance].Explore_isPaused=false;
+    }
+    else if([screenIdentifier isEqualToString:@"HOME"])
+    {
+        [HMPlayerManager sharedInstance].Home_isPaused=false;
+    }
+    
+    //    [HMPlayerManager sharedInstance].All_isPaused=false;
+    
+    NSLog(@"closed");
+    
+}
+
 - (CGFloat)getLabelHeight:(UILabel*)label
 {
     CGSize constraint = CGSizeMake(label.frame.size.width, CGFLOAT_MAX);

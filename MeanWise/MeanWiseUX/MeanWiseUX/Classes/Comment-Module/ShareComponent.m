@@ -7,16 +7,110 @@
 //
 
 #import "ShareComponent.h"
+#import "ShareDialogue.h"
+#import "AppDelegate.h"
+#import "ViewController.h"
+#import "SharePostVC.h"
+
 
 @implementation ShareComponent
 
+-(void)setPostId:(NSString *)postId;
+{
+    postIdReceived=postId;
+}
+-(void)setMainData:(APIObjects_FeedObj *)feed;
+{
+    mainData=feed;
+    
+}
 -(void)setTarget:(id)target andCloseBtnClicked:(SEL)func1;
 {
     delegate=target;
     closeBtnClicked=func1;
 }
-
 -(void)setUp
+{
+    [AnalyticsMXManager PushAnalyticsEvent:@"Feed share Button Clicked"];
+
+    blackOverLay=[[UIView alloc] initWithFrame:self.bounds];
+    [self addSubview:blackOverLay];
+    blackOverLay.backgroundColor=[UIColor blackColor];
+    blackOverLay.alpha=0;
+
+    containerView=[[UIView alloc] initWithFrame:CGRectMake(0, self.bounds.size.height, self.bounds.size.width, self.bounds.size.height*0.3)];
+    
+    containerView.backgroundColor=[UIColor whiteColor];
+    [self addSubview:containerView];
+    
+    
+    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
+        
+        containerView.frame=CGRectMake(0, self.bounds.size.height*0.7, self.bounds.size.width, self.bounds.size.height*0.3);
+        blackOverLay.alpha=0.4;
+        
+    } completion:^(BOOL finished) {
+        
+        
+        
+        
+    }];
+    
+    shareTitle=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 40)];
+    [containerView addSubview:shareTitle];
+    shareTitle.font=[UIFont fontWithName:k_fontRegular size:17];
+    shareTitle.text=@"Share";
+    
+    shareTitle.textColor=[UIColor colorWithRed:0.26 green:0.36 blue:0.41 alpha:1.00];
+    shareTitle.textAlignment=NSTextAlignmentCenter;
+    
+
+    seperator1=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 1)];
+    seperator1.backgroundColor=[UIColor colorWithRed:0.26 green:0.36 blue:0.41 alpha:0.1];
+    [containerView addSubview:seperator1];
+    seperator1.center=CGPointMake(self.frame.size.width/2, 40);
+    
+    seperator3=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 1)];
+    seperator3.backgroundColor=[UIColor colorWithRed:0.26 green:0.36 blue:0.41 alpha:0.1];
+    [containerView addSubview:seperator3];
+    seperator3.center=CGPointMake(self.frame.size.width/2, self.frame.size.height*0.3-40);
+
+    
+    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, self.bounds.size.height*0.3-40, self.frame.size.width, 40)];
+    [cancelBtn setTitle:@"Cancel" forState:UIControlStateNormal];
+    [cancelBtn setTitleColor:[UIColor colorWithRed:0.26 green:0.36 blue:0.41 alpha:1.00] forState:UIControlStateNormal];
+    [containerView addSubview:cancelBtn];
+    cancelBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:17];
+    [cancelBtn addTarget:self action:@selector(cancelBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+
+    
+    NSArray *array=[NSArray arrayWithObjects:
+                    @"SHARE_Facebook.png",
+                    @"SHARE_Twitter.png",
+                    @"SHARE_Email.png",
+                    @"SHARE_Copy.png",
+                    @"SHARE_SMS.png",
+                    nil];
+    
+    float width=self.frame.size.width/[array count];
+    
+    for(int i=0;i<array.count;i++)
+    {
+        
+        UIButton *btn=[[UIButton alloc] initWithFrame:CGRectMake(i*width, self.frame.size.height*0.15-35, width, width)];
+        [containerView addSubview:btn];
+        btn.tag=i;
+      //  btn.backgroundColor=[UIColor colorWithRed:(i*30)/255.0f green:(i*20)/255.0f blue:(i*49)/255.0f alpha:1.0f];
+        
+        [btn setImage:[UIImage imageNamed:[array objectAtIndex:i]] forState:UIControlStateNormal];
+        [btn setImageEdgeInsets:UIEdgeInsetsMake(22, 22, 22, 22)];
+        [btn addTarget:self action:@selector(shareBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    }
+
+
+}
+
+-(void)setUpMessage
 {
     blackOverLay=[[UIView alloc] initWithFrame:self.bounds];
     [self addSubview:blackOverLay];
@@ -93,18 +187,73 @@
     [peopleList registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [containerView addSubview:peopleList];
 
-    NSArray *array=[NSArray arrayWithObjects:@"FacebookIcon.png",@"TwitterIcon.png",@"GoogleIcon.png", nil];
+    NSArray *array=[NSArray arrayWithObjects:
+                    @"SHARE_Facebook.png",
+                    @"SHARE_Twitter.png",
+                    @"SHARE_Email.png",
+                    @"SHARE_Copy.png",
+                    @"SHARE_SMS.png",
+                    nil];
     
-    for(int i=0;i<5;i++)
+    for(int i=0;i<array.count;i++)
     {
         
         UIButton *btn=[[UIButton alloc] initWithFrame:CGRectMake(i*70, self.frame.size.height/2-140, 70, 70)];
         [containerView addSubview:btn];
-        
+        btn.tag=i;
+
         [btn setImage:[UIImage imageNamed:[array objectAtIndex:i%3]] forState:UIControlStateNormal];
         [btn setImageEdgeInsets:UIEdgeInsetsMake(25, 25, 25, 25)];
+        [btn addTarget:self action:@selector(shareBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    }
+    
+    //fb,twitter,email,sms,copy
+    
+}
+
+-(void)shareBtnClicked:(UIButton *)sender
+{
+    
+    NSString *string=[NSString stringWithFormat:@"Hey! https://meanwise.com/post?post=%@",postIdReceived];
+//
+    NSDictionary *dict=[[NSDictionary alloc] initWithObjectsAndKeys:string,@"text", nil];
+//
+//    
+    UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+    ViewController *t=(ViewController *)vc.topViewController;
+//
+//    
+//    
+    SharePostVC *vc1=[[SharePostVC alloc] init];
+    
+    if(sender.tag==0)
+    {
+    [vc1 shareOn:dict andNetwork:0 withVC:t];
+    }
+    else if(sender.tag==1)
+    {
+        [vc1 shareOn:dict andNetwork:1 withVC:t];
         
     }
+    else if(sender.tag==2)
+    {
+        [vc1 shareOn:dict andNetwork:2 withVC:t];
+        
+    }
+    else if(sender.tag==3)
+    {
+        [vc1 shareOn:dict andNetwork:3 withVC:t];
+        
+    }
+    else if(sender.tag==4)
+    {
+        [vc1 shareOn:dict andNetwork:4 withVC:t];
+        
+    }
+    
+    [self addSubview:vc1];
+    
+    
     
     
 }
@@ -143,6 +292,8 @@
 
 -(void)cancelBtnClicked:(id)sender
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Feed share Close Clicked"];
+
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
         
         containerView.frame=CGRectMake(0, self.bounds.size.height, self.bounds.size.width, self.bounds.size.height/2);

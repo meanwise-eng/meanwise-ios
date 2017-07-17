@@ -7,6 +7,8 @@
 //
 
 #import "PreviewMedia_ImageController.h"
+#import "GUIScaleManager.h"
+
 
 
 @implementation PreviewMedia_ImageController
@@ -449,7 +451,7 @@
 -(void)combineAndAddText:(NSString *)filePath
 {
     
-    CGSize requiredVideoSize=[UIScreen mainScreen].bounds.size;
+    CGSize requiredVideoSize=RX_mainScreenBounds.size;
     
     
     requiredVideoSize=CGSizeMake(requiredVideoSize.width*2, requiredVideoSize.height*2);
@@ -492,7 +494,7 @@
 
     
     
-    float ratio=videoSize.width/[UIScreen mainScreen].bounds.size.width;
+    float ratio=videoSize.width/RX_mainScreenBounds.size.width;
     
     UIImage *myImage =[self createImageFromTextField:ratio];
     
@@ -532,11 +534,10 @@
     
     
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)objectAtIndex:0];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
-    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
-    
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
+    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov",@"555"];
+    [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
+
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
     exportSession.videoComposition=videoComposition;
     
     exportSession.outputURL = [NSURL fileURLWithPath:destinationPath];

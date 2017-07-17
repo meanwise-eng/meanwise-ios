@@ -11,6 +11,37 @@
 
 @implementation MediaCropper
 
+-(void)setDirectCrop
+{
+    UIView *view=[[UIView alloc] initWithFrame:self.bounds];
+    [self addSubview:view];
+    view.backgroundColor=[UIColor clearColor];
+    
+    title.hidden=true;
+    doneBtn.hidden=true;
+    trimSlider.hidden=true;
+    view1.hidden=true;
+    view2.hidden=true;
+    view3.hidden=true;
+    view4.hidden=true;
+
+    gridView1.hidden=true;
+    gridView2.hidden=true;
+    gridView3.hidden=true;
+    gridView4.hidden=true;
+    gridView5.hidden=true;
+    cancelBtn.hidden=true;
+
+    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+    UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+    blurEffectView.frame = view.bounds;
+    blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [view addSubview:blurEffectView];
+
+
+    
+    [self performSelector:@selector(cropFinished:) withObject:nil afterDelay:0.001];
+}
 
 -(void)setUpWithPath:(NSString *)stringPath
 {
@@ -48,7 +79,7 @@
     scrollView.layer.borderColor=[UIColor whiteColor].CGColor;
     scrollView.delegate=self;
     scrollView.minimumZoomScale=1.0f;
-    scrollView.maximumZoomScale=5.0f;
+    scrollView.maximumZoomScale=1.1f;
     
     
     if(isVideo==false)
@@ -185,6 +216,7 @@
         [trimSlider setUp:filePathStr];
         [trimSlider setTarget:self andOnTrimmingDidChangeFunc:@selector(trimmingChange:)];
 
+        
         //        CGSize mediaSize=[self getTheSizeFromVideoPath:filePathStr];
         //
         //        int orien=[self getOrientation_FromVideoPath:filePathStr];
@@ -193,12 +225,60 @@
         
     }
     
+    title.layer.shadowColor=[UIColor blackColor].CGColor;
+    title.layer.shadowOpacity=0.5;
+    title.layer.shadowRadius=2;
+    title.layer.shadowOffset=CGSizeMake(0, 0);
     
-    UIButton *button=[[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-80, 20, 70, 50)];
-    [self addSubview:button];
-    [button setTitle:@"Done" forState:UIControlStateNormal];
-    button.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
-    [button addTarget:self action:@selector(cropFinished:) forControlEvents:UIControlEventTouchUpInside];
+    
+    doneBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-80, 20, 70, 50)];
+    [self addSubview:doneBtn];
+    [doneBtn setTitle:@"Done" forState:UIControlStateNormal];
+    doneBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
+    [doneBtn addTarget:self action:@selector(cropFinished:) forControlEvents:UIControlEventTouchUpInside];
+ 
+    doneBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
+    doneBtn.titleLabel.layer.shadowOpacity=0.5;
+    doneBtn.titleLabel.layer.shadowRadius=2;
+    doneBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
+    
+    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 20, 70, 50)];
+    [self addSubview:cancelBtn];
+    [cancelBtn setTitle:@"Cancel" forState:UIControlStateNormal];
+    cancelBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
+    [cancelBtn addTarget:self action:@selector(cancelBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    cancelBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
+    cancelBtn.titleLabel.layer.shadowOpacity=0.5;
+    cancelBtn.titleLabel.layer.shadowRadius=2;
+    cancelBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
+    
+}
+-(void)cancelBtnClicked:(id)sender
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        
+        if(isVideo)
+        {
+            isPlayerPaused=true;
+            [playerViewControl.player pause];
+            playerViewControl.player=nil;
+            playerViewControl=nil;
+            
+        }
+        else
+        {
+            
+            
+        }
+        
+        [target performSelector:cancelBtnClicked withObject:nil afterDelay:0.001];
+       [self performSelector:@selector(removeThisView:) withObject:nil afterDelay:0.001];
+        
+    });
+    
+
     
 }
 
@@ -229,9 +309,12 @@
         
         [firstTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:startTime error:nil];
         
+        if([firstAsset tracksWithMediaType:AVMediaTypeAudio].count>0)
+        {
         AVMutableCompositionTrack *firstAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
         
         [firstAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, duration) ofTrack:[[firstAsset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:startTime error:nil];
+        }
         
         
         AVMutableVideoCompositionInstruction * MainInstruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
@@ -297,7 +380,13 @@
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentsDirectory = [paths objectAtIndex:0];
-        NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"fixOrientation-%d.mov",arc4random() % 1000]];
+        NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"fixOrientation-%d.mov",5]];
+        
+        
+        [[NSFileManager defaultManager] removeItemAtPath:myPathDocs error:nil];
+        
+        
+        
         
         NSURL *url = [NSURL fileURLWithPath:myPathDocs];
         
@@ -338,14 +427,20 @@
 {
     AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
     AVMutableCompositionTrack *track = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
-    AVMutableCompositionTrack *track1 = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
     
     
     AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:path]];
     
     [track insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration) ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:CMTimeMake(0, 1) error:nil];
     
+    if([asset tracksWithMediaType:AVMediaTypeAudio].count>0)
+    {
+        
+        AVMutableCompositionTrack *track1 = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+
+
     [track1 insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration) ofTrack:[[asset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:CMTimeMake(0, 1) error:nil];
+    }
     
     
     NSString *documentsDirectory=[self applicationDocumentsDirectoryPath];
@@ -427,7 +522,7 @@
     
     AVAssetExportSession *exporter;
     
-    exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
+    exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
     
     exporter.videoComposition = mainCompositionInst;
     exporter.outputURL=url;
@@ -442,8 +537,23 @@
     [exporter exportAsynchronouslyWithCompletionHandler:^{
         dispatch_async(dispatch_get_main_queue(), ^{
             
-            [self removeAndClose:myPathDocs];
             
+            if(exporter.status == AVAssetExportSessionStatusCompleted)
+            {
+                [self removeAndClose:myPathDocs];
+
+                
+               // [self saveNewVideoManage:myPathDocs];
+                
+                
+                NSLog(@"DONE - %@",myPathDocs);
+            }
+            else
+            {
+                NSLog(@"DONE - %@",myPathDocs);
+                
+            }
+
             //            [self convertIntoUploadedFormat:myPathDocs];
             
             
@@ -549,14 +659,14 @@
         
         [trimSlider updateProgress:playerStartTime endTime:playerEndTime andCurrentTime:currentItem.currentTime];
         
-    
+
     }
     else{
         [playerViewControl.player pause];
     }
+
     [self performSelector:@selector(autoplayContinue:) withObject:nil afterDelay:0.2f];
 
-    
 }
 
 
@@ -675,25 +785,34 @@
 
 -(void)removeAndClose:(NSString *)path
 {
-    [FTIndicator dismissProgress];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        [FTIndicator dismissProgress];
+        
+        if(isVideo)
+        {
+            [playerViewControl.player pause];
+            playerViewControl.player=nil;
+            playerViewControl=nil;
+            
+        }
+        else
+        {
+            
+            
+        }
+        
+        [target performSelector:doneBtnClicked withObject:path afterDelay:0.001];
+        [self performSelector:@selector(removeThisView:) withObject:nil afterDelay:0.5];
+
+    });
     
-    if(isVideo)
-    {
-        [playerViewControl.player pause];
-        playerViewControl.player=nil;
-        playerViewControl=nil;
-        
-    }
-    else
-    {
-        
-        
-    }
     
-    [target performSelector:doneBtnClicked withObject:path afterDelay:0.01];
+}
+-(void)removeThisView:(id)sender
+{
     [self removeFromSuperview];
-    
-    
+
 }
 -(void)replayBtnClicked:(id)sender
 {
@@ -708,10 +827,17 @@
     [FTIndicator showProgressWithmessage:@"Preparing.." userInteractionEnable:NO];
     CGRect visibleRect = [scrollView convertRect:scrollView.bounds toView:imageView];
     
+
     visibleRect=CGRectMake(visibleRect.origin.x/ratio, visibleRect.origin.y/ratio, visibleRect.size.width/ratio, visibleRect.size.height/ratio);
     
     if(isVideo)
     {
+        UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
+        UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+        blurEffectView.frame = self.bounds;
+        blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [self addSubview:blurEffectView];
+
         [self saveNewVideo];
     }
     else
@@ -726,6 +852,7 @@
         [self removeAndClose:path];
         
     }
+    
 }
 #pragma mark - Helper
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
@@ -766,13 +893,15 @@
 -(void)setUpBoundriesAndGrid
 {
     
+    
     UIColor *color=[UIColor colorWithWhite:0.0f alpha:0.5f];
     UIColor *color1=[UIColor colorWithWhite:1.0f alpha:0.3];
     
-    UIView *view1=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *view2=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *view3=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *view4=[[UIView alloc] initWithFrame:CGRectZero];
+    view1=[[UIView alloc] initWithFrame:CGRectZero];
+    view2=[[UIView alloc] initWithFrame:CGRectZero];
+    view3=[[UIView alloc] initWithFrame:CGRectZero];
+    view4=[[UIView alloc] initWithFrame:CGRectZero];
+    
     view1.backgroundColor=color;
     view2.backgroundColor=color;
     view3.backgroundColor=color;
@@ -799,11 +928,11 @@
     
     
     
-    UIView *gridView1=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *gridView2=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *gridView3=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *gridView4=[[UIView alloc] initWithFrame:CGRectZero];
-    UIView *gridView5=[[UIView alloc] initWithFrame:CGRectZero];
+     gridView1=[[UIView alloc] initWithFrame:CGRectZero];
+    gridView2=[[UIView alloc] initWithFrame:CGRectZero];
+    gridView3=[[UIView alloc] initWithFrame:CGRectZero];
+    gridView4=[[UIView alloc] initWithFrame:CGRectZero];
+    gridView5=[[UIView alloc] initWithFrame:CGRectZero];
     
     
     gridView1.backgroundColor=color1;
@@ -830,6 +959,7 @@
     gridView4.frame=CGRectMake(scrollView.frame.origin.x,scrollView.frame.origin.y+size.height/4*2, size.width, 1);
     
     gridView5.frame=CGRectMake(scrollView.frame.origin.x,scrollView.frame.origin.y+size.height/4*3, size.width, 1);
+    
     
 }
 -(NSString *)getNewPathWith:(NSString *)string

@@ -10,6 +10,7 @@
 #import "PreviewMedia_ImageController.h"
 #import "PreviewMedia_VideoController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "GUIScaleManager.h"
 
 
 @implementation PreviewViewComponent
@@ -46,7 +47,7 @@
     NSString *ext = [path pathExtension];
     
     
-    fullRect=[UIScreen mainScreen].bounds;
+    fullRect=RX_mainScreenBounds;
     smallRect=rect;
     self.backgroundColor=[UIColor colorWithWhite:1.0f alpha:1.0f];
     
@@ -150,7 +151,7 @@
     closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(smallRect.size.width-2-30, 2, 30, 30)];
     [self addSubview:closeBtn];
     [closeBtn setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
-    closeBtn.backgroundColor=[UIColor redColor];
+    closeBtn.backgroundColor=[UIColor colorWithRed:30/255.0f green:38/255.0f blue:56/255.0f alpha:0.7f];
     closeBtn.clipsToBounds=YES;
     closeBtn.layer.cornerRadius=15;
     [closeBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];

@@ -10,18 +10,33 @@
 
 @implementation PhotoAlbumCCell
 
+- (NSString *)timeFormatted:(int)totalSeconds
+{
+    
+    int seconds = totalSeconds % 60;
+    int minutes = (totalSeconds / 60) % 60;
+    int hours = totalSeconds / 3600;
+    if(hours==0)
+    {
+    return [NSString stringWithFormat:@"%02d:%02d",minutes,seconds];
+    }
+    else
+    {
+        return [NSString stringWithFormat:@"%02d:%02d:%02d",hours,minutes,seconds];
+    }
+}
 
 -(void)setAsset:(PHAsset *)assetReceived;
 {
+    self.backgroundColor=[Constant colorGlobal:arc4random()%12];
+    
+    self.shadowImage.hidden=true;
     asset=assetReceived;
     
         PHImageManager *manager = [PHImageManager defaultManager];
-        //  NSMutableArray *images = [NSMutableArray arrayWithCapacity:[assets count]];
-        
-        
         PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
-        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
+        requestOptions.resizeMode   = PHImageRequestOptionsResizeModeFast;
+        requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeOpportunistic;
     
     
    if(asset.mediaType==PHAssetMediaTypeVideo)
@@ -29,13 +44,14 @@
        self.duration.hidden=false;
 
        
-       self.duration.text=[NSString stringWithFormat:@"%1.0fs",asset.duration];
+       self.duration.text=[self timeFormatted:(int)asset.duration];
+
    }
     else
     {
         self.duration.hidden=true;
     }
-        // this one is key
+    
         requestOptions.synchronous = false;
         
     
@@ -47,11 +63,10 @@
                             
                           //  NSLog(@"Image size:%@",NSStringFromCGSize(image.size));
 
-
-                            
-                            
                             dispatch_async(dispatch_get_main_queue(), ^{
                                 
+                                
+                                self.shadowImage.hidden=false;
                                 self.photoView.image=image;
                               //  self.photoView.frame=CGRectMake(0, 0, image.size.width, image.size.height);
                                // self.photoView.center=CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
@@ -82,22 +97,45 @@
         
         
         
-        self.photoView=[[UIImageView alloc] initWithFrame:CGRectMake(1, 1, self.frame.size.width-2, self.frame.size.height-2)];
+        
+        self.photoView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
         self.photoView.frame=self.bounds;
         
         [self addSubview:self.photoView];
         self.photoView.contentMode=UIViewContentModeScaleAspectFill;
         self.photoView.clipsToBounds=YES;
         
-        self.duration=[[UILabel alloc] initWithFrame:CGRectMake(2, self.frame.size.height-20, self.frame.size.width-4, 20)];
+        self.photoView.backgroundColor=[UIColor clearColor];
+        
+        
+        
+        self.shadowImage=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+        self.shadowImage.frame=self.bounds;
+        
+        [self addSubview:self.shadowImage];
+        self.shadowImage.contentMode=UIViewContentModeScaleAspectFill;
+        self.shadowImage.clipsToBounds=YES;
+        self.shadowImage.image=[UIImage imageNamed:@"BlackShadow.png"];
+        self.shadowImage.alpha=0.3;
+        self.shadowImage.transform=CGAffineTransformMakeScale(1, -1);
+        
+        
+        self.duration=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 20)];
         self.duration.textColor=[UIColor whiteColor];
-        self.duration.textAlignment=NSTextAlignmentLeft;
+        self.duration.textAlignment=NSTextAlignmentCenter;
         self.duration.text=@"v";
         self.duration.hidden=true;
         self.duration.adjustsFontSizeToFitWidth=YES;
         [self addSubview:self.duration];
         self.duration.font=[UIFont fontWithName:k_fontExtraBold size:10];
 
+        self.duration.layer.cornerRadius=2;
+        self.duration.clipsToBounds=YES;
+        self.duration.backgroundColor=[UIColor colorWithWhite:1 alpha:0.3f];
+
+        self.shadowImage.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+
+        self.photoView.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     }
     return self;
 }

@@ -17,6 +17,8 @@
     self.backgroundColor=[UIColor clearColor];
     [Constant setUpGradient:self style:7];
     
+    [self addSubview:[Constant createProgressSignupViewWithWidth:self.frame.size.width andProgress:0.6 toPercentage:0.75]];;
+
     selectedArray=[[NSMutableArray alloc] init];
    // arrayData=[[NSArray alloc] initWithObjects:@"Music",@"Travel",@"Lifestyle",@"Sports",@"Science & Technology",@"Politics",@"Fashion",@"Finance",@"Gamming",nil];
 
@@ -75,7 +77,8 @@
     
     
     
-    CGRect collectionViewFrame = CGRectMake(0, self.frame.size.height-430, self.frame.size.width, 400);
+    CGRect collectionViewFrame = CGRectMake(0, self.frame.size.height-430, self.frame.size.width, 350);
+    
     
     
     interestCollectionView = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout];
@@ -91,7 +94,7 @@
     
     numberOfItemSelected=0;
     
-    counterLBL=[[UILabel alloc] initWithFrame:CGRectMake(10, self.frame.size.height-420, self.frame.size.width-20, 30)];
+    counterLBL=[[UILabel alloc] initWithFrame:CGRectMake(10, interestCollectionView.frame.origin.y-30, self.frame.size.width-20, 30)];
     [self addSubview:counterLBL];
     counterLBL.textAlignment=NSTextAlignmentRight;
     counterLBL.textColor=[UIColor whiteColor];
@@ -248,7 +251,7 @@
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    return CGSizeMake(collectionView.frame.size.width*0.56, collectionView.bounds.size.height*0.75);
+    return CGSizeMake(220, 320);
 }
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {

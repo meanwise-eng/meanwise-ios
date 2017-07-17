@@ -82,7 +82,6 @@
     searchField.font=[UIFont fontWithName:k_fontSemiBold size:15];
 
     
-    [self refreshAction];
  
     emptyView=[[EmptyView alloc] initWithFrame:friendListTableView.frame];
     [self addSubview:emptyView];
@@ -90,46 +89,12 @@
     [emptyView setUIForWhite];
     [emptyView setDelegate:self onReload:@selector(refreshAction)];
 
-    
+    pManager=[[API_PAGESManager alloc] initWithRequestCount:9 isVertical:YES];
+
+    [self refreshAction];
+
     // msgContactTable.bounces=false;
     
-}
--(void)refreshAction
-{
-    
-    manager=[[APIManager alloc] init];
-    
-    [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:1 delegate:self andSelector:@selector(userFriendsReceived:)];
-    
-    [FTIndicator showProgressWithmessage:@"Loading.."];
-}
--(void)userFriendsReceived:(APIResponseObj *)responseObj
-{
-  //  NSLog(@"%@",responseObj.response);
-    
-    if([responseObj.response isKindOfClass:[NSArray class]])
-    {
-        NSArray *array=(NSArray *)responseObj.response;
-        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-        resultData=[parser parseObjects_PROFILES:array];
-        
-     //   int p=0;
-        [friendListTableView reloadData];
-    }
-    
-    if(resultData.count==0)
-    {
-        emptyView.hidden=false;
-        friendListTableView.hidden=true;
-    }
-    else
-    {
-        emptyView.hidden=true;
-        friendListTableView.hidden=false;
-   
-    }
-    
-    [FTIndicator dismissProgress];
 }
 
 -(void)setTarget:(id)target andBackFunc:(SEL)func
@@ -164,7 +129,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return resultData.count;
+    return finalArray.count;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -180,7 +145,7 @@
         cell = [[FriendListCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
     }
     
-    APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
+    APIObjects_ProfileObj *obj=[finalArray objectAtIndex:indexPath.row];
     
     [cell setDataDict:obj];
         
@@ -197,6 +162,226 @@
     [cell setSelected:false animated:true];
     
 }
+#pragma mark - API Pagination
 
+-(void)refreshAction
+{
+    
+    [finalArray removeAllObjects];
+    finalArray=[[NSMutableArray alloc] init];
+    [friendListTableView reloadData];
+    
+    
+    manager=[pManager getFreshAPIManager];
+     [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:1 delegate:self andSelector:@selector(updateTheData:)];
+    
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+}
+-(BOOL)checkIfUpdateValid:(NSArray *)update
+{
+//    NSMutableArray *temp=[[NSMutableArray alloc] init];
+//    
+//    [temp addObjectsFromArray:update];
+//    
+//    for(int i=0;i<[finalArray count];i++)
+//    {
+//        [temp addObject:[[finalArray objectAtIndex:i] valueForKey:@"id"]];
+//    }
+//    
+//    
+//    NSSet *setAll=[NSSet setWithArray:temp];
+//    //NSLog(@"%ld-%ld",temp.count,setAll.count);
+//    
+//    if(setAll.count==temp.count)
+//    {
+//        return true;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+    return true;
+}
+-(void)updateTheData:(APIResponseObj *)obj
+{
+    
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Add code here to do background processing
+        //
+        //
+        dispatch_async( dispatch_get_main_queue(), ^{
+            
+            [FTIndicator dismissProgress];
+
+            NSLog(@"NEW DATA RECEIVED");
+            
+            if(obj.inputPageNo==pManager.AP_lastPageNumberRequested && obj.statusCode==200)
+            {
+                
+
+                NSArray *response;
+                
+                if([[obj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
+                {
+                    response=(NSArray *)[obj.response valueForKey:@"data"];
+                    
+                    APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+                    response=[NSMutableArray arrayWithArray:[parser parseObjects_PROFILES:response]];
+
+                }
+                
+              
+                
+
+                
+                if(obj.statusCode==200 && [self checkIfUpdateValid:response])
+                {
+                    [pManager updateTheData:obj.totalNumOfPagesAvailable andLastReceived:obj.inputPageNo];
+                    
+                    //[FTIndicator showToastMessage:@"New Data Recevied"];
+                    
+                    
+                    
+                    
+                    
+                    if([friendListTableView isKindOfClass:[UITableView class]])
+                    {
+                        
+                        UITableView *tableView=(UITableView *)friendListTableView;
+                        
+                        [tableView beginUpdates];
+                        NSMutableArray *newIndexs=[[NSMutableArray alloc] init];
+                        
+                        for(int i=(int)finalArray.count;i<(finalArray.count+response.count);i++)
+                        {
+                            NSIndexPath *indexPath=[NSIndexPath indexPathForRow:i inSection:0];
+                            [newIndexs addObject:indexPath];
+                        }
+                        
+                        [finalArray addObjectsFromArray:response];
+                        
+                        NSArray *paths = [NSArray arrayWithArray:newIndexs];
+                        [tableView insertRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationTop];
+                        [tableView endUpdates];
+                    }
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    //        //Full Reload
+                    //        NSArray *response=[obj.response valueForKey:@"data"];
+                    //        NSMutableArray *array=[NSMutableArray arrayWithArray:finalArray];
+                    //        [array addObjectsFromArray:response];
+                    //        finalArray=[NSArray arrayWithArray:array];
+                    //        [listView reloadData];
+                    //
+                    
+                    NSMutableArray *temp=[[NSMutableArray alloc] init];
+                    for(int i=0;i<[finalArray count];i++)
+                    {
+                        APIObjects_ProfileObj *po=[finalArray objectAtIndex:i];
+                        [temp addObject:po.userId];
+                    }
+                    
+                    
+                    NSSet *setAll=[NSSet setWithArray:temp];
+                    //NSLog(@"%ld-%ld",temp.count,setAll.count);
+                    
+                    if(temp.count!=setAll.count)
+                    {
+                        int breakMax=0;
+                    }
+                    else
+                    {
+                        NSLog(@"%ld",finalArray.count);
+                        
+                        
+                    }
+                    
+                    
+                }
+                else
+                {
+                    if(obj.statusCode!=200)
+                    {
+                        [FTIndicator showToastMessage:obj.message];
+                    }
+                    else
+                    {
+                        [FTIndicator showToastMessage:@"Something Went Wrong.."];
+                        
+                    }
+                    [pManager failedLastRequest];
+                }
+            }
+            else
+            {
+                
+                int p=0;
+            }
+            
+            if(finalArray.count==0)
+            {
+                emptyView.hidden=false;
+                friendListTableView.hidden=true;
+            }
+            else
+            {
+                emptyView.hidden=true;
+                friendListTableView.hidden=false;
+            }
+            
+        });
+    });
+}
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+    if([pManager ifNewCallRequired:scrollView withCellHeight:friendListTableView.rowHeight])
+    {
+        [self callNewData];
+    }
+}
+-(void)callNewData
+{
+    [FTIndicator showProgressWithmessage:@"Loading.."];
+    
+    manager=[pManager getNewAPImanagerForNextPage];
+    [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:1 delegate:self andSelector:@selector(updateTheData:)];
+    
+}
+-(void)userFriendsReceived:(APIResponseObj *)responseObj
+{
+    //  NSLog(@"%@",responseObj.response);
+    
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
+    {
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
+        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+        finalArray=[NSMutableArray arrayWithArray:[parser parseObjects_PROFILES:array]];
+        
+        [friendListTableView reloadData];
+    }
+    
+    if(finalArray.count==0)
+    {
+        emptyView.hidden=false;
+        friendListTableView.hidden=true;
+    }
+    else
+    {
+        emptyView.hidden=true;
+        friendListTableView.hidden=false;
+        
+    }
+    
+    [FTIndicator dismissProgress];
+}
 
 @end

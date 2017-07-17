@@ -42,13 +42,13 @@
    // self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
 
     
-    if([[dict valueForKey:@"user_profession"] valueForKey:@"name"]==nil)
+    if([dict valueForKey:@"user_profession_text"]==nil)
     {
         self.user_profession=@"";
     }
     else
     {
-        self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
+        self.user_profession=[dict valueForKey:@"user_profession_text"];
         
     }
     

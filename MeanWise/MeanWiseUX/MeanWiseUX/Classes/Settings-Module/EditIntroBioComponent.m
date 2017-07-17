@@ -11,6 +11,7 @@
 #import "EditIntroBioComponent.h"
 #import "UserSession.h"
 #import "ViewController.h"
+#import "FTIndicator.h"
 
 
 @implementation EditIntroBioComponent
@@ -27,16 +28,29 @@
     
     [self setUpNavBarAndAll];
     
-    bioBgView=[[UIView alloc] initWithFrame:CGRectMake(0, 66+70, self.frame.size.width, 55)];
+    
+    noOfCharacters=50;
+    
+    limitIndicatorLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 66+70, self.frame.size.width, 20)];
+    [self addSubview:limitIndicatorLBL];
+    limitIndicatorLBL.textAlignment=NSTextAlignmentCenter;
+    limitIndicatorLBL.font=[UIFont fontWithName:k_fontBold size:15];
+    limitIndicatorLBL.textColor=[UIColor blackColor];
+
+
+    
+    bioBgView=[[UIView alloc] initWithFrame:CGRectMake(0, 66+70+20, self.frame.size.width, 100)];
     [self addSubview:bioBgView];
     [self styleTextFieldStyle:bioBgView];
     
-    bioTextView=[[UITextView alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 55)];
+    bioTextView=[[SAMTextView alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 100)];
     bioTextView.backgroundColor=[UIColor clearColor];
     bioTextView.textColor=[UIColor blackColor];
     bioTextView.font=[UIFont fontWithName:k_fontSemiBold size:18];
     [bioBgView addSubview:bioTextView];
     bioTextView.delegate=self;
+    bioTextView.placeholder=@"Type here..";
+
     
     
     NSString *temp=[UserSession getBioText];
@@ -46,25 +60,41 @@
         bioTextView.text=temp;
     }
     
+    [self textViewDidChange:bioTextView];
+    [bioTextView becomeFirstResponder];
     
     // msgContactTable.bounces=false;
     
 }
 - (void)textViewDidChange:(UITextView *)textView
 {
-    
+   int len =(int)textView.text.length;
+    noOfCharacters=50-len;
+    limitIndicatorLBL.text=[NSString stringWithFormat:@"%i",noOfCharacters];
+//
+    if(noOfCharacters<0)
+    {
+        bioTextView.textColor=[UIColor redColor];
+        limitIndicatorLBL.textColor=[UIColor redColor];
+    }
+    else
+    {
+                bioTextView.textColor=[UIColor blackColor];
+        limitIndicatorLBL.textColor=[UIColor blackColor];
+    }
+
     //CGRect frame=textView.frame;
     
-    
-    CGFloat fixedWidth = textView.frame.size.width;
-    CGSize newSize = [textView sizeThatFits:CGSizeMake(fixedWidth, MAXFLOAT)];
-    CGRect newFrame = textView.frame;
-    newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), newSize.height);
-    textView.frame = newFrame;
-    
-    
-    bioBgView.frame=CGRectMake(0, 66+70, self.frame.size.width, newFrame.size.height);
-  
+//    
+//    CGFloat fixedWidth = textView.frame.size.width;
+//    CGSize newSize = [textView sizeThatFits:CGSizeMake(fixedWidth, MAXFLOAT)];
+//    CGRect newFrame = textView.frame;
+//    newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), newSize.height);
+//    textView.frame = newFrame;
+//    
+//    
+//    bioBgView.frame=CGRectMake(0, 66+70+20, self.frame.size.width, newFrame.size.height);
+//  
     
 }
 
@@ -112,7 +142,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"This is your elevator pitch.\nTell who you are in just a few words.";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;
@@ -128,7 +158,15 @@
 -(void)saveBtnClicked:(id)sender
 {
     //NSString *bioText=bioTextView.text;
+    [bioTextView resignFirstResponder];
     
+    if(noOfCharacters<0)
+    {
+        [FTIndicator showToastMessage:@"Sorry you are exceeding the limit of characters."];
+        
+    }
+    else
+    {
     NSDictionary *dict=@{
                           @"bio":bioTextView.text,
                           };
@@ -136,7 +174,7 @@
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
     [t updateProfileWithDict:dict];
-
+    }
     
     
 }
@@ -150,6 +188,8 @@
 }
 -(void)backBtnClicked:(id)sender
 {
+    [bioTextView resignFirstResponder];
+
     [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{

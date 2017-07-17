@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "APIObjects_ProfileObj.h"
 
 @interface SignupDataObjects : NSObject
 -(void)clearAllData;
@@ -26,6 +27,8 @@
 
 @end
 
+
+
 @interface DataSession : NSObject
 {
   
@@ -34,12 +37,23 @@
 + (instancetype)sharedInstance;
 -(void)postLiked:(NSString *)postId;
 -(void)postUnliked:(NSString *)postId;
+-(void)userProfileUpdate:(APIObjects_ProfileObj *)userObject;
+-(void)updateCommentCountForPostId:(NSString *)postId andCommentCount:(int)commentCount;
+-(int)getUpdatedCommentCountForPostId:(NSString *)postId;
 
-@property (nonatomic, strong) SignupDataObjects* signupObject;
+
+
+@property (nonatomic, strong) NSNumber *SocialshareStatus;
+@property (nonatomic, strong) SignupDataObjects *signupObject;
+
 @property (nonatomic, strong) NSMutableArray* homeFeedResults;
 @property (nonatomic, strong) NSMutableArray* exploreFeedResults;
+@property (nonatomic, strong) NSMutableArray* searchUserResults;
+
+
 @property (nonatomic, strong) NSMutableArray* notificationsResults;
 @property (nonatomic, strong) NSNumber* noOfNewNotificationReceived;
+
 @property (nonatomic, strong) NSNumber* noOfInstantNotificationReceived;
 
 @end

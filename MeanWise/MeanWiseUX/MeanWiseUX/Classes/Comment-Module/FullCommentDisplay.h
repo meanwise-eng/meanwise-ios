@@ -11,6 +11,7 @@
 #import "IQKeyboardManager.h"
 #import "APIManager.h"
 #import "EmptyView.h"
+#import "SAMTextView.h"
 
 
 @interface FullCommentDisplay : UIView <UICollectionViewDelegate,UICollectionViewDataSource,UITextViewDelegate>
@@ -30,7 +31,7 @@
 
     
     UIView *newChatBox;
-    UITextView *newChatMessageBox;
+    SAMTextView *newChatMessageBox;
     UIButton *sendBtn;
     
     id delegate;

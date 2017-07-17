@@ -48,21 +48,25 @@
         self.profileIMGVIEW.alpha=0.6;
         
         
+        self.nameLBL=[[UILabel alloc] initWithFrame:CGRectMake(5, 5, self.frame.size.width-10, 30)];
+        [self addSubview:self.nameLBL];
+        self.nameLBL.text=@"Music";
+        self.nameLBL.textColor=[UIColor whiteColor];
+        self.nameLBL.textAlignment=NSTextAlignmentLeft;
+        self.nameLBL.font=[UIFont fontWithName:k_fontBold size:12];
+        self.nameLBL.numberOfLines=2;
+//        CGSize size=[self.nameLBL sizeThatFits:self.nameLBL.frame.size];
+//        self.nameLBL.frame=CGRectMake(5, 5, size.width, size.height);
+        
         self.overLayView=[[UIView alloc] initWithFrame:self.bounds];
         self.overLayView.backgroundColor=[UIColor redColor];
-        self.overLayView.alpha=0.4;
+        self.overLayView.alpha=0.5;
         [self addSubview:self.overLayView];
         
     
         
         
-        self.nameLBL=[[UILabel alloc] initWithFrame:CGRectMake(5, self.frame.size.height-40, self.frame.size.width-10, 40)];
-        [self addSubview:self.nameLBL];
-        self.nameLBL.text=@"Music";
-        self.nameLBL.textColor=[UIColor whiteColor];
-        self.nameLBL.textAlignment=NSTextAlignmentCenter;
-        self.nameLBL.font=[UIFont fontWithName:k_fontBold size:11];
-        self.nameLBL.numberOfLines=2;
+       
         
         self.backgroundColor=[UIColor blackColor];
         
@@ -76,12 +80,16 @@
     if(selected==true)
     {
         
-        [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        [UIView animateKeyframesWithDuration:0.3 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
 
-            self.bgView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
+//            self.bgView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
+//
+//            self.profileIMGVIEW.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
+//            self.overLayView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
+            
+            self.profileIMGVIEW.alpha=0.8;
 
-            self.profileIMGVIEW.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
-            self.overLayView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height+10);
+            self.overLayView.alpha=0;
 
         } completion:^(BOOL finished) {
             
@@ -92,13 +100,17 @@
     {
         
         
-        [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+        [UIView animateKeyframesWithDuration:0.3 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
             
-            self.bgView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+//            self.bgView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+//
+//            self.profileIMGVIEW.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+//            self.overLayView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
+//
+            self.profileIMGVIEW.alpha=0.6;
 
-            self.profileIMGVIEW.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-            self.overLayView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-            
+            self.overLayView.alpha=0.5;
+
         } completion:^(BOOL finished) {
             
         }];

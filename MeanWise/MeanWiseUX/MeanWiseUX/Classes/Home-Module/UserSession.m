@@ -69,10 +69,10 @@
     return obj.interests;
 
 }
-+(NSArray *)getUserSkills
++(NSArray *)getXUserSkills
 {
     APIObjects_ProfileObj *obj=[self sessionProfileObj];
-    return obj.skills;
+    return obj.skillsX;
 
 }
 
@@ -116,10 +116,10 @@
     APIObjects_ProfileObj *obj=[self sessionProfileObj];
     return obj.cover_photo;
 }
-+(NSString *)getProffesion
++(NSString *)getXProffesion
 {
     APIObjects_ProfileObj *obj=[self sessionProfileObj];
-    return obj.profession;
+    return obj.professionX;
 }
 
 +(NSString *)getUserId
@@ -127,6 +127,29 @@
     APIObjects_ProfileObj *obj=[self sessionProfileObj];
     return obj.userId;
 }
++(NSNumber *)getUserType
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.user_type;
+}
++(NSString *)getProfileBackgroundColor
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.profile_background_color;
+}
++(NSString *)getprofessiontext
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.profession_text;
+}
+
++(NSArray *)getUserCustomSkills;
+{
+    APIObjects_ProfileObj *obj=[self sessionProfileObj];
+    return obj.skill_List;
+    
+}
+
 +(NSString *)getUserName
 {
     APIObjects_ProfileObj *obj=[self sessionProfileObj];
@@ -138,6 +161,14 @@
     return obj.accessToken;
    
 }
++(NSString *)getAccessTokenOnLaunch
+{
+    NSUserDefaults *default1=[NSUserDefaults standardUserDefaults];
+    NSData *encodedObject = [default1 objectForKey:@"MW_UserSession"];
+    APIObjects_ProfileObj *obj = [NSKeyedUnarchiver unarchiveObjectWithData:encodedObject];
+    return obj.accessToken;
+}
+
 +(void)setSessionProfileObj:(NSDictionary *)sessionDict andAccessToken:(NSString *)token
 {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;

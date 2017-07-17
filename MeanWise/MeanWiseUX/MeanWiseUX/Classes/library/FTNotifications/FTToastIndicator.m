@@ -12,7 +12,7 @@
 #pragma mark - Defines
 
 #define kFTToastMaxWidth                        (kFTScreenWidth*0.7)
-#define kFTToastMaxHeight                       (100.f)
+#define kFTToastMaxHeight                       (130.0f)
 #define kFTToastMargin_X                        (20.f)
 #define kFTToastMargin_Y                        (10.f)
 #define kFTToastToBottom                        (100.f)

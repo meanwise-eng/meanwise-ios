@@ -66,10 +66,10 @@
     
     NSString *interestStr = [[interest valueForKey:@"id"] componentsJoinedByString:@","];
     
-    NSString *skillStr = [[skills valueForKey:@"id"] componentsJoinedByString:@","];
+//    NSString *skillStr = [[skills valueForKey:@"id"] componentsJoinedByString:@","];
     
     interestStr=[NSString stringWithFormat:@"[%@]",interestStr];
-    skillStr=[NSString stringWithFormat:@"[%@]",skillStr];
+//    skillStr=[NSString stringWithFormat:@"[%@]",skillStr];
     
     
 //@"[1,2]"
@@ -81,10 +81,11 @@
                           @"last_name":last_name,
                           @"dob":dob,
                           @"interests":interestStr,
-                          @"skills":skillStr,
+                          @"skills_list":skills,
                           @"profile_photo":profile_photo,
                           @"cover_photo":cover_photo,
                           @"invite_code":@"REALPEOPLE",
+                          @"profile_background_color":@"#66CCFF",
                          // @"profession":@"1"
                           
                           };
@@ -163,6 +164,7 @@
 }
 -(void)saveSession:(NSDictionary *)dict;
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Signup Completed"];
     [UserSession setSessionProfileObj:dict andAccessToken:accessToken];
     
 }

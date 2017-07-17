@@ -52,9 +52,16 @@
     backgroundImageView.contentMode=UIViewContentModeScaleAspectFill;
     backgroundImageView.alpha=1;
     
-    backgroundImageOverLayView=[[UIView alloc] initWithFrame:self.bounds];
-    [self addSubview:backgroundImageOverLayView];
-    backgroundImageOverLayView.alpha=0.3;
+//    backgroundImageOverLayView=[[UIView alloc] initWithFrame:self.bounds];
+//    [self addSubview:backgroundImageOverLayView];
+//    backgroundImageOverLayView.alpha=0.3;
+    
+    UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+    UIVisualEffectView *blurEffectView = [[UIVisualEffectView alloc] initWithEffect:blurEffect];
+    blurEffectView.frame = self.bounds;
+    blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    [self addSubview:blurEffectView];
+
     
     
     exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
@@ -73,7 +80,9 @@
     exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, exploreTermBaseView.frame.size.width-50, 40)];
     [exploreTermBaseView addSubview:exploreTerm];
     exploreTerm.tintColor=[UIColor whiteColor];
+    exploreTerm.clearButtonMode=UITextFieldViewModeAlways;
     exploreTerm.textColor=[UIColor whiteColor];
+    exploreTerm.keyboardAppearance=UIKeyboardAppearanceDark;
     
     
     
@@ -175,9 +184,58 @@
     backCloseBtn.hidden=true;
     [self refreshAction];
 
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(refreshTopicChannels)
+                                                 name:@"REFRESH_EXPLORE_INTERESTS"
+                                               object:nil];
+
+}
+-(void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+}
+
+-(void)refreshTopicChannels
+{
+  
+        APIManager *mg=[[APIManager alloc] init];
+        [mg sendRequestForInterestWithDelegate:self andSelector:@selector(NewChannelListReceived:)];
+}
+-(void)NewChannelListReceived:(APIResponseObj *)responseObj
+{
+    
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
+    {
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
+        
+        
+        //        NSMutableArray *arrayT=[[NSMutableArray alloc] initWithArray:array];
+        //
+        //        for(int m=0;m<15;m++)
+        //        {
+        //            int no1=arc4random()%arrayT.count;
+        //            int no2=arc4random()%arrayT.count;
+        //            if(no1!=no2)
+        //            {
+        //                [arrayT exchangeObjectAtIndex:no1 withObjectAtIndex:no2];
+        //            }
+        //        }
+        //
+        //            array=[NSArray arrayWithArray:arrayT];
+        //
+        APIPoster *poster=[[APIPoster alloc] init];
+        [poster saveDataAs:array andKey:@"DATA_INTEREST"];
+    }
+    [ChannelList reloadData];
+  
+    
 }
 -(void)onTopicForChannelChanged:(NSString *)topicName
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Explore Topic Change"];
+
     topicNameForChannel=topicName;
     typeOfSearch=4;
     [self refreshAction];
@@ -185,6 +243,8 @@
 }
 -(void)searchAndAPICall:(NSString *)searchTag
 {
+    
+
     NSLog(@"%@",searchTag);
 
     backCloseBtn.hidden=false;
@@ -246,6 +306,7 @@ exploreTerm.hidden=false;
     }
     else if([currentSearchTerm hasPrefix:@"#"])
     {
+
         typeOfSearch=2;
     }
     else
@@ -278,22 +339,29 @@ exploreTerm.hidden=false;
     }
     if(typeOfSearch==4)
     {
+        
         NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
         dict=@{@"type":[NSNumber numberWithInt:4],@"word":channelName,@"topic":topicNameForChannel};
    
     }
     
     
-    
+    [DataSession sharedInstance].exploreFeedResults=[[NSMutableArray alloc] init];
+    [feedList reloadData];
+    emptyView.hidden=false;
+    emptyView.msgLBL.text=@"Loading..";
+
+
     [manager sendRequestExploreFeedWithKey:dict Withdelegate:self andSelector:@selector(UsersPostReceived:)];
     
-    
+    feedList.userInteractionEnabled=false;
     
     
     //[self performSelector:@selector(endRefreshControl) withObject:nil afterDelay:1.0f];
 }
 -(void)UsersPostReceived:(APIResponseObj *)responseObj
 {
+    feedList.userInteractionEnabled=true;
     
     NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
     
@@ -309,6 +377,8 @@ exploreTerm.hidden=false;
     if([DataSession sharedInstance].exploreFeedResults.count==0)
     {
         emptyView.hidden=false;
+        emptyView.msgLBL.text=@"Nothing to display";
+
     }
     else
     {
@@ -386,6 +456,8 @@ exploreTerm.hidden=false;
    // cell.backgroundColor=[UIColor clearColor];
     cell.nameLBL.text=[[channelList objectAtIndex:indexPath.row] valueForKey:@"name"];
         
+        cell.nameLBL.frame=CGRectMake(5, 5, cell.frame.size.width-10, 30);
+        [cell.nameLBL sizeToFit];
         
         
         cell.overLayView.backgroundColor=[Constant colorGlobal:(indexPath.row%13)];
@@ -504,8 +576,14 @@ exploreTerm.hidden=false;
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     
+    exploreTerm.text=@"";
+    [self SearchTermChanged:nil];
+    [exploreTerm resignFirstResponder];
+
+    
     if(collectionView==feedList && 1==0)
     {
+        
         
         
     [self hideBottomBar];
@@ -674,13 +752,25 @@ exploreTerm.hidden=false;
     
 }
 
+-(void)updateTheCommentCountsForVisibleRows
+{
+    NSArray *arrayVisible=[feedList visibleCells];
+    
+    for(int i=0;i<arrayVisible.count;i++)
+    {
+        HomeFeedCell *cell=(HomeFeedCell *)[arrayVisible objectAtIndex:i];
+        [cell UpdateCommentCountIfRequired];
+    }
+    
+}
 
 
 -(void)downClicked:(NSIndexPath *)indexPath
 {
     
     detailPostView=nil;
-    
+    [self updateTheCommentCountsForVisibleRows];
+
     [[HMPlayerManager sharedInstance] StartKeepKillingExploreFeedVideosIfAvaialble];
     
     [self showBottomBar];

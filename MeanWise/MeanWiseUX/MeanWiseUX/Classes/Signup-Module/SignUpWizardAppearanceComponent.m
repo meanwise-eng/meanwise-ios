@@ -8,6 +8,7 @@
 
 #import "SignUpWizardAppearanceComponent.h"
 #import "ViewController.h"
+#import "FTIndicator.h"
 
 @implementation SignUpWizardAppearanceComponent
 
@@ -23,6 +24,8 @@
     self.backgroundColor=[UIColor clearColor];
     [Constant setUpGradient:self style:8];
     
+    [self addSubview:[Constant createProgressSignupViewWithWidth:self.frame.size.width andProgress:0.75 toPercentage:0.9]];
+
     coverPhoto=[[UIImageView alloc] initWithFrame:self.bounds];
     [self addSubview:coverPhoto];
     coverPhoto.clipsToBounds=YES;
@@ -75,7 +78,7 @@
     
     usernameHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
     [self addSubview:usernameHeadLBL];
-    usernameHeadLBL.text=@"USERNAME";
+    usernameHeadLBL.text=@"USERNAME (MIN 6 CHARACTERS)";
     usernameHeadLBL.textColor=[UIColor whiteColor];
     usernameHeadLBL.textAlignment=NSTextAlignmentLeft;
     usernameHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
@@ -102,6 +105,16 @@
     userNameValidationSign.center=CGPointMake(self.frame.size.width-40, 230+45);
     userNameValidationSign.image=[UIImage imageNamed:@"Checkmark.png"];
     userNameValidationSign.hidden=true;
+    
+    usernameValidationLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 20)];
+    [self addSubview:usernameValidationLBL];
+    usernameValidationLBL.center=CGPointMake(self.frame.size.width/2, 230+15);
+    usernameValidationLBL.font=[UIFont fontWithName:k_fontExtraBold size:12];
+    usernameValidationLBL.textAlignment=NSTextAlignmentLeft;
+    usernameValidationLBL.text=@"Username already in use.";
+    usernameValidationLBL.textColor=[UIColor yellowColor];
+    usernameValidationLBL.hidden=true;
+
     
     UIView *view=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 2)];
     view.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.2f];
@@ -383,6 +396,47 @@
 }
 -(void)nextBtnClicked:(id)sender
 {
+
+    [usernameField resignFirstResponder];
+    
+        nextBtn.enabled=false;
+        
+        APIManager *manager=[[APIManager alloc] init];
+        [manager sendRequestTocheckIfUserExistWithUsername:[usernameField.text lowercaseString] withDelegate:self andSelector:@selector(performNextIfPossible:)];
+        
+
+    [FTIndicator showProgressWithmessage:@"Please wait.." userInteractionEnable:FALSE];
+
+
+}
+-(void)performNextIfPossible:(APIResponseObj *)responseObj
+{
+    nextBtn.enabled=true;
+    
+    [FTIndicator dismissProgress];
+    
+    NSString *string=[responseObj.response valueForKey:@"exists"];
+    if([[string lowercaseString] isEqualToString:@"true"])
+    {
+        NSLog(@"User Already Exists");
+        
+        
+        usernameValidationLBL.hidden=false;
+        [usernameField becomeFirstResponder];
+        usernameValidationLBL.text=[NSString stringWithFormat:@"'%@' already in use.",[usernameField.text lowercaseString]];
+    }
+    else
+    {
+        [self GoforSignup];
+    }
+
+}
+
+-(void)GoforSignup
+{
+    [usernameField resignFirstResponder];
+    
+    
     [DataSession sharedInstance].signupObject.username=usernameField.text;
     [DataSession sharedInstance].signupObject.profile_photo=profilephotoPath;
     [DataSession sharedInstance].signupObject.cover_photo=coverphotoPath;
@@ -390,9 +444,6 @@
     screen=[[SignUpTransitionScreen alloc] initWithFrame:self.bounds];
     [self addSubview:screen];
     [screen setUpForSignup:self andFunc1:@selector(SignupSuccessfully:) andFunc2:@selector(SignupFailed:)];
-
-
-
 }
 -(void)SignupSuccessfully:(id)sender
 {

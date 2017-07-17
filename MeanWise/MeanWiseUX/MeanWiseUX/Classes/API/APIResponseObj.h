@@ -13,9 +13,12 @@
     
 }
 
+
 @property (nonatomic) NSInteger statusCode;
 @property (strong, nonatomic) NSString *message;
 @property (strong, nonatomic) NSDictionary *response;
+@property(nonatomic) NSInteger totalNumOfPagesAvailable;
+@property(nonatomic) NSInteger inputPageNo;
 
 
 @end

@@ -7,7 +7,8 @@
 //
 
 #import "FriendListCell.h"
-
+#import "MiniProfileComponent.h"
+#import "GUIScaleManager.h"
 
 @implementation FriendListCell
 
@@ -46,10 +47,85 @@
     self.contactNameLBL.attributedText=string;
 //    self.contactNameLBL.text=[NSString stringWithFormat:@"%@ %@",obj.first_name,obj.last_name];
 
-    self.proType.text=obj.profession;
-    
+    self.proType.text=obj.profession_text;
+    [self.profileIMGVIEW setTarget:self OnClickFunc:@selector(profileBtnClicked:) WithObj:[self userDictDetail:dataObj]];
+
 
 }
+-(NSDictionary *)userDictDetail:(APIObjects_ProfileObj *)feedData
+{
+    
+    NSDictionary *dict=@{
+                         @"user_firstname":feedData.first_name,
+                         @"user_lastname":feedData.last_name,
+                         @"user_profile_photo_small":feedData.profile_photo_small,
+                         @"user_profession":feedData.profession_text,
+                         @"user_id":feedData.userId,
+                         @"user_cover_photo":feedData.cover_photo
+                         };
+    
+    return dict;
+}
+-(void)profileBtnClicked:(NSDictionary *)userDict
+{
+    NSString *screenIdentifier=@"FLIST";
+    
+    if(RX_isiPhone4Res)
+    {
+        return;
+    }
+    
+    [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen from Friend list"];
+
+    
+    if(![screenIdentifier isEqualToString:@"PROFILE"] && ![screenIdentifier isEqualToString:@"DEEPLINKPOST"] && ![screenIdentifier isEqualToString:@"NOTIFICATIONPOST"])
+    {
+        if([screenIdentifier isEqualToString:@"EXPLORE"])
+        {
+            [HMPlayerManager sharedInstance].Explore_isPaused=true;
+        }
+        else if([screenIdentifier isEqualToString:@"HOME"])
+        {
+            [HMPlayerManager sharedInstance].Home_isPaused=true;
+        }
+        
+        //    [HMPlayerManager sharedInstance].All_isPaused=true;
+        
+        CGRect rect=[self.profileIMGVIEW convertRect:self.profileIMGVIEW.superview.frame fromView:self];
+        
+        CGPoint p=[self.profileIMGVIEW convertPoint:self.profileIMGVIEW.center toView:nil];
+        rect=CGRectMake(p.x-self.profileIMGVIEW.bounds.size.width/2, p.y-self.profileIMGVIEW.bounds.size.height/2, self.profileIMGVIEW.bounds.size.width, self.profileIMGVIEW.bounds.size.width);
+
+        
+       // CGRect rect=CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, 0);
+        MiniProfileComponent *compo=[[MiniProfileComponent alloc] initWithFrame:rect];
+        [compo setUp:userDict];
+        [compo setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
+        
+        
+        NSLog(@"%@",userDict);
+    }
+    
+}
+-(void)ProfilecloseBtnClicked:(id)sender
+{
+    NSString *screenIdentifier=@"FLIST";
+    
+    if([screenIdentifier isEqualToString:@"EXPLORE"])
+    {
+        [HMPlayerManager sharedInstance].Explore_isPaused=false;
+    }
+    else if([screenIdentifier isEqualToString:@"HOME"])
+    {
+        [HMPlayerManager sharedInstance].Home_isPaused=false;
+    }
+    
+    //    [HMPlayerManager sharedInstance].All_isPaused=false;
+    
+    NSLog(@"closed");
+    
+}
+
 
 -(void)setTargetCaller:(id)targetReceived
 {
@@ -136,6 +212,7 @@
     }
     return self;
 }
+
 -(void)FriendShipAccepted:(id)sender
 {
     [targetCaller performSelector:onAcceptCallBack withObject:dataObj.userId afterDelay:0.01];

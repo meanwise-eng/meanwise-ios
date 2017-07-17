@@ -33,7 +33,8 @@
 }
 -(void)setUp
 {
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"Home Screen"];
+
 
     masterControl=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
     [self addSubview:masterControl];
@@ -103,7 +104,54 @@
     masterControl.center=CGPointMake(self.frame.size.width*0.5, self.frame.size.height/2);
 
     
+   // [self showTutorial];
+  //  [self newPostBtnClicked:nil];
+    
+    [self showTutorial];
+    
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(isRegisteredForRemoteNotifications)])
+    {
+        [AnalyticsMXManager PushAnalyticsEvent:@"Push Notification Popup"];
+
+        //ios 10
+        //https://stackoverflow.com/questions/39382852/didreceiveremotenotification-not-called-ios-10/39383027#39383027
+        
+        // iOS 8 Notifications
+        [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeSound |UIUserNotificationTypeAlert | UIUserNotificationTypeBadge) categories:nil]];
+        
+        
+        [[UIApplication sharedApplication] registerForRemoteNotifications];
+        
+        
+    }
+    
 }
+-(void)showTutorial
+{
+    
+   if([Constant isHomePageTutorialFinished]==false)
+   {
+       [AnalyticsMXManager PushAnalyticsEvent:@"Tutorial"];
+
+    [HMPlayerManager sharedInstance].Home_isPaused=true;
+
+    tutorialCmp=[[TutorialComponent alloc] initWithFrame:self.bounds];
+    [self addSubview:tutorialCmp];
+    [tutorialCmp setUp];
+    [tutorialCmp setTarget:self andDoneBtnCallBack:@selector(hideTutorial:)];
+   }
+}
+-(void)hideTutorial:(UIView *)view
+{
+    
+    [tutorialCmp removeFromSuperview];
+    tutorialCmp=nil;
+    
+    [HMPlayerManager sharedInstance].Home_isPaused=false;
+
+    
+}
+
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     
@@ -182,21 +230,28 @@
     if(visiblePoint.x<self.bounds.size.width)
     {
         NSLog(@"EXPLORE");
-       
+        [AnalyticsMXManager PushAnalyticsEvent:@"Explore Screen by Scroll"];
+
         [HMPlayerManager sharedInstance].Explore_isVisibleBounds=true;
         [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
 
     }
     else if(visiblePoint.x<self.bounds.size.width*2)
     {
+        [AnalyticsMXManager PushAnalyticsEvent:@"Home Screen by Scroll"];
+
         [HMPlayerManager sharedInstance].Home_isVisibleBounds=true;
         [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
 
+        [searchComp endEditing:YES];
+        [exploreComp endEditing:YES];
         NSLog(@"HOME");
 
     }
     else if(visiblePoint.x<self.bounds.size.width*3)
     {
+        [AnalyticsMXManager PushAnalyticsEvent:@"Search Screen by Scroll"];
+
         NSLog(@"SEARCH");
         [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
         [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
@@ -213,26 +268,73 @@
 
 -(void)newPostBtnClicked:(UIButton *)sender
 {
-    
-    
-    [HMPlayerManager sharedInstance].Home_isPaused=true;
 
-    [Constant setStatusBarColorWhite:false];
+    NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
+    [nud setValue:[NSNumber numberWithFloat:0.0f] forKey:@"GALLERY_SCROLLY"];
+    [nud synchronize];
+
+    
+    if([[UserSession getUserType] intValue]==1)
+    {
+        [HMPlayerManager sharedInstance].Home_isPaused=true;
+        
+        [Constant setStatusBarColorWhite:false];
+
+        [AnalyticsMXManager PushAnalyticsEvent:@"New Post Screen"];
+
     
     NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.bounds];
     [self addSubview:cont];
     [cont setTarget:self onCloseEvent:@selector(newPostBackToHome:)];
     
     [cont setUpWithCellRect:CGRectMake(0, self.frame.size.height, self.frame.size.width, 0)];
- 
+    }
+    else
+    {
+        [AnalyticsMXManager PushAnalyticsEvent:@"Invite Code screen"];
+
+        [HMPlayerManager sharedInstance].Home_isPaused=true;
+        
+        inviteCodeComp=[[InviteCodeComponent alloc] initWithFrame:self.bounds];
+        [self addSubview:inviteCodeComp];
+        [inviteCodeComp setUp];
+        [inviteCodeComp setTarget:self CallBackSuccess:@selector(inviteCodeSuccess:) andCallBackCance:@selector(inviteCodeCancel:)];
+        
+        
+    }
+
+    
+
+}
+-(void)inviteCodeCancel:(id)sender
+{
+    [AnalyticsMXManager PushAnalyticsEvent:@"Invite Code Screen Cancel"];
+
+    [HMPlayerManager sharedInstance].Home_isPaused=false;
+
+    [inviteCodeComp removeFromSuperview];
+    inviteCodeComp=nil;
+}
+-(void)inviteCodeSuccess:(id)sender
+{
+    [AnalyticsMXManager PushAnalyticsEvent:@"Invite Code Screen Success"];
+
+    [HMPlayerManager sharedInstance].Home_isPaused=false;
+    [inviteCodeComp removeFromSuperview];
+    inviteCodeComp=nil;
+    [self newPostBtnClicked:nil];
 
 }
 -(void)newPostBackToHome:(id)sender
 {
+
     [HMPlayerManager sharedInstance].Home_isPaused=false;
 }
 -(void)exploreBtnClicked:(UIButton *)sender
 {
+
+    [AnalyticsMXManager PushAnalyticsEvent:@"Explore Screen"];
+
     [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
     [HMPlayerManager sharedInstance].Explore_isVisibleBounds=true;
 
@@ -269,7 +371,6 @@
 
 -(void)backBtnClicked:(id)sender
 {
-    
     [HMPlayerManager sharedInstance].Home_isVisibleBounds=true;
     [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
 
@@ -303,6 +404,8 @@
 
 -(void)searchBtnClicked:(UIButton *)sender
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Search Screen"];
+
     [HMPlayerManager sharedInstance].Home_isVisibleBounds=false;
     [HMPlayerManager sharedInstance].Explore_isVisibleBounds=false;
 

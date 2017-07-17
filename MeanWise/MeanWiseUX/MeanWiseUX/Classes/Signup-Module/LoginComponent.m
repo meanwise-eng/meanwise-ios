@@ -28,40 +28,36 @@
     
     
     
-    subTitleLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 60)];
-    subTitleLBL.text=@"Work. Life. Balance.";
+    subTitleLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, logoImg.frame.origin.y+90, self.frame.size.width, 50)];
+    subTitleLBL.text=@"meanwise";
     subTitleLBL.textColor=[UIColor whiteColor];
     subTitleLBL.textAlignment=NSTextAlignmentCenter;
-    subTitleLBL.font=[UIFont fontWithName:k_fontAvenirNextHeavy size:30];
-    subTitleLBL.center=CGPointMake(self.frame.size.width/2, 260);
+    subTitleLBL.font=[UIFont fontWithName:k_fontBold size:30];
+  //  subTitleLBL.center=CGPointMake(self.frame.size.width/2, 260);
     [self addSubview:subTitleLBL];
 
     
-    topLogin=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-100, 20, 100, 50)];
-    [topLogin setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [topLogin setTitle:@"LOG IN" forState:UIControlStateNormal];
-    [topLogin setShowsTouchWhenHighlighted:YES];
-    topLogin.titleLabel.font=[UIFont fontWithName:k_fontBold size:13];
-    [topLogin addTarget:self action:@selector(loginBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self addSubview:topLogin];
-    
+//    topLogin=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-150, 20, 150, 50)];
+//    [topLogin setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+//    [topLogin setTitle:@"FORGET PASSWORD" forState:UIControlStateNormal];
+//    [topLogin setShowsTouchWhenHighlighted:YES];
+//    topLogin.titleLabel.font=[UIFont fontWithName:k_fontBold size:13];
+//    [topLogin addTarget:self action:@selector(loginBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+//    [self addSubview:topLogin];
+//    
     
     
     fbLoginBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width-80, 50)];
     fbLoginBtn.backgroundColor=[UIColor whiteColor];
     [fbLoginBtn setTitleColor:[UIColor colorWithRed:0.40 green:0.80 blue:1.00 alpha:1.00] forState:UIControlStateNormal];
-    [fbLoginBtn setTitle:@"Login With Facebook" forState:UIControlStateNormal];
+    [fbLoginBtn setTitle:@"Login" forState:UIControlStateNormal];
     [fbLoginBtn setShowsTouchWhenHighlighted:YES];
     fbLoginBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:15];
     fbLoginBtn.titleLabel.adjustsFontSizeToFitWidth=YES;
-    [fbLoginBtn addTarget:self action:@selector(fbLoginBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [fbLoginBtn addTarget:self action:@selector(loginBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:fbLoginBtn];
     fbLoginBtn.center=CGPointMake(self.frame.size.width/2, 360);
 
-    UIImageView *imageView=[[UIImageView alloc] initWithFrame:CGRectMake(12, 12, 26, 26)];
-    imageView.image=[UIImage imageNamed:@"facebookSignupIcon.png"];
-    [fbLoginBtn addSubview:imageView];
-    imageView.userInteractionEnabled=false;
 
     
     createAccountBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width-80, 50)];
@@ -84,11 +80,11 @@
     
     loginWithEmailBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width-80, 50)];
     [loginWithEmailBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [loginWithEmailBtn setTitle:@"Login With Email" forState:UIControlStateNormal];
+    [loginWithEmailBtn setTitle:@"Forgot Password?" forState:UIControlStateNormal];
     [loginWithEmailBtn setShowsTouchWhenHighlighted:YES];
     loginWithEmailBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:15];
     loginWithEmailBtn.titleLabel.adjustsFontSizeToFitWidth=YES;
-    [loginWithEmailBtn addTarget:self action:@selector(loginWithEmailBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [loginWithEmailBtn addTarget:self action:@selector(forgetPasswordBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:loginWithEmailBtn];
     loginWithEmailBtn.center=CGPointMake(self.frame.size.width/2, 480);
 
@@ -195,6 +191,10 @@
     Func_normalLoginBtnClicked=func;
     
 }
+-(void)setCallBackForForgotPassword:(SEL)func;
+{
+    Func_forgotPassword=func;
+}
 -(void)setTarget:(id)target andFunc2:(SEL)func;
 {
     delegate=target;
@@ -206,6 +206,11 @@
 {
     [delegate performSelector:Func_normalLoginBtnClicked withObject:nil afterDelay:0.01];
 }
+-(void)forgetPasswordBtnClicked:(id)sender
+{
+    [delegate performSelector:Func_forgotPassword withObject:nil afterDelay:0.01];
+
+}
 
 
 -(void)createAccountBtnClicked:(id)sender
@@ -216,7 +221,7 @@
 
 -(void)fbLoginBtnClicked:(id)sender
 {
-    
+
 }
 
 -(void)loginBtnClicked:(id)sender

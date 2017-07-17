@@ -28,6 +28,8 @@
 }
 -(void)setUpWithCellRect:(CGRect)rect
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Explore Screen Expand"];
+
     screenIdentifier=@"EXPLORE";
 
     self.backgroundColor=[UIColor clearColor];
@@ -323,6 +325,7 @@
         
         sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
         [sharecompo setUp];
+                [sharecompo setPostId:senderId];
         [sharecompo setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
         
         [self addSubview:sharecompo];
@@ -383,11 +386,25 @@
 }
 -(void)commentFullClosed:(id)sender
 {
+    [self updateTheCommentCountsForVisibleRows];
+
     [self DetailViewScreenComesToFront];
     
     commentDisplay=nil;
     sharecompo=nil;
 }
+-(void)updateTheCommentCountsForVisibleRows
+{
+    NSArray *arrayVisible=[galleryView visibleCells];
+    
+    for(int i=0;i<arrayVisible.count;i++)
+    {
+        PostFullCell *cell=(PostFullCell *)[arrayVisible objectAtIndex:i];
+        [cell UpdateCommentCountIfRequired];
+    }
+    
+}
+
 
 
 @end

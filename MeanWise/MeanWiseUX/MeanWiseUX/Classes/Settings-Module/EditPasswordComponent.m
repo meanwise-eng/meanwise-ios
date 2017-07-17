@@ -110,7 +110,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Please make sure that your password is secure";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;
@@ -154,6 +154,17 @@
         [FTIndicator showErrorWithMessage:@"Password must contain atleast 8 characters."];
    
     }
+    else if(reNewPswTXT.text.length>12)
+    {
+        [FTIndicator showErrorWithMessage:@"Password must contain max 12 characters."];
+
+    }
+    else if(![self isValidPassword:reNewPswTXT.text])
+    {
+        
+        [FTIndicator showToastMessage:@"Password must be minimum 8 characters with 1 digit"];
+
+    }
     else
     {
         
@@ -170,6 +181,22 @@
         [t updateProfileWithDict:dict];
     }
     
+}
+-(BOOL)isValidPassword:(NSString *)passwordString
+{
+//    if(![self isValidPassword:reNewPswTXT.text])
+//    {
+//        
+//        
+//        [FTIndicator showErrorWithMessage:@"Password must be minimum 8 characters, at least 1 Uppercase Alphabet, 1 Lowercase Alphabet, 1 Number and 1 Special Character"];
+//        
+//    }
+//
+//    
+    NSString *stricterFilterString = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}";
+    stricterFilterString=@"^(?=.*\\d).{8,12}$";
+    NSPredicate *passwordTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", stricterFilterString];
+    return [passwordTest evaluateWithObject:passwordString];
 }
 
 -(void)setTarget:(id)target andBackFunc:(SEL)func

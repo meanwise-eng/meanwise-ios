@@ -112,6 +112,15 @@
     NSUserDefaults *default1=[self userDefault];
     [default1 setObject:array forKey:@"DATA_IMAGECACHE"];
     [default1 synchronize];
+    
+    NSString *dataPath = [self getDocumentPath];
+    NSError *error;
+    
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    }
+
 }
 
 -(NSString *)getCachePathIfExists:(NSString *)urlToSearch
@@ -460,8 +469,17 @@
     }
     [self createEmptyArray];
 }
-
 -(NSString *)getDocumentPath
+{
+    NSArray   *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString  *documentsDirectory = [paths objectAtIndex:0];
+    
+    documentsDirectory=[documentsDirectory stringByAppendingPathComponent:@"/ImageCache"];
+    
+    return documentsDirectory;
+    
+}
+-(NSString *)getDocumentPath1
 {
     NSArray   *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString  *documentsDirectory = [paths objectAtIndex:0];

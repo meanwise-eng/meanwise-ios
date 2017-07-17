@@ -13,6 +13,7 @@
 
 @interface MiniProfileComponent : UIView
 {
+    CGRect selfRect;
     UIWindow *window;
     id target;
     SEL onCloseFunc;
@@ -32,6 +33,8 @@
     int isProfileOpened;
     
     APIObjects_ProfileObj *userData;
+    
+    CGRect fullScreenSize;
 }
 -(void)setUp:(NSDictionary *)dict;
 -(void)setTarget:(id)targetReceived onClose:(SEL)func;

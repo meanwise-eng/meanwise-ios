@@ -23,6 +23,8 @@
     UIView *passBaseView;
     UIView *emailBaseView;
     UILabel *emailHeadLBL;
+    UIImageView *emailValidationSign;
+    UITextField *emailField;
     
     id delegate;
     SEL Func_backBtnClicked;

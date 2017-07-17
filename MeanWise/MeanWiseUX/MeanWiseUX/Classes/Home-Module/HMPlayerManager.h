@@ -11,17 +11,21 @@
 @interface HMPlayerManager : NSObject
 
 
+@property (nonatomic, strong) NSMutableArray *AllVideosURLIdentifiers;
 
 @property (nonatomic, strong) NSString *Home_screenIdentifier;
 @property (nonatomic, strong) NSString *Home_urlIdentifier;
 @property (nonatomic,assign) BOOL Home_isPaused;
 @property (nonatomic,assign) BOOL Home_isVisibleBounds;
+@property (nonatomic, strong) NSNumber *Home_RefreshIdentifier;
+
 
 @property (nonatomic, strong) NSString *Profile_screenIdentifier;
 @property (nonatomic, strong) NSString *Profile_urlIdentifier;
 @property (nonatomic,assign) BOOL Profile_isPaused;
 @property (nonatomic,assign) BOOL Profile_isVisibleBounds;
 @property (nonatomic,assign) BOOL Profile_isKilling;
+@property (nonatomic, strong) NSNumber *Profile_RefreshIdentifier;
 
 
 @property (nonatomic, strong) NSString *Explore_screenIdentifier;
@@ -35,6 +39,13 @@
 @property (nonatomic,assign) BOOL NotificationPost_isPaused;
 @property (nonatomic,assign) BOOL NotificationPost_isVisibleBounds;
 @property (nonatomic,assign) BOOL NotificationPost_isKilling;
+
+@property (nonatomic, strong) NSString *DeepLinkPost_screenIdentifier;
+@property (nonatomic, strong) NSString *DeepLinkPost_urlIdentifier;
+@property (nonatomic,assign) BOOL DeepLinkPost_isPaused;
+@property (nonatomic,assign) BOOL DeepLinkPost_isVisibleBounds;
+@property (nonatomic,assign) BOOL DeepLinkPost_isKilling;
+@property (nonatomic, strong) NSNumber *DeepLink_RefreshIdentifier;
 
 
 
@@ -56,5 +67,12 @@
 -(void)StartKeepKillingNotificationVideosIfAvaialble;
 -(void)StopKeepKillingNotificationVideosIfAvaialble;
 
+-(void)StartKeepKillingDeepLinkVideosIfAvaialble;
+-(void)StopKeepKillingDeepLinkVideosIfAvaialble;
+
+
+-(NSNumber *)generateNewProfileRefreshIdentifier;
+-(NSNumber *)generateHomeRefreshIdentifier;
+-(NSNumber *)generateNewDeepLinkRefreshIdentifier;
 
 @end

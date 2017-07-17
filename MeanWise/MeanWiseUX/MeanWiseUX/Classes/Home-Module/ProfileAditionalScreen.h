@@ -15,6 +15,8 @@
 #import "APIManager.h"
 #import "ShareComponent.h"
 #import "FullCommentDisplay.h"
+#import "ProfileFilterPostComponent.h"
+#import "EmptyView.h"
 
 
 @interface ProfileAditionalScreen : UIView  <UIScrollViewDelegate,UICollectionViewDataSource,UICollectionViewDelegate>
@@ -68,6 +70,9 @@
     UIView *storyView;
     UIView *introVideoView;
     UIView *postView;
+    
+    
+    ProfileFilterPostComponent *postFilterview;
 
     
     //Close Btn
@@ -83,6 +88,8 @@
     UILabel *cover_shortDescLBL;
     UILabel *cover_connectionCount,*cover_connectionLabel,*cover_profileViewCount,*cover_profileLabel;
     UIButton *cover_addBtn;
+    UIButton *cover_completeProfileBtn;
+    UIButton *cover_ColorChangeBtn;
 
     
     //StoryView
@@ -91,14 +98,20 @@
     UILabel *story_tagsLBL;
     
     
-    //IntroVideoView;
-    VideoLoopPlayer *player;
     
     //PostView
     NSMutableArray *dataRecords;
     UICollectionView *galleryView;
+    EmptyView *emptyPostView;
 
     NSString *screenIdentifier;
+    
+    
+    //IntroVideoView;
+    VideoLoopPlayer *player;
+    
+
+    NSNumber *refreshIdentifier;
 
 }
 -(void)setUpProfileObj:(APIObjects_ProfileObj *)obj;

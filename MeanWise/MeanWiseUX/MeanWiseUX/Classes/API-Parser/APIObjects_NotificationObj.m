@@ -73,6 +73,7 @@
         self.notifier_userFirstName=[[dict valueForKey:@"comment"] valueForKey:@"user_first_name"];
         self.notifier_userLastName=[[dict valueForKey:@"comment"] valueForKey:@"user_last_name"];
         self.notifier_userThumbURL=[[dict valueForKey:@"comment"] valueForKey:@"user_profile_photo_small"];
+        self.notifier_userCoverURL=[[dict valueForKey:@"comment"] valueForKey:@"cover_photo"];
 
         
         
@@ -92,7 +93,8 @@
 
         self.notifier_userThumbURL=[[[dict valueForKey:@"post_liked_by"] valueForKey:@"userprofile"] valueForKey:@"profile_photo_small"];
 
-        
+        self.notifier_userCoverURL=[[[dict valueForKey:@"post_liked_by"] valueForKey:@"userprofile"] valueForKey:@"cover_photo"];
+
     }
 
 
@@ -122,6 +124,9 @@
             
             self.notifier_userThumbURL=
             [[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"profile_photo_small"];
+
+        self.notifier_userCoverURL=
+        [[[[dict valueForKey:@"user_friend"] valueForKey:notificationFromUser] valueForKey:@"userprofile"] valueForKey:@"cover_photo"];
 
        
         
@@ -157,7 +162,7 @@
 
     }
     
-    
+    int p=0;
 
     
 
@@ -177,6 +182,7 @@
 
     [encoder encodeObject:self.notifier_userUserName forKey:@"notifier_userUserName"];
     [encoder encodeObject:self.notifier_userThumbURL forKey:@"notifier_userThumbURL"];
+    [encoder encodeObject:self.notifier_userCoverURL forKey:@"notifier_userCoverURL"];
 
     [encoder encodeObject:self.commentId forKey:@"commentId"];
     [encoder encodeObject:self.commentText forKey:@"commentText"];
@@ -204,7 +210,9 @@
 
         self.notifier_userUserName = [decoder decodeObjectForKey:@"notifier_userUserName"];
         self.notifier_userThumbURL = [decoder decodeObjectForKey:@"notifier_userThumbURL"];
+        self.notifier_userCoverURL = [decoder decodeObjectForKey:@"notifier_userCoverURL"];
 
+        
         self.commentId = [decoder decodeObjectForKey:@"commentId"];
         self.commentText = [decoder decodeObjectForKey:@"commentText"];
 

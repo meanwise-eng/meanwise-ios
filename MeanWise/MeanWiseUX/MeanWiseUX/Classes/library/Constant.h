@@ -11,7 +11,12 @@
 #import "FCAlertView.h"
 #import "UIButton+ContentSize.h"
 #import "APIPoster.h"
+#import "ResolutionVersion.h"
+#import "AnalyticsMXManager.h"
 
+#define RX_isiPhone5Res [ResolutionVersion IfResIPhone5]
+#define RX_isiPhone4Res [ResolutionVersion IfResIPhone4]
+#define RX_isiPhone7PlusRes [ResolutionVersion IfResiPhone7Plus]
 
 #define KK_globalMediaURL @"http://ec2-54-86-42-134.compute-1.amazonaws.com:8000"
 /*
@@ -44,6 +49,7 @@
 
 #define kk_homeFeedCellRatio 1.3
 
+#define KK_VideoQualityRatio AVAssetExportPresetHighestQuality
 
 
 @interface Constant : NSObject
@@ -53,9 +59,13 @@
 +(void)okAlert:(NSString *)alertTitle withSubTitle:(NSString *)subtitle onView:(UIView *)view andStatus:(int)status;
 
 +(UIColor *)colorGlobal:(int)number;
+
 +(UIImage *)takeScreenshot;
 +(void)setUpGradient:(UIView *)parentView style:(int)number;
++(UIView *)createProgressSignupViewWithWidth:(float)width andProgress:(float)percentage toPercentage:(float)toPercentage;
 
++(BOOL)isHomePageTutorialFinished;
++(BOOL)isNewPostTutorialFinished;
 
 #pragma mark - File Manager
 

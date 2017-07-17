@@ -29,7 +29,7 @@
         [self.contentView addSubview:self.nameLBL];
         self.nameLBL.textColor=[UIColor whiteColor];
         self.nameLBL.textAlignment=NSTextAlignmentCenter;
-        self.nameLBL.font=[UIFont fontWithName:k_fontSemiBold size:16];
+        self.nameLBL.font=[UIFont fontWithName:k_fontRegular size:16];
         self.nameLBL.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         
     }
@@ -39,17 +39,22 @@
 {
     [super setSelected:selected];
     
-  if(selected==false)
-  {
-      self.nameLBL.textColor=[UIColor whiteColor];
-      self.bgView.backgroundColor=self.topicColor;
-  }
-    if(selected==true)
-    {
-        self.nameLBL.textColor=self.topicColor;
-        self.bgView.backgroundColor=[UIColor whiteColor];
-    }
     
+    [UIView animateWithDuration:0.5 animations:^{
+        
+        if(selected==false)
+        {
+            self.nameLBL.textColor=[UIColor whiteColor];
+            self.bgView.backgroundColor=self.topicColor;
+        }
+        if(selected==true)
+        {
+            self.nameLBL.textColor=self.topicColor;
+            self.bgView.backgroundColor=[UIColor whiteColor];
+        }
+
+        
+    }];
     
     
    /* if(selected==true)

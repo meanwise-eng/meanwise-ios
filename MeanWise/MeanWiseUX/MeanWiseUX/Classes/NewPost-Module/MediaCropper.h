@@ -38,10 +38,18 @@
     BOOL isVideo;
     
     
+    
     UILabel *title;
+    UIButton *doneBtn;
+    UIButton *cancelBtn;
+    
+    UIView *view1,*view2,*view3,*view4;
+    UIView *gridView1,*gridView2,*gridView3,*gridView4,*gridView5;
+
     
 }
 -(void)setUpWithPath:(NSString *)stringPath;
 -(void)setTarget:(id)delegate andDoneBtn:(SEL)func1 andCancelBtn:(SEL)func2;
+-(void)setDirectCrop;
 
 @end

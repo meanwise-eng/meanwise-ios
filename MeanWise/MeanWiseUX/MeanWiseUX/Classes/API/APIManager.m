@@ -9,12 +9,23 @@
 #import "APIManager.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <UIKit/UIKit.h>
+#import "Constant.h"
 
 @implementation APIManager
 
 -(NSString *)baseString
 {
-    return @"http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/";
+// CURRENT
+ //   return @"http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/";
+ //NEW
+//    return @"http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/";
+
+//Dev Server
+  //  return  @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8000/api/v4/";
+    
+//Live
+   return @"https://api.meanwise.com/api/v4/";
+    
 }
 
 
@@ -25,23 +36,29 @@
     
 
     
-    NSString *path=[NSString stringWithFormat:@"user/%@/friends/",userId];
-    
+ //   NSString *path=[NSString stringWithFormat:@"user/%@/friends/",userId];
+    NSString *path=[NSString stringWithFormat:@"user/%@/friends/?page_size=%d&page=%d",userId,(int)self.countRequested,(int)self.pageNoRequested];
+
     if(statusValue==-1)
     {
-        path=[NSString stringWithFormat:@"%@?status=pending",path];
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Friend-Pending"];
+
+        path=[NSString stringWithFormat:@"%@&status=pending",path];
+    }
+    else{
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Friend-list"];
+
     }
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
     NSURL *url = [NSURL URLWithString:finalURL];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                          timeoutInterval:60.0];
+                                                          timeoutInterval:30.0f];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"GET"];
     
     NSString *token=[UserSession getAccessToken];
-    
     NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
     
     [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
@@ -58,6 +75,8 @@
         APIResponseObj *obj=[[APIResponseObj alloc] init];
         obj.message=nil;
         obj.response=nil;
+        obj.totalNumOfPagesAvailable=nil;
+        obj.inputPageNo=self.pageNoRequested;
         
         if(error==nil)
         {
@@ -80,7 +99,9 @@
                     obj.statusCode=200;
                     obj.message=@"Success";
                     obj.response=[jsonDict valueForKey:@"results"];
-                    
+                    obj.totalNumOfPagesAvailable=[[[jsonDict valueForKey:@"results"] valueForKey:@"num_pages"] integerValue];
+                    obj.inputPageNo=self.pageNoRequested;
+
                 }
                 else
                 {
@@ -102,10 +123,12 @@
             //NSLog(@"Error %@",error.localizedDescription);
         }
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            
-            [delegate performSelector:selector withObject:obj afterDelay:0.01];
-        });
+        [delegate performSelectorInBackground:selector withObject:obj];
+//
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            
+//            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+//        });
         
     }];
     
@@ -114,8 +137,10 @@
 
 -(void)sendRequestForUpdateFriendshipStatus:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Friend-Respond"];
+
     /*
-     curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/18/friends/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" -X POST --data '{"friend_id":12, "status":"pending"}' | more
+     curl -X POST http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/user/6/friends/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token a090e9e5d74815da85de56925ee82ba45b073856" -X POST --data '{"friend_id":7, "status":"pending"}' | more
      {"status":"success","error":"","results":"Request already pending"}
      
      Reject Request
@@ -226,6 +251,8 @@
 -(void)sendRequestForLikeAPostId:(NSString *)postId delegate:(id)delegate andSelector:(SEL)selector andIsLike:(BOOL)flag
 {
     
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Like"];
+
     NSString *userId=[UserSession getUserId];
     NSString *token=[UserSession getAccessToken];
     
@@ -316,10 +343,15 @@
 }
 -(void)sendRequestForAddingNewComment:(NSString *)postId withData:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Comment"];
+
     
    // curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/posts/2/comments/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token 638b5d5a3b8d83b28fdd580d25c717cf574a4710" -X POST --data '{"comment_text":"test comment one", "commented_by":10}'
     
  //   curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/posts/1/comments/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" -X POST --data '{"comment_text":"test comment one", "commented_by":18}' | more
+    
+//    curl -X POST http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/posts/3/comments/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token a090e9e5d74815da85de56925ee82ba45b073856" -X POST --data '{"comment_text":"test comment one", "commented_by":7}' | more
+    
     
     NSString *path=[NSString stringWithFormat:@"posts/%@/comments/",postId];
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
@@ -408,6 +440,8 @@
 
 -(void)sendRequestForDeletePost:(NSString *)postId delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Deletepost"];
+
     
     // curl -X  DELETE http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/17/posts/3/ -H 'Authorization: Token 638b5d5a3b8d83b28fdd580d25c717cf574a4710' | more
     
@@ -497,6 +531,8 @@
 
 -(void)sendRequestForNewPostWithMedia:(NSDictionary *)dict WithMediaURL:(NSString *)mediaURL andTypeisVideo:(BOOL)isVideo delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-PostMedia"];
+
    /* NSDictionary *dict1=@{
                           @"text":text,
                           @"interest":interest,
@@ -572,19 +608,21 @@
     [body appendData:[[NSString stringWithString:text] dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     
-    NSString *topic_names=[dict valueForKey:@"topic_names"];
-    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"topic_names\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithString:topic_names] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    if([dict valueForKey:@"topic_names"]){
+        NSString *topic_names=[dict valueForKey:@"topic_names"];
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"topic_names\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithString:topic_names] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    }
     
-
-    
-    NSString *tags=[dict valueForKey:@"tags"];
-    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithString:tags] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    if([dict valueForKey:@"tags"]){
+        NSString *tags=[dict valueForKey:@"tags"];
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"tags\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithString:tags] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    }
     
 
     
@@ -673,6 +711,8 @@
 }
 -(void)sendRequestForNewPost:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-NewPost-Text"];
+
     //curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/18/posts/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6" -X POST --data '{"text":"text post dec22", "interest":1}' | more
 
     NSString *userId=[UserSession getUserId];
@@ -762,6 +802,8 @@
 
 -(void)sendRequestForDeleteComment:(NSString *)commentId postId:(NSString *)postId delegate:(id)delegate andSelector:(SEL)selector;
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-DeleteComment"];
+
     //curl -X  DELETE http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/posts/2/comments/3/ -H 'Authorization: Token 638b5d5a3b8d83b28fdd580d25c717cf574a4710' | more
     
     
@@ -934,6 +976,8 @@
 -(void)sendRequestForChannel:(NSString *)channelName delegate:(id)delegate andSelector:(SEL)selector
 {
  
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ChannelSearch"];
+
     NSString *path=[NSString stringWithFormat:@"search/post/?interest_name='%@'",channelName];
     
     
@@ -1019,6 +1063,8 @@
 -(void)sendRequestForPostOfUsersId:(NSString *)userId delegate:(id)delegate andSelector:(SEL)selector
 {
     
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-UserPost"];
+
     NSString *path=[NSString stringWithFormat:@"user/%@/posts/",userId];
     
     
@@ -1101,12 +1147,15 @@
     [postDataTask resume];
 }
 #pragma mark - Notifications
--(void)sendRequestForNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector
+-(void)sendRequestForMyNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector
 {
+
     // curl -X GET  http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/17/home/feed/ -H 'Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d' | more
     
 //    curl -X GET  http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/17/notifications/latest/ -H 'Authorization: Token e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6' | more
     
+    //    curl -X GET  http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/5/notifications/latest/ -H 'Authorization: Token 659581f173cd25cca2011d97249db5900980b9e4' | more
+
     
     NSString *userId=[UserSession getUserId];
     NSString *path=[NSString stringWithFormat:@"user/%@/notifications/latest/",userId];
@@ -1195,14 +1244,18 @@
 
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector
 {
-    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Home"];
+
   // curl -X GET  http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/17/home/feed/ -H 'Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d' | more
     
     NSString *userId=[UserSession getUserId];
-    NSString *path=[NSString stringWithFormat:@"user/%@/home/feed/",userId];
-    
+//    NSString *path=[NSString stringWithFormat:@"user/%@/home/feed/?page_size=200",userId];
+    NSString *path=[NSString stringWithFormat:@"user/%@/home/feed/?page_size=%d&page=%d",userId,(int)self.countRequested,(int)self.pageNoRequested];
+
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    finalURL = [finalURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+
     NSURL *url = [NSURL URLWithString:finalURL];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
@@ -1227,6 +1280,8 @@
         APIResponseObj *obj=[[APIResponseObj alloc] init];
         obj.message=nil;
         obj.response=nil;
+        obj.totalNumOfPagesAvailable=nil;
+        obj.inputPageNo=self.pageNoRequested;
         
         if(error==nil)
         {
@@ -1249,7 +1304,8 @@
                     obj.statusCode=200;
                     obj.message=@"Success";
                     obj.response=[jsonDict valueForKey:@"results"];
-                    
+                    obj.totalNumOfPagesAvailable=[[[jsonDict valueForKey:@"results"] valueForKey:@"num_pages"] integerValue];
+                    obj.inputPageNo=self.pageNoRequested;
                 }
                 else
                 {
@@ -1280,10 +1336,128 @@
     
     [postDataTask resume];
 }
--(void)sendRequestExploreTopTrendingTopicsForChannel:(NSString *)channelId Withdelegate:(id)delegate andSelector:(SEL)selector
+
+-(void)sendRequestForPostInfoWithId:(NSString *)postId Withdelegate:(id)delegate andSelector:(SEL)selector;
 {
     
+    
     //curl GET http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/interests/2/topics/trending/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d" | more
+    
+    
+    //curl GET http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/post/25/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token 14ad0f5008b049e24e0fdc6a3857722d31db09b9" | more
+    
+    NSString *path=[NSString stringWithFormat:@"post/%@/",postId];
+    
+    
+    //http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/post/25/
+    
+    
+    
+    
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"GET"];
+    
+    
+    NSString *token=[UserSession getAccessToken];
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    // NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    //[urlRequest setHTTPBody:postData];
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            
+            
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                
+
+                
+                if([jsonDict valueForKey:@"detail"]==nil)
+                {
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=jsonDict;
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=@"Fail";
+                    obj.response=[jsonDict valueForKey:@"detail"];
+                }
+                
+               /* if([jsonDict valueForKey:@"results"]!=nil && [[jsonDict valueForKey:@"results"] isKindOfClass:[NSArray class]])
+                {
+                    NSLog(@"Success");
+                    
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+                    
+                    
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=[jsonDict valueForKey:@"error"];
+                    
+                    
+                    
+                }*/
+                
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+    
+
+}
+-(void)sendRequestExploreTopTrendingTopicsForChannel:(NSString *)channelId Withdelegate:(id)delegate andSelector:(SEL)selector
+{
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-TopTrendingTopics"];
+
+    //curl GET http://ec2-54-159-112-138.compute-1.amazonaws.com:8000/api/v4/interests/1/topics/trending/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token 14ad0f5008b049e24e0fdc6a3857722d31db09b9" | more
     
     
     NSString *path=[NSString stringWithFormat:@"interests/%@/topics/trending/",channelId];
@@ -1475,6 +1649,7 @@
 }
 -(void)sendRequestExploreFeedWithKey:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector
 {
+    
 //    http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/search/post/?interest_name=%22sports%22
     
     // curl -X GET  http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/17/home/feed/ -H 'Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d' | more
@@ -1488,24 +1663,30 @@
         NSString *string=[dict valueForKey:@"word"];
 
       path=[NSString stringWithFormat:@"search/post/?interest_name=%@",string];
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ExploreInterest"];
+
     }
     if(typeOfSearch==2) //interest based
     {
         NSString *string=[dict valueForKey:@"word"];
         
         path=[NSString stringWithFormat:@"search/post/?tag_names=%@",string];
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ExploreTags"];
+
     }
     if(typeOfSearch==3) //interest based
     {
         NSString *string=[dict valueForKey:@"word"];
-        
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ExploreWord"];
+
         path=[NSString stringWithFormat:@"search/post/?topic_texts=%@",string];
     }
     if(typeOfSearch==4)
     {
         NSString *channelName=[dict valueForKey:@"word"];
         NSString *topicName=[dict valueForKey:@"topic"];
-        
+        [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ExploreTopicInterest"];
+
         path=[NSString stringWithFormat:@"search/post/?interest_name=%@&topic_texts=%@",channelName,topicName];
 
     }
@@ -1514,6 +1695,10 @@
     
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    finalURL = [finalURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    
+
+
     NSURL *url = [NSURL URLWithString:finalURL];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
@@ -1583,6 +1768,8 @@
 
 -(void)sendRequestForLoginWithData:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Login"];
+
     
 //    NSString *path=@"custom_auth/api-token-auth/";
         NSString *path=@"custom_auth/fetch/token/";
@@ -1663,6 +1850,7 @@
 #pragma mark - User Profile Retrival
 -(void)sendRequestForUserData:(NSString *)token andUserId:(NSString *)userId delegate:(id)delegate andSelector:(SEL)selector
 {
+    
     
     //curl -X GET http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/userprofile/ -H 'Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d'
     
@@ -1750,6 +1938,8 @@
 #pragma mark - User Search
 -(void)sendRequestForUserSearch:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-UserSearch"];
+
 //    http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/search/userprofile/?skills_text=python&username=testuser2
     
 //    NSDictionary *dict=@{@"paramKey":paramKey,@"searchTerm":searchFieldTXT.text};
@@ -1790,11 +1980,9 @@
             }
             else
             {
-               
                     obj.statusCode=200;
                     obj.message=@"Success";
                     obj.response=[jsonDict valueForKey:@"results"];
-              
             }
         }
         else
@@ -1817,17 +2005,18 @@
 }
 -(void)sendRequestForAllUserData:(NSString *)token delegate:(id)delegate andSelector:(SEL)selector
 {
-    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-FeaturedUser"];
+
     //curl -X GET http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/userprofile/ -H 'Authorization: Token ad44b3c55e73cdca2b84e2c7d4c0d2f2d7e7532d'
     
-    NSString *path=[NSString stringWithFormat:@"user/userprofile/"];
+    NSString *path=[NSString stringWithFormat:@"user/userprofile/?featured=yes"];
     
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
     NSURL *url = [NSURL URLWithString:finalURL];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                          timeoutInterval:60.0];
+                                                          timeoutInterval:10.0f];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"GET"];
     
@@ -1901,6 +2090,7 @@
     [postDataTask resume];
 }
 #pragma mark - Signup Mechanism
+
 -(NSMutableData *)setUpBodyForSignup:(NSDictionary *)dict
 {
     
@@ -1917,7 +2107,9 @@
     
     NSString *interests=[dict valueForKey:@"interests"];
     NSString *invite_code=[dict valueForKey:@"invite_code"];
-    NSString *skills=[dict valueForKey:@"skills"];
+    NSArray *skills_list=[dict valueForKey:@"skills_list"];
+    NSString *profile_background_color=[dict valueForKey:@"profile_background_color"];
+    
     //NSString *profession=[dict valueForKey:@"profession"];
     
     
@@ -2005,12 +2197,30 @@
     [body appendData:[[NSString stringWithString:invite_code] dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
     
+    //profile_background_color
+    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"profile_background_color\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithString:profile_background_color] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+
     
+    
+    for(int i=0;i<[skills_list count];i++)
+    {
     //skills
     [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"skills\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
-    [body appendData:[[NSString stringWithString:skills] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"skills_list\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"%@", [skills_list objectAtIndex:i]] dataUsingEncoding:NSUTF8StringEncoding]];
     [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    
+    
+//    //skills
+//    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+//    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"skills_list\"\r\n\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+//    [body appendData:[[NSString stringWithFormat:@"%@", skills_list] dataUsingEncoding:NSUTF8StringEncoding]];
+//    [body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+//    
     
     /*//profession
      [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
@@ -2027,6 +2237,8 @@
 
 -(void)sendRequestForSignUp:(NSDictionary *)dataDict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-Signup"];
+
     /*
      curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/custom_auth/user/register/ --dump-header - -H "Content-Type: multipart/form-data"  -X POST -F username="alonehitman" -F email="hardik@test.com" -F password="testpass123" -F first_name="testfname11" -F last_name="testlname11" -F skills=[1,2] -F profession=1 -F interests=[1,2] -Finvite_code="REALPEOPLE" -F dob="2000-10-10" -F cover_photo="@/Users/Hardik/Desktop/Research2/9d033fd0788d1a5704f93f20c6df4bfe.jpg" -F profile_photo="@/Users/Hardik/Github/MeanWiseUX/MeanWiseUX/temp/profile8.jpg" | more
      */
@@ -2126,9 +2338,195 @@
     
     
 }
+-(void)sendRequestTocheckIfUserExistWithUsername:(NSString *)username withDelegate:(id)delegate andSelector:(SEL)selector
+{
+    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-UsernameExists"];
+
+    //       curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/custom_auth/user/verify/ --dump-header - -H "Content-Type: application/json"  -X POST --data '{"email”:"call.max17@gmail.com”}' | more
+    
+    //http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/custom_auth/user/verify/
+    
+    NSString *path=@"custom_auth/user/verify-username";
+    
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"POST"];
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+    NSDictionary *dict=@{@"username":username};
+    
+    
+    NSError *error=nil;
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    [urlRequest setHTTPBody:postData];
+    
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                if([[jsonDict valueForKey:@"status"] isEqualToString:@"success"])
+                {
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
+                    
+                    
+                    
+                }
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+    
+}
+
+-(void)sendRequestTocheckInviteCode:(NSString *)inviteCode withDelegate:(id)delegate andSelector:(SEL)selector
+{
+    
+    
+    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-InviteCode"];
+
+    NSString *path=@"me/invite-code/";
+    
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"PUT"];
+    
+    
+    NSString *token=[UserSession getAccessToken];
+
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+    
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+    NSDictionary *dict=@{@"invite_code":inviteCode};
+    
+    
+    NSError *error=nil;
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    [urlRequest setHTTPBody:postData];
+    
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                if(![[jsonDict valueForKey:@"error"] isEqualToString:@""])
+                {
+                    obj.statusCode=500;
+                    obj.message=@"Invalid Code!";
+
+                }
+                else
+                {
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+
+                }
+                
+              
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+    
+}
+
 
 -(void)sendRequestTocheckIfUserExistWithEmail:(NSString *)email withDelegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-EmailExists"];
+
+    
+//       curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/custom_auth/user/verify/ --dump-header - -H "Content-Type: application/json"  -X POST --data '{"email”:"call.max17@gmail.com”}' | more
     
     //http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/custom_auth/user/verify/
     
@@ -2213,6 +2611,8 @@
 #pragma mark - Edit Profile
 -(void)sendRequestForChangePassword:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ChangePassword"];
+
    // curl -X POST http://127.0.0.1:8000/api/v4/user/41/change/password/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token 638b5d5a3b8d83b28fdd580d25c717cf574a4710" -X POST --data '{"old_password":"testpass321", "new_password":"testpass123"}' | more
     
     //http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/18/userprofile/
@@ -2306,7 +2706,8 @@
 
 -(void)sendRequestForEditProfile:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector
 {
-    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-EditProfile"];
+
     //http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/18/userprofile/
     
     NSString *token=[UserSession getAccessToken];
@@ -2396,6 +2797,8 @@
 
 -(void)sendRequestForUpdateCoverPhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-UpdateCoverPhoto"];
+
     NSString *token=[UserSession getAccessToken];
     NSString *userId=[UserSession getUserId];
     
@@ -2518,9 +2921,15 @@
     [postDataTask resume];
     
 }
--(void)sendRequestForForgetPasswordWithDelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForForgetPasswordWithDelegate:(id)delegate withData:(NSDictionary *)dict andSelector:(SEL)selector;
 {
-    NSString *path=[NSString stringWithFormat:@"user/%@/forgot/password/",[UserSession getUserId]];
+    
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ForgetPass"];
+
+    // curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/forgot/password/ --dump-header - -H "Content-Type: application/json" -X POST --data '{"email":"raj.emailme@gmail.com"}' | more
+
+    
+    NSString *path=[NSString stringWithFormat:@"user/forgot/password/"];
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
     NSURL *url = [NSURL URLWithString:finalURL];
@@ -2529,14 +2938,14 @@
                                                           timeoutInterval:60.0];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     
-    NSString *token=[UserSession getAccessToken];
-    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
-    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
-    [urlRequest setHTTPMethod:@"GET"];
-    
-    
+    [urlRequest setHTTPMethod:@"POST"];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
+    [urlRequest setHTTPBody:postData];
+
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+
     
     NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         
@@ -2596,6 +3005,8 @@
 }
 -(void)sendRequestForUpdateProfilePhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector
 {
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-ProfilePhoto"];
+
     NSString *token=[UserSession getAccessToken];
     NSString *userId=[UserSession getUserId];
     
@@ -2865,6 +3276,184 @@
     [postDataTask resume];
     
 }
+-(void)sendRequestForAutoCompleteProfessions:(NSString *)term Delegate:(id)delegate andSelector:(SEL)selector
+{
+    
+    
+    NSString *path=[NSString stringWithFormat:@"autocomplete/profession/?q=%@",term];
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    
+    
+    // finalURL=[NSString stringWithFormat:@"https://autocomplete.clearbit.com/v1/companies/suggest?query=%@",term];
+    
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"GET"];
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            
+            
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                NSArray *array=(NSArray *)jsonDict;
+                
+                obj.statusCode=200;
+                obj.message=@"success";
+                obj.response=@{@"results":array,@"searchTerm":term};
+                
+                //                [NSDictionary dictionaryWithObject:array forKey:@"results"];
+                
+                /*
+                 if([[jsonDict valueForKey:@"status"] isEqualToString:@"success"])
+                 {
+                 obj.statusCode=200;
+                 obj.message=@"Success";
+                 obj.response=[jsonDict valueForKey:@"results"];
+                 }
+                 else
+                 {
+                 obj.statusCode=500;
+                 obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
+                 
+                 
+                 
+                 }*/
+                
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+}
+
+-(void)sendRequestForAutoCompleteSkills:(NSString *)term Delegate:(id)delegate andSelector:(SEL)selector
+{
+    
+
+    NSString *path=[NSString stringWithFormat:@"autocomplete/skill/?q=%@",term];
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    
+    
+   // finalURL=[NSString stringWithFormat:@"https://autocomplete.clearbit.com/v1/companies/suggest?query=%@",term];
+    
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"GET"];
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            
+            
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                NSArray *array=(NSArray *)jsonDict;
+                
+                obj.statusCode=200;
+                obj.message=@"success";
+                obj.response=@{@"results":array,@"searchTerm":term};
+                
+//                [NSDictionary dictionaryWithObject:array forKey:@"results"];
+                
+                /*
+                if([[jsonDict valueForKey:@"status"] isEqualToString:@"success"])
+                {
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
+                    
+                    
+                    
+                }*/
+                
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+}
+
 -(void)sendRequestForInterestWithDelegate:(id)delegate andSelector:(SEL)selector
 {
     NSString *path=@"interest/";
@@ -2936,4 +3525,243 @@
     [postDataTask resume];
     
 }
+
+#pragma mark - Push notification
+-(void)registerDeviceForPushNotification:(NSString *)device delegate:(id)delegate andSelector:(SEL)selector
+{
+    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-PushTokenSubmit"];
+
+    //curl -X POST http://ec2-54-86-42-134.compute-1.amazonaws.com:8000/api/v4/user/18/posts/ --dump-header - -H "Content-Type: application/json" -H "Authorization: Token 2b40b3899d179376ccf6f86277d576b94c175e90" -X POST --data '{"text":"text post dec22", "interest":1}' | more
+    
+    NSString *userId=[UserSession getUserId];
+    
+    NSString *path=[NSString stringWithFormat:@"amazon/notification/device/register/"];
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"POST"];
+    
+    NSString *token=[UserSession getAccessToken];
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+    
+    NSUUID *identifierForVendor = [[UIDevice currentDevice] identifierForVendor];
+    NSString* uuid = [identifierForVendor UUIDString];
+    
+    NSError *error;
+    NSDictionary *dict;
+    
+    dict=@{
+           @"device_id":uuid,
+           @"user_id":userId,
+           @"device_token":device,
+          @"platform":@"APNS"
+           };
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+    [urlRequest setHTTPBody:postData];
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=nil;
+        obj.response=nil;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+            }
+            else
+            {
+                if([[jsonDict valueForKey:@"error"] isEqualToString:@""])
+                {
+                    
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+                    
+                    
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
+                    
+                }
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+}
+-(void)sendRequestForDeviceVersion:(id)delegate andSelector:(SEL)selector
+{
+    NSString * appVersionString = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString"];
+
+ //   appVersionString=@"1.0.1";
+ 
+    NSString *path=[NSString stringWithFormat:@"version/iOS/%@/",appVersionString];
+    NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
+    NSURL *url = [NSURL URLWithString:finalURL];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:60.0];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest setHTTPMethod:@"GET"];
+    
+    NSString *token=[UserSession getAccessTokenOnLaunch];
+    if(token!=nil)
+    {
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+    }
+
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
+    
+    NSURLSessionDataTask *postDataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        
+        APIResponseObj *obj=[[APIResponseObj alloc] init];
+        obj.message=@"gj";
+        obj.response=nil;
+        obj.statusCode=500;
+        
+        if(error==nil)
+        {
+            NSError *Jerror = nil;
+            NSDictionary* jsonDict =[NSJSONSerialization
+                                     JSONObjectWithData:data
+                                     options:kNilOptions
+                                     error:&Jerror];
+            if(Jerror!=nil)
+            {
+                obj.statusCode=Jerror.code;
+                obj.message=Jerror.localizedDescription;
+                
+                NSLog(@"json error:%@",Jerror);
+            }
+            else
+            {
+                
+                if([[jsonDict valueForKey:@"status"] isEqualToString:@"success"]) //working version
+                {
+                    obj.statusCode=200;
+                    obj.message=@"Success";
+                    obj.response=[jsonDict valueForKey:@"results"];
+                    
+                    if([[[obj.response valueForKey:@"latest_version"] valueForKey:@"version"] isEqualToString:[[obj.response valueForKey:@"version"] valueForKey:@"version"]]) //up to date
+                    {
+                        obj.message=@"1";
+
+                        int p=0;
+                    }
+                    else //Update is avaialble
+                    {
+                        obj.message=@"2";
+
+                        int p=0;
+                    }
+                }
+                else if([[jsonDict valueForKey:@"status"] isEqualToString:@"failed"]) //Force Update
+                {
+                    obj.statusCode=200;
+                    obj.message=@"3";
+                    obj.response=[jsonDict valueForKey:@"results"];
+
+                    int p=0;
+                }
+                else
+                {
+                    obj.statusCode=500;
+                    obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
+                    
+                }
+            }
+        }
+        else
+        {
+            obj.statusCode=error.code;
+            obj.message=error.localizedDescription;
+            
+            //NSLog(@"Error %ld",error.code);
+            //NSLog(@"Error %@",error.localizedDescription);
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            [delegate performSelector:selector withObject:obj afterDelay:0.01];
+        });
+        
+    }];
+    
+    [postDataTask resume];
+    
+}
+
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

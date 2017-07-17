@@ -7,6 +7,7 @@
 //
 
 #import "MasterScrollView.h"
+#import "GUIScaleManager.h"
 
 @implementation MasterScrollView
 - (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event {
@@ -14,7 +15,7 @@
     NSLog(@"Passing all touches to the next view (if any), in the view stack.");
 
     
-    if(point.y<[UIScreen mainScreen].bounds.size.height/2)
+    if(point.y<RX_mainScreenBounds.size.height/2)
     {
         return false;
     }

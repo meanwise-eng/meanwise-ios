@@ -26,12 +26,13 @@
     SEL Func_normalLoginBtnClicked;
     SEL Func_signUpBtnClicked;
     
-    
+    SEL Func_forgotPassword;
     
 }
 -(void)setUp;
 -(void)setTarget:(id)target andFunc1:(SEL)func;
 -(void)setTarget:(id)target andFunc2:(SEL)func;
+-(void)setCallBackForForgotPassword:(SEL)func;
 
 @end
 

@@ -12,7 +12,7 @@
 #import <QuartzCore/QuartzCore.h>
 #import "FTIndicator.h"
 
-@interface PreviewMedia_VideoController : UIView <UITableViewDelegate, UITableViewDataSource>
+@interface PreviewMedia_VideoController : UIView 
 {
     NSString *filePathStr;
     BOOL isVideo;

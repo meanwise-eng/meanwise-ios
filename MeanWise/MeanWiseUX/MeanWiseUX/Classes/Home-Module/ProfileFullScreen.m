@@ -98,7 +98,8 @@
 -(void)closeThisViewManuallyClicked:(id)sender
 {
     
-    postIMGVIEW.transform=CGAffineTransformMakeScale(1, 1);
+
+//    postIMGVIEW.transform=CGAffineTransformMakeScale(1, 1);
 
     [self closeThisView];
     
@@ -117,7 +118,7 @@
 
     [UIView animateKeyframesWithDuration:4.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeCubicPaced | UIViewKeyframeAnimationOptionRepeat | UIViewKeyframeAnimationOptionAutoreverse animations:^{
         
-        postIMGVIEW.transform=CGAffineTransformMakeScale(1.2, 1.2);
+        postIMGVIEW.transform=CGAffineTransformMakeScale(1.1, 1.1);
         
     } completion:^(BOOL finished) {
         

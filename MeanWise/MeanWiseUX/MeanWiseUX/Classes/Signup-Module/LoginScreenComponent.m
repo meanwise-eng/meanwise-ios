@@ -76,7 +76,8 @@
     emailField.center=CGPointMake(self.frame.size.width/2, 230+45);
     emailField.autocapitalizationType=UITextAutocapitalizationTypeNone;
     emailField.autocorrectionType=UITextAutocorrectionTypeNo;
-    
+    emailField.keyboardType=UIKeyboardTypeEmailAddress;
+
 
     emailValidationSign=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     [self addSubview:emailValidationSign];
@@ -134,6 +135,7 @@
     }
     
 }
+
 -(BOOL) NSStringIsValidEmail:(NSString *)checkString
 {
     BOOL stricterFilter = NO; // Discussion http://blog.logichigh.com/2010/09/02/validating-an-e-mail-address/
@@ -230,7 +232,8 @@
 }
 -(void)loginFailed:(NSDictionary *)dict
 {
-    [UIView animateKeyframesWithDuration:2.0f delay:0.0f options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+    
+    [UIView animateKeyframesWithDuration:0.2f delay:0.0f options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         
         
         
@@ -249,6 +252,7 @@
         
         [loader removeFromSuperview];
         
+
     }];
     
 }

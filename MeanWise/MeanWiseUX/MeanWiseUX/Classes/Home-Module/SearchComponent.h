@@ -13,14 +13,16 @@
 #import "APIManager.h"
 #import "SearchSuggestionsView.h"
 #import "EmptyView.h"
-
+#import "DataSession.h"
 
 @interface SearchComponent : UIView <UICollectionViewDelegate,UICollectionViewDataSource>
 {
+
     
+    int lastSearchType;
     
+    UIRefreshControl *refreshControl;
     APIManager *manager;
-    NSArray *resultData;
 
     UITextField *searchFieldTXT;
     SearchSuggestionsView *suggestionBox;
@@ -44,7 +46,7 @@
     SEL showBottomBarFunc;
     
     EmptyView *emptyView;
-
+    
 }
 -(void)setUp;
 -(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2;

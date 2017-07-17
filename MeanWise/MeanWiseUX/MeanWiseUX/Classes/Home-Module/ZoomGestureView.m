@@ -13,6 +13,7 @@
 -(void)setUpCellRect:(CGRect)rect;
 {
     forPostDetail=false;
+    forMiniProfile=false;
     cellRect=rect;
     
     self.backgroundColor=[UIColor clearColor];
@@ -36,6 +37,11 @@
     
     self.clipsToBounds=YES;
 
+
+}
+-(void)setForMiniProfile
+{
+    forMiniProfile=true;
 
 }
 -(void)setForPostDetail
@@ -91,6 +97,16 @@
         [self zoomDownGestureEnded];
     }];
     
+//    [UIView animateWithDuration:0.6 delay:0 usingSpringWithDamping:0.9 initialSpringVelocity:0.9 options:UIViewAnimationOptionCurveEaseIn animations:^{
+//        
+//        containerView.frame=self.bounds;
+//        self.backgroundColor=[UIColor blackColor];
+//        
+//    } completion:^(BOOL finished) {
+//        [self FullScreenDone];
+//        [self zoomDownGestureEnded];
+//        
+//    }];
 }
 -(void)FullScreenDone
 {
@@ -388,16 +404,145 @@
 
     }*/
     
-    if(forPostDetail==true)
+    if(forPostDetail==true && forMiniProfile==false)
     {
         [self panGesture_forPostDetail_RecognizerSnapChat:recognizer];
+    }
+    else if(forMiniProfile==true)
+    {
+        [self panGesture_forMiniProfile_RecognizerSnapChat:recognizer];
     }
     else
     {
         [self panGesture_Other_Recognizer:recognizer];
 
     }
+    
 
+}
+-(void)panGesture_forMiniProfile_RecognizerSnapChat:(UIPanGestureRecognizer *)recognizer
+{
+    CGPoint point=[recognizer locationInView:self];
+    CGPoint translation=[recognizer translationInView:self];
+    containerView.backgroundColor=[UIColor clearColor];
+
+    if(recognizer.state==UIGestureRecognizerStateChanged)
+    {
+        if(swipeDownDetected==0)
+        {
+            if(translation.y>0)
+            {
+                if(translation.x==0 || fabs(translation.y)/fabs(translation.x)>2)
+                {
+                    swipeDownDetected=1;
+                    topPoint=point.y;
+                    [self zoomDownGestureDetected];
+                    
+                    [UIView animateWithDuration:0.2 animations:^{
+                        
+                        containerView.center=self.center;
+                        containerView.layer.cornerRadius=containerView.frame.size.height/2;
+
+
+                    } completion:^(BOOL finished) {
+                    }];
+
+                    
+                }
+            }
+        }
+        else
+        {
+            if(translation.x==0 || fabs(translation.y)/fabs(translation.x)>2)
+            {
+                
+                
+                float y=2*point.y/self.bounds.size.height;
+                y=(point.y-topPoint)/(cellRect.origin.y+1);
+                NSLog(@"%f",y);
+                NSLog(@"Top point=%f",topPoint);
+                
+                if(y>=1)
+                {
+                    y=1;
+                }
+                if(y<=0)
+                {
+                    y=0;
+                }
+                float yOrigin=self.frame.origin.y*(1-y)+cellRect.origin.y*(y);
+                float ySize=self.frame.size.height*(1-y)+cellRect.size.height*(y);
+                float xOrigin=self.frame.origin.x*(1-y)+cellRect.origin.x*(y);
+                float xSize=self.frame.size.width*(1-y)+cellRect.size.width*(y);
+                
+                self.backgroundColor=[UIColor colorWithWhite:0 alpha:(1-y*y*y)];
+                
+                containerView.clipsToBounds=YES;
+                
+                containerView.frame=CGRectMake(xOrigin+translation.x/3, yOrigin+translation.y/3, ySize,ySize);
+                
+                containerView.layer.cornerRadius=ySize/2;
+                containerView.center=self.center;
+
+                
+                NSLog(@"%@",NSStringFromCGRect(containerView.frame));
+            }
+        }
+    }
+    else if(recognizer.state==UIGestureRecognizerStateEnded || recognizer.state==UIGestureRecognizerStateCancelled)
+    {
+        if(swipeDownDetected==1)
+        {
+            
+            swipeDownDetected=0;
+            
+            float y=(point.y-topPoint)/cellRect.origin.y;
+            if(y>=1) y=1;
+            if(y<=0)
+            {
+                y=0;
+            }
+            //                float speed=velocity.y;
+            //
+            //
+            //            speed=0.4+0.2/speed;
+            CGRect destRect=self.bounds;
+            if(y<0.3)
+            {
+                destRect=self.bounds;
+                [UIView animateWithDuration:0.2 animations:^{
+                    containerView.frame=destRect;
+                    containerView.layer.cornerRadius=0;
+
+                    self.backgroundColor=[UIColor colorWithWhite:0 alpha:1];
+                } completion:^(BOOL finished) {
+                    [self zoomDownGestureEnded];
+                }];
+            }
+            else{
+                destRect=cellRect;
+                [UIView animateWithDuration:0.2 animations:^{
+                    
+                    containerView.frame=destRect;
+                    self.backgroundColor=[UIColor colorWithWhite:0 alpha:0];
+                    
+                } completion:^(BOOL finished) {
+                    [self zoomDownOut];
+                    
+                    [UIView animateWithDuration:0.01 animations:^{
+                        
+                        
+                    } completion:^(BOOL finished) {
+                        [self zoomDownGestureEnded];
+                        
+                        [self removeFromSuperview];
+                    }];
+                    
+                }];
+            }
+        }
+    }
+    
 }
 -(void)panGesture_forPostDetail_RecognizerSnapChat:(UIPanGestureRecognizer *)recognizer
 {
@@ -818,23 +963,14 @@
 
 -(void)closeThisView
 {
+    
+    if(forMiniProfile==false)
+    {
     [self zoomDownGestureDetected];
 
     CGRect destRect=self.bounds;
-
     destRect=cellRect;
     
-    
-    [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.9 initialSpringVelocity:0.5 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        
-      
-        
-    } completion:^(BOOL finished) {
-        
-        
-     
-
-    }];
     
     [UIView animateWithDuration:0.5 animations:^{
         
@@ -848,6 +984,44 @@
         
         [self removeFromSuperview];
     }];
+    }
+    else
+    {
+        [self zoomDownGestureDetected];
+        
+        containerView.clipsToBounds=YES;
+        
+        CGRect destRect=self.bounds;
+        destRect=cellRect;
+
+        containerView.layer.cornerRadius=self.frame.size.height/2;
+        containerView.backgroundColor=[UIColor whiteColor];
+        
+        
+        containerView.frame=CGRectMake(0, 0, self.frame.size.height, self.frame.size.height);
+        containerView.center=self.center;
+        
+        
+        
+        
+
+//
+//        
+        [UIView animateWithDuration:0.5 animations:^{
+            
+            containerView.center=CGPointMake(CGRectGetMidX(cellRect), CGRectGetMidY(cellRect));
+            containerView.transform=CGAffineTransformMakeScale(0.1, 0.1);
+            
+            
+        } completion:^(BOOL finished) {
+            
+            [self zoomDownGestureEnded];
+            [self zoomDownOut];
+            
+            [self removeFromSuperview];
+        }];
+
+    }
 
 }
 

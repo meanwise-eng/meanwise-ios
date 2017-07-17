@@ -12,6 +12,7 @@
 @interface UserSession : NSObject
 
 
++(APIObjects_ProfileObj *)sessionProfileObj;
 
 +(NSString *)getFullName;
 +(NSString *)getProfilePictureURL;
@@ -20,21 +21,31 @@
 +(NSString *)getCoverPictureURL;
 +(NSString *)getBigProfilePictureURL;
 +(NSString *)getBioText;
-+(NSString *)getProffesion;
 +(NSString *)getFirstName;
 +(NSString *)getLastName;
 +(NSString *)getBirthDate;
 +(NSString *)getPhoneNumber;
+
++(NSNumber *)getUserType;
++(NSString *)getProfileBackgroundColor;
++(NSArray *)getUserCustomSkills;
++(NSString *)getprofessiontext;
 
 +(NSString *)getCityLocation;
 +(NSString *)getProfileStoryTitle;
 +(NSString *)getProfileStoryDesc;
 
 +(NSArray *)getUserInterests;
-+(NSArray *)getUserSkills;
+
+
 
 
 +(NSString *)getAccessToken;
++(NSString *)getAccessTokenOnLaunch;
+
+//Old
++(NSArray *)getXUserSkills;
++(NSString *)getXProffesion;
 
 +(APIObjects_ProfileObj *)getUserObj;
 

@@ -10,6 +10,7 @@
 #import "UserSession.h"
 #import "ProfileFullScreen.h"
 #import "FTIndicator.h"
+#import "GUIScaleManager.h"
 
 @implementation MiniProfileComponent
 
@@ -25,10 +26,42 @@
     if (!window) {
         window = [[UIApplication sharedApplication].windows objectAtIndex:0];
     }
+
+    [AnalyticsMXManager PushAnalyticsEvent:@"ProfileFromFeed"];
+    
     
     sourceFrame=self.frame;
+    
+    if(RX_isiPhone5Res)
+    {
+
+        
+        CGPoint center=self.center;
+        center=[self convertPoint:center toView:nil];
+
+        sourceFrame=CGRectMake(center.x-20, center.y-20, 40, 40);
+        
+//        sourceFrame=CGRectMake(sourceFrame.origin.x, [UIScreen mainScreen].bounds.size.height-136+sourceFrame.size.height/2, sourceFrame.size.width, sourceFrame.size.height);
+        
+    }
+    if(RX_isiPhone7PlusRes)
+    {
+        CGPoint center=self.center;
+        center=[self convertPoint:center toView:nil];
+        
+        sourceFrame=CGRectMake(center.x-20, center.y-20, 40, 40);
+
+       // sourceFrame=CGRectMake(sourceFrame.origin.x, [UIScreen mainScreen].bounds.size.height-240+sourceFrame.size.height/2, sourceFrame.size.width, sourceFrame.size.height);
+    }
+    
+    
+    [GUIScaleManager setTransform:self];
+    
     [window addSubview:self];
-    self.frame=window.bounds;
+
+    
+    self.frame=self.bounds;
+
 
     isDataReceived=0;
     isProfileOpened=0;
@@ -37,11 +70,13 @@
 
     containerView=[[UIView alloc] initWithFrame:sourceFrame];
     [self addSubview:containerView];
+    
     containerView.layer.cornerRadius=sourceFrame.size.width/2;
     containerView.backgroundColor=[UIColor whiteColor];
     containerView.clipsToBounds=YES;
     
-    profileImageView=[[UIImageHM alloc] initWithFrame:self.bounds];
+    
+    profileImageView=[[UIImageHM alloc] initWithFrame:RX_mainScreenBounds];
     [self addSubview:profileImageView];
     [profileImageView setUp:[dict valueForKey:@"user_cover_photo"]];
     profileImageView.alpha=0;
@@ -101,12 +136,17 @@
         containerView.hidden=true;
     
         [FTIndicator dismissProgress];
+        if(RX_isiPhone7PlusRes)
+        {
+        self.frame=[UIScreen mainScreen].bounds;
+        }
 
-    ProfileFullScreen *com=[[ProfileFullScreen alloc] initWithFrame:self.bounds];
+    ProfileFullScreen *com=[[ProfileFullScreen alloc] initWithFrame:RX_mainScreenBounds];
     [self addSubview:com];
     [com setUpProfileObj:userData];
-    [com setUpWithCellRect:self.bounds];
+    [com setUpWithCellRect:RX_mainScreenBounds];
     [com setClosingFrame:sourceFrame];
+        [com setForMiniProfile];
     
     [com setDelegate:self andPageChangeCallBackFunc:@selector(closeBtnClicked:) andDownCallBackFunc:@selector(closeBtnClicked:)];
         
@@ -121,9 +161,9 @@
     [UIView animateKeyframesWithDuration:0.5 delay:0.1 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         
         
-        profileImageView.alpha=0;
+      //  profileImageView.alpha=0;
 
-        containerView.transform=CGAffineTransformMakeScale(1, 1);
+        //containerView.transform=CGAffineTransformMakeScale(1, 1);
 
         
         

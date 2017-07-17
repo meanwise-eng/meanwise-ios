@@ -11,6 +11,7 @@
 #import <Photos/Photos.h>
 #import "LineProgressBar.h"
 #import "UICameraBtn.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface PhotosBtnController : UIView
 {
@@ -29,6 +30,8 @@
 @interface PhotoGallery : UIView  <UICollectionViewDelegate,UICollectionViewDataSource>
 
 {
+    BOOL isSourceCamera;
+    
     PhotosBtnController *control;
 
     UIView *overlayBlack;
@@ -58,6 +61,8 @@
     UIButton *switchCamBtn;
     UIButton *flashLightBtn;
 
+    float columunWidth;
+    NSUInteger numColumns;
 
     
 }

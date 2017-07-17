@@ -16,6 +16,7 @@
     CGRect cellRect;
     
     BOOL forPostDetail;
+    BOOL forMiniProfile;
     
     float topPoint;
 
@@ -39,6 +40,7 @@
 -(void)zoomDownGestureDetected; //Override when changes being detected
 -(void)zoomDownGestureEnded; //Override when gesture stops detecting
 
+-(void)setForMiniProfile;
 -(void)setForPostDetail; //To differentiate
 -(void)zoomDownOut; //Override when about to close
 -(void)FullScreenDone; //When Opened full screen like viewwillapear

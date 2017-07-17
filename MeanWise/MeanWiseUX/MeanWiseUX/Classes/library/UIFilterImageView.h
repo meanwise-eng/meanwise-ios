@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "FTIndicator.h"
 
 @interface UIFilterImageView : UIView
 
@@ -19,7 +20,7 @@
     
     UIImage *nextEffectImage;
     int nextImageNo;
-
+    
     
     
     NSString *imagePath;
@@ -32,8 +33,11 @@
     
     
     
+    
+    
 }
 -(void)setUpWithImage:(NSString *)path;
 -(void)generateNewEffectPoint:(CGPoint)point;
+-(void)cleanUp;
 
 @end

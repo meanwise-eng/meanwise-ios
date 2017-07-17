@@ -42,6 +42,7 @@
 #import <UIKit/UINavigationController.h>
 #import <UIKit/UITableView.h>
 #import <UIKit/UITouch.h>
+#import "GUIScaleManager.h"
 
 #import <UIKit/UICollectionView.h>
 #import <UIKit/NSLayoutConstraint.h>
@@ -1075,7 +1076,7 @@ NSInteger const kIQPreviousNextButtonToolbarTag     =   -1005;
     //  Getting UIKeyboardSize.
     CGRect kbFrame = [[aNotification userInfo][UIKeyboardFrameEndUserInfoKey] CGRectValue];
 
-    CGRect screenSize = [[UIScreen mainScreen] bounds];
+    CGRect screenSize = RX_mainScreenBounds;
 
     //Calculating actual keyboard displayed size, keyboard frame may be different when hardware keyboard is attached (Bug ID: #469) (Bug ID: #381)
     CGRect intersectRect = CGRectIntersection(kbFrame, screenSize);

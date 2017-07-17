@@ -7,6 +7,7 @@
 //
 
 #import "LocationFilterView.h"
+#import "GUIScaleManager.h"
 
 @implementation LocationFilterView
 
@@ -235,7 +236,7 @@
         
         [bgView addSubview:locationLabel];
         
-        CGSize mainSize=[[UIScreen mainScreen] bounds].size;
+        CGSize mainSize=RX_mainScreenBounds.size;
         
         self.frame=bgRect;
         self.frame=CGRectMake(mainSize.width-bgRect.size.width, mainSize.height*0.7, bgRect.size.width, bgRect.size.height);
@@ -277,7 +278,7 @@
         [bgView addSubview:locationLabel];
         [bgView addSubview:imageView];
 
-        CGSize mainSize=[[UIScreen mainScreen] bounds].size;
+        CGSize mainSize=RX_mainScreenBounds.size;
         
         self.frame=bgRect;
         self.frame=CGRectMake(mainSize.width-bgRect.size.width, mainSize.height*0.7, bgRect.size.width, bgRect.size.height);
@@ -321,7 +322,7 @@
         
         //bgView.layer.cornerRadius=(padding+10)/2;
 
-        CGSize mainSize=[[UIScreen mainScreen] bounds].size;
+        CGSize mainSize=RX_mainScreenBounds.size;
         
         self.frame=bgRect;
         self.frame=CGRectMake(mainSize.width-bgRect.size.width, mainSize.height*0.7, bgRect.size.width, bgRect.size.height);
@@ -391,7 +392,7 @@
         [bgView1 addSubview:timeLabel];
 
         
-        CGSize mainSize=[[UIScreen mainScreen] bounds].size;
+        CGSize mainSize=RX_mainScreenBounds.size;
         self.frame=containerRect;
         self.frame=CGRectMake(mainSize.width-containerRect.size.width, mainSize.height*0.7, containerRect.size.width, containerRect.size.height);
         

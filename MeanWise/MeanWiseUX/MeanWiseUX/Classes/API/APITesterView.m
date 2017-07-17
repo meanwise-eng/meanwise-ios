@@ -43,8 +43,8 @@
 }
 -(void)sendForgetPassword
 {
-    manager=[[APIManager alloc] init];
-    [manager sendRequestForForgetPasswordWithDelegate:self andSelector:@selector(forgetPasswordCallBack:)];
+   // manager=[[APIManager alloc] init];
+  //  [manager sendRequestForForgetPasswordWithDelegate:self andSelector:@selector(forgetPasswordCallBack:)];
     
 }
 -(void)forgetPasswordCallBack:(APIResponseObj *)responseObj
@@ -88,7 +88,7 @@
 -(void)UserNotificationAPI
 {
     manager=[[APIManager alloc] init];
-    [manager sendRequestForNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
+    [manager sendRequestForMyNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
 
 }
 -(void)UserNotificationAPIReceived:(APIResponseObj *)responseObj

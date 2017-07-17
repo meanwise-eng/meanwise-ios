@@ -179,6 +179,7 @@
             [listTable insertRowsAtIndexPaths:[NSArray arrayWithArray:indexPathArray] withRowAnimation:UITableViewRowAnimationTop];
             [listTable endUpdates];
 
+//            [listTable reloadData]
             
 
         }
@@ -285,6 +286,9 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    
+    [AnalyticsMXManager PushAnalyticsEvent:@"Notification-Detail Screen"];
+
     APIObjects_NotificationObj *obj=[dataFeeds objectAtIndex:indexPath.row];
     int typeNo=obj.notification_typeNo.intValue;
 

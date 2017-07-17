@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import "FTIndicator.h"
+#import "ViewController.h"
+#import "ResolutionVersion.h"
+#import "AnalyticsMXManager.h"
 
 @interface AppDelegate ()
 
@@ -27,9 +31,24 @@
     [default1 synchronize];
 }
 
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
+    [self listOfFonts];
+    
+    
+    // TODO: Move this to where you establish a user session
+
+    [AnalyticsMXManager PushAnalyticsStartup];
+    
+    
+    BOOL iphone5=RX_isiPhone5Res;
+
+    BOOL iphoen52=[ResolutionVersion IfResIPhone5];
    // [self clearcache];
+    
+    
+    
     
     self.MeanWise_VideoQueue = [[NSOperationQueue alloc]init];
     self.MeanWise_VideoQueue.maxConcurrentOperationCount = 1;
@@ -37,12 +56,14 @@
     self.MeanWise_ImageQueue=[[NSOperationQueue alloc] init];
     self.MeanWise_ImageQueue.maxConcurrentOperationCount=10;
     
+    [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
     
     [VideoCacheManager setUp];
-    [VideoCacheManager clearCache];
+   // [VideoCacheManager clearCache];
    
     
-    
+   
+
    /* NSUInteger cacheSizeMemory = 10*1024*1024; // 500 MB
     NSUInteger cacheSizeDisk = 10*1024*1024; // 500 MB
     NSURLCache *sharedCache = [[NSURLCache alloc] initWithMemoryCapacity:cacheSizeMemory diskCapacity:cacheSizeDisk diskPath:@"nsurlcache"];
@@ -50,12 +71,162 @@
     sleep(1); // Critically important line, sadly, but it's worth it!
 
     */
+
+    [UserSession setUserSessionIfExist];
     
+    self.navController=(UINavigationController *)self.window.rootViewController;
 
 
+    [self clearAllTheNotifications];
+
+    vuti=[[VersionUtility alloc] init];
+    [vuti setUpWithTarget:self onCallBack:nil];
+    
+    [vuti requestForCall];
     
     // Override point for customization after application launch.
     return YES;
+}
+-(void)clearAllTheNotifications
+{
+    [[UIApplication sharedApplication] setApplicationIconBadgeNumber: 0];
+    [[UIApplication sharedApplication] cancelAllLocalNotifications];
+    
+
+}
+-(void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    
+
+
+    NSString * deviceTokenString = [[[[deviceToken description]
+                                      stringByReplacingOccurrencesOfString: @"<" withString: @""]
+                                     stringByReplacingOccurrencesOfString: @">" withString: @""]
+                                    stringByReplacingOccurrencesOfString: @" " withString: @""];
+    
+    
+    
+
+    if([UserSession sessionProfileObj]!=nil)
+    {
+    
+    APIManager *manager=[[APIManager alloc] init];
+    [manager registerDeviceForPushNotification:deviceTokenString delegate:self andSelector:@selector(registerDevice:)];
+    
+    NSLog(@"DEVICE TOKEN IS : %@", deviceTokenString);
+    }
+    
+    
+}
+-(void)registerDevice:(APIResponseObj *)responseObj
+{
+    if(responseObj.statusCode!=200)
+    {
+        NSLog(@"REGISTRATION FOR PUSH: FAILED");
+        
+    }
+    else
+    {
+        NSLog(@"REGISTRATION FOR PUSH: SUCCESS");
+    }
+}
+
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error {
+    
+    NSLog(@"Did Fail to Register for Remote Notifications");
+    NSLog(@"%@, %@", error, error.localizedDescription);
+}
+- (void)application:(UIApplication *)application
+didReceiveRemoteNotification:(NSDictionary *)userInfo {
+
+    UIApplicationState state = [application applicationState];
+    // user tapped notification while app was in background
+    if (state == UIApplicationStateInactive || state == UIApplicationStateBackground)
+    {
+        
+        //        UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+        //        ViewController *t=(ViewController *)vc.topViewController;
+        //        [t checkTheNotificationsManually];
+        //
+        // [FTIndicator showInfoWithMessage:[NSString stringWithFormat:@"Background : %@",userInfo]];
+        
+        // go to screen relevant to Notification content
+    }
+    else
+    {
+        //  [FTIndicator showInfoWithMessage:[NSString stringWithFormat:@"Foreground : %@",userInfo]];
+        
+        //  [FTIndicator showToastMessage:alert];
+        
+        //        [FTIndicator showNotificationWithTitle:@"1 Notification!" message:@""];
+        [self clearAllTheNotifications];
+        
+        // App is in UIApplicationStateActive (running in foreground)
+        // perhaps show an UIAlertView
+    }
+
+}
+
+
+
+-(BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+    
+    [self parseDeepLinking:url Options:options];
+    
+    return true;
+}
+-(void)parseDeepLinking:(NSURL *)url Options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+    
+    
+    if(RX_isiPhone4Res)
+    {
+        return;
+    }
+    
+   // [FTIndicator showSuccessWithMessage:url.absoluteString];
+    
+    NSString *string=url.absoluteString;
+    
+    if([string hasPrefix:@"meanwise://post/"] && [UserSession getAccessToken]!=nil)
+    {
+     
+        [self showDeepLinkURL:string];
+        
+    }
+    else
+    {
+     
+        [self performSelector:@selector(showDeepLinkURL:) withObject:string afterDelay:0.5];
+    }
+    
+}
+-(void)showDeepLinkURL:(NSString *)string
+{
+    if([UserSession getAccessToken]!=nil)
+    {
+    [self.deepLinkViewer cleanUp];
+    self.deepLinkViewer=nil;
+    
+    NSString *postId=[string substringFromIndex:16];
+    
+    self.deepLinkViewer=[[DeepLinkViewer alloc] init];
+    [self.deepLinkViewer setUpWithPostId:postId];
+        [self.deepLinkViewer setDelegate:self onCleanUp:@selector(onDeepLinkControlDismiss:)];
+    }
+    else
+    {
+         [FTIndicator showErrorWithMessage:@"Please must be logged in to view this post."];
+    }
+    
+}
+-(void)onDeepLinkControlDismiss:(id)sender
+{
+    
+    [self.deepLinkViewer removeFromSuperview];
+    self.deepLinkViewer=nil;
+
 }
 -(void)listOfFonts
 {
@@ -216,6 +387,8 @@
 }*/
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+    
+
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
     // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
 }
@@ -226,10 +399,32 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
+    [self clearAllTheNotifications];
+    
+
+
+
+   [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"REFRESH_HOME"
+     object:self];
+    
+    
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:@"REFRESH_EXPLORE_INTERESTS"
+     object:self];
+    
+//    
+    
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+    [vuti requestForCall];
+    
+       // [[Crashlytics sharedInstance] crash];
+
+
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 

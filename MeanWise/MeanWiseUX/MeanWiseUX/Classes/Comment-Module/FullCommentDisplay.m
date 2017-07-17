@@ -11,6 +11,7 @@
 #import "APIObjects_CommentObj.h"
 #import "APIObjectsParser.h"
 #import "FTIndicator.h"
+#import "DataSession.h"
 
 @implementation FullCommentDisplay
 -(void)setTarget:(id)target andCloseBtnClicked:(SEL)func1;
@@ -23,6 +24,8 @@
 {
     postId=postIdString;
     
+    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Screen General"];
+
     self.backgroundColor=[UIColor clearColor];
     
     UIBlurEffect *blurEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
@@ -119,13 +122,14 @@
     newChatBox.backgroundColor=[UIColor colorWithWhite:0 alpha:0.7f];
     
     
-    newChatMessageBox=[[UITextView alloc] initWithFrame:CGRectMake(10, self.frame.size.height-(kk_chatBoxTextViewHeight-1), self.frame.size.width-20-50, (kk_chatBoxTextViewHeight-1))];
+    newChatMessageBox=[[SAMTextView alloc] initWithFrame:CGRectMake(10, self.frame.size.height-(kk_chatBoxTextViewHeight-1), self.frame.size.width-20-50, (kk_chatBoxTextViewHeight-1))];
     [self addSubview:newChatMessageBox];
     newChatMessageBox.font=kk_chatFont;
     newChatMessageBox.returnKeyType=UIReturnKeySend;
     newChatMessageBox.editable=true;
     newChatMessageBox.backgroundColor=[UIColor clearColor];
     newChatMessageBox.textColor=[UIColor whiteColor];
+    newChatMessageBox.placeholder=@"Leave a comment";
     
     
     newChatMessageBox.keyboardAppearance=UIKeyboardAppearanceDark;
@@ -190,7 +194,8 @@
 {
     emptyView.hidden=true;
     
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Screen Refresh"];
+
     [UIView animateWithDuration:0.25 delay:0.02 options:UIViewAnimationOptionCurveEaseOut animations:^(void){
         
         commentList.contentOffset = CGPointMake(0, -100);
@@ -216,7 +221,7 @@
 }
 -(void)commentListReceived:(APIResponseObj *)responseObj
 {
-    NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
+    NSArray *responseArray=[NSMutableArray arrayWithArray:[(NSArray *)responseObj.response valueForKey:@"data"]];
     APIObjectsParser *parser=[[APIObjectsParser alloc] init];
     
     
@@ -228,6 +233,7 @@
     
 
     
+    [[DataSession sharedInstance] updateCommentCountForPostId:postId andCommentCount:(int)chatMessages.count];
     
     if(chatMessages.count==0)
     {
@@ -350,6 +356,8 @@
 }
 -(void)sendBtnClicked:(id)sender
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Post"];
+
     [newChatMessageBox resignFirstResponder];
 
     NSString *msg=newChatMessageBox.text;
@@ -385,6 +393,7 @@
 }
 -(void)newCommentSent:(APIResponseObj *)obj
 {
+    
     dispatch_async(dispatch_get_main_queue(), ^{
         [refreshControl beginRefreshing];
 
@@ -445,7 +454,8 @@
 -(void)onCommentDeleteBtnClicked:(NSString *)commentId
 {
     
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Delete"];
+
    APIManager  *manager1=[[APIManager alloc] init];
     [manager1 sendRequestForDeleteComment:commentId postId:[NSString stringWithFormat:@"%@",postId] delegate:self andSelector:@selector(commnentDeleteResponse:)];
     

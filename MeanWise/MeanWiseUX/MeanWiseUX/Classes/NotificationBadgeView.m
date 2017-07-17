@@ -9,6 +9,7 @@
 #import "NotificationBadgeView.h"
 #import "NotificationsComponent.h"
 #import "FTIndicator.h"
+#import "GUIScaleManager.h"
 
 @implementation NotificationBadgeView
 
@@ -22,18 +23,16 @@
 -(void)setUp:(id)dataObj
 {
     objMain=dataObj;
-    
+    ifnotificationExpanded=false;
     statusBarNotifierView=nil;
     
    
-    
-
-    
     window = [UIApplication sharedApplication].keyWindow;
     if (!window) {
         window = [[UIApplication sharedApplication].windows objectAtIndex:0];
     }
     
+
     
     float padding=4;
     
@@ -42,10 +41,12 @@
     hiddenRect=CGRectMake(padding, -60, window.frame.size.width-padding*2, 55);
     showingRect=CGRectMake(padding, padding, window.frame.size.width-padding*2, 55);
     
-    
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"NotifyBadge"];
+
+
     
     statusBarNotifierView=[[UIView alloc] initWithFrame:hiddenRect];
+    
     //statusBarNotifierView.backgroundColor=[UIColor colorWithRed:0.27 green:0.80 blue:1.00 alpha:1.00];
     statusBarNotifierView.backgroundColor=[UIColor whiteColor];
     
@@ -53,7 +54,7 @@
     statusBarNotifierView.layer.cornerRadius=4;
     
    
-    
+
     
     [window addSubview:statusBarNotifierView];
     [window bringSubviewToFront:statusBarNotifierView];
@@ -198,10 +199,43 @@
 }
 -(void)TapToViewPressed:(id)sender
 {
-    expandedView=[[NotificationsComponent alloc] initWithFrame:CGRectMake(0, -window.frame.size.height, window.frame.size.width, window.frame.size.height)];
+    CGRect rect=RX_mainScreenBounds;
     
-    [window addSubview:expandedView];
+    mainView=[[UIView alloc] initWithFrame:RX_mainScreenBounds];
+    [window addSubview:mainView];
+    [GUIScaleManager setTransform:mainView];
+    mainView.frame=mainView.bounds;
+
+    ifnotificationExpanded=true;
+    
+    profileIdentifier=[HMPlayerManager sharedInstance].Profile_urlIdentifier;
+    homeIdentifier=[HMPlayerManager sharedInstance].Home_urlIdentifier;
+    exploreIdentifier=[HMPlayerManager sharedInstance].Explore_urlIdentifier;
+    
+    
+    [HMPlayerManager sharedInstance].Profile_urlIdentifier=@"";
+    [HMPlayerManager sharedInstance].Home_urlIdentifier=@"";
+    [HMPlayerManager sharedInstance].Explore_urlIdentifier=@"";
+
+
+    if(RX_isiPhone7PlusRes)
+    {
+        mainView.frame=[UIScreen mainScreen].bounds;
+    }
+    
+    expandedView=[[NotificationsComponent alloc] initWithFrame:CGRectMake(0, -rect.size.height, rect.size.width, rect.size.height)];
+    
+    [mainView addSubview:expandedView];
     [expandedView setUp:nil];
+    [expandedView setTarget:self andBackBtnFunc:@selector(backBtnFunc:)];
+    
+    
+    
+    if(sender==nil)
+    {
+        [window bringSubviewToFront:statusBarNotifierView];
+
+    }
     
     expandedView.alpha=0;
 
@@ -210,13 +244,26 @@
         
             expandedView.alpha=1;
         
-        expandedView.frame=window.bounds;
+        expandedView.frame=rect;
         
     } completion:^(BOOL finished) {
         [self hideProgress];
         
     }];
     
+}
+-(void)backBtnFunc:(id)sender
+{
+    [HMPlayerManager sharedInstance].Profile_urlIdentifier=profileIdentifier;
+    [HMPlayerManager sharedInstance].Home_urlIdentifier=homeIdentifier;
+    [HMPlayerManager sharedInstance].Explore_urlIdentifier=exploreIdentifier;
+    
+    [expandedView removeFromSuperview];
+    [mainView removeFromSuperview];
+    mainView=nil;
+    
+    expandedView=nil;
+
 }
 -(void)showProgress
 {
@@ -235,6 +282,8 @@
 -(void)hideProgress
 {
     
+    
+    
     float duration=2.0f;
     if([objMain isKindOfClass:[APIObjects_NotificationObj class]])
     {
@@ -245,6 +294,11 @@
             duration=5.0f;
         }
     }
+    else
+    {
+        
+        
+    }
     
     [self performSelector:@selector(hideDone) withObject:nil afterDelay:duration];
     
@@ -252,6 +306,8 @@
 -(void)hideDone
 {
  
+    
+    
     fullSizeBtn.enabled=false;
     
         [UIView animateKeyframesWithDuration:1.0 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{

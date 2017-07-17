@@ -26,7 +26,7 @@
     
     
     NSArray *array1=[[APIPoster alloc] getSkillsData];
-    NSArray *array2=[UserSession getUserSkills];
+    NSArray *array2=[UserSession getXUserSkills];
     
     NSMutableArray *userTagList=[[NSMutableArray alloc] init];
     
@@ -124,7 +124,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Got any cool skills? List them here.";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;

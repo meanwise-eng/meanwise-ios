@@ -13,7 +13,7 @@
 {
     UICollectionView *topicListView;
 
-    NSArray *arrayTopics;
+    NSMutableArray *arrayTopics;
     
     int selectedChannel;
     NSString *searchTerm;
@@ -22,6 +22,8 @@
 
     id target;
     SEL onTopicSelectCallBack;
+    
+    int selectedTopicCellIndex;
 
 }
 -(void)setUp:(int)height;

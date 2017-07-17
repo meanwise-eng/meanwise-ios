@@ -20,7 +20,7 @@
 {
     urlPath=path;
     
-    
+    alertCount=0;
     videoDuration=[self getVideoDuration];
     
     if(videoDuration<4.0)
@@ -34,6 +34,9 @@
     }
     
     distanceFor2Seconds=2*(self.frame.size.width-30)/videoDuration;
+    distanceFor25Seconds=25*(self.frame.size.width-30)/videoDuration;
+    
+    
     
     
     baseSlider=[[UIView alloc] initWithFrame:CGRectMake(15, 0, self.frame.size.width-30, 50)];
@@ -95,8 +98,19 @@
     
     
     
+    
+    
     node1Slider.center=CGPointMake(15, node1Slider.center.y);
+    
+    if(videoDuration<25.0f)
+    {
     node2Slider.center=CGPointMake(self.frame.size.width-15, node2Slider.center.y);
+    }
+    else
+    {
+     node2Slider.center=CGPointMake(node1Slider.center.x+distanceFor25Seconds, node2Slider.center.y);
+
+    }
     
     
     selected=-1;
@@ -272,7 +286,13 @@
     UITouch *touch=[touches anyObject];
     CGPoint point=[touch locationInView:self];
     
-    if(CGRectContainsPoint(node1Slider.frame, point))
+    CGRect node1frame=node1Slider.frame;
+    CGRect node2frame=node2Slider.frame;
+    
+    node1frame=CGRectMake(node1frame.origin.x-10, node1frame.origin.y, node1frame.size.width+20, node1frame.size.height);
+    node2frame=CGRectMake(node2frame.origin.x-10, node2frame.origin.y, node2frame.size.width+20, node2frame.size.height);
+    
+    if(CGRectContainsPoint(node1frame, point))
     {
         blockView.center=CGPointMake(node1Slider.center.x, blockView.center.y);
         
@@ -281,7 +301,7 @@
         selected=1;
         
     }
-    else if(CGRectContainsPoint(node2Slider.frame, point))
+    else if(CGRectContainsPoint(node2frame, point))
     {
         blockView.center=CGPointMake(node2Slider.center.x, blockView.center.y);
         
@@ -293,6 +313,17 @@
     else
     {
         
+    }
+}
+-(void)showAlert
+{
+    if(alertCount==0)
+    {
+
+
+
+        alertCount++;
+        //[FTIndicator showToastMessage:@"Minimum 3 secs, Max 25 Secs"];
     }
 }
 -(void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -315,6 +346,12 @@
     {
         if(point.x>node2Slider.center.x-15-distanceFor2Seconds)
         {
+            [self showAlert];
+            point=CGPointMake(node1Slider.center.x, point.y);
+        }
+        if(point.x<node2Slider.center.x-15-distanceFor25Seconds)
+        {
+            [self showAlert];
             point=CGPointMake(node1Slider.center.x, point.y);
         }
     }
@@ -323,8 +360,14 @@
     {
         if(point.x<node1Slider.center.x+15+distanceFor2Seconds)
         {
+                        [self showAlert];
             point=CGPointMake(node2Slider.center.x, point.y);
         }
+        if(point.x>node1Slider.center.x+15+distanceFor25Seconds)
+        {            [self showAlert];
+            point=CGPointMake(node2Slider.center.x, point.y);
+        }
+        
     }
     
     
@@ -351,6 +394,8 @@
 }
 -(void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
+    alertCount=0;
+
     blockView.alpha=0;
     
     [self callBackToHandler:selected isTouched:0];

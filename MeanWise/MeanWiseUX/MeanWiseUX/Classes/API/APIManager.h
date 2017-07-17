@@ -16,6 +16,8 @@
     
 }
 -(NSString *)baseString;
+@property(nonatomic) NSInteger countRequested;
+@property(nonatomic) NSInteger pageNoRequested;
 
 
 
@@ -34,10 +36,13 @@
 
 //HOME
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector;
--(void)sendRequestForNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForMyNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestExploreFeedWithKey:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestExploreAutoCompleteAPI:(NSDictionary *)term Withdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestExploreTopTrendingTopicsForChannel:(NSString *)channelId Withdelegate:(id)delegate andSelector:(SEL)selector;
+
+-(void)sendRequestForPostInfoWithId:(NSString *)postId Withdelegate:(id)delegate andSelector:(SEL)selector;
+
 
 
 //Edit Profile
@@ -50,18 +55,23 @@
 -(void)sendRequestForUpdateCoverPhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForUpdateProfilePhoto:(NSString *)coverphotoURL delegate:(id)delegate andSelector:(SEL)selector;
 
--(void)sendRequestForForgetPasswordWithDelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForForgetPasswordWithDelegate:(id)delegate withData:(NSDictionary *)dict andSelector:(SEL)selector;
 
 
 //Signup API
 -(void)sendRequestForSignUp:(NSDictionary *)signupData delegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestTocheckIfUserExistWithEmail:(NSString *)email withDelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestTocheckIfUserExistWithUsername:(NSString *)email withDelegate:(id)delegate andSelector:(SEL)selector;
 
+-(void)sendRequestTocheckInviteCode:(NSString *)inviteCode withDelegate:(id)delegate andSelector:(SEL)selector;
 
 //STATIC
 -(void)sendRequestForProffesionsWithDelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForSkillsWithDelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForInterestWithDelegate:(id)delegate andSelector:(SEL)selector;
+
+-(void)sendRequestForAutoCompleteSkills:(NSString *)term Delegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForAutoCompleteProfessions:(NSString *)term Delegate:(id)delegate andSelector:(SEL)selector;
 
 
 
@@ -115,8 +125,10 @@
 
 
 
+//Push Notifications
+-(void)registerDeviceForPushNotification:(NSString *)device delegate:(id)delegate andSelector:(SEL)selector;
 
-
+-(void)sendRequestForDeviceVersion:(id)delegate andSelector:(SEL)selector;
 
 
 

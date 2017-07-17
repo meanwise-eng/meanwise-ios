@@ -38,6 +38,7 @@
     LoginComponent *c=[self create_LoginComponent];
     [c setTarget:self andFunc1:@selector(normalLoginBtnClicked:)];
     [c setTarget:self andFunc2:@selector(signupNormalClicked:)];
+    [c setCallBackForForgotPassword:@selector(forgetPassBtnClicked:)];
     [self transitionToNextScreen:c];
 
     

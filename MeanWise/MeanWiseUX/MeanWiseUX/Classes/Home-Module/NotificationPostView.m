@@ -195,6 +195,7 @@
         
         sharecompo=[[ShareComponent alloc] initWithFrame:self.bounds];
         [sharecompo setUp];
+                [sharecompo setPostId:senderId];
         [sharecompo setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
         
         [self addSubview:sharecompo];

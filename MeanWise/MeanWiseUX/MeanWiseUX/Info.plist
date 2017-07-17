@@ -15,11 +15,39 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.1</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>meanwise</string>
+				<string>prefs</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
-	<string>1.11</string>
+	<string>1.1</string>
+	<key>Fabric</key>
+	<dict>
+		<key>APIKey</key>
+		<string>a70739c85b32e895d51a2ac83d0fe71239259836</string>
+		<key>Kits</key>
+		<array>
+			<dict>
+				<key>KitInfo</key>
+				<dict/>
+				<key>KitName</key>
+				<string>Crashlytics</string>
+			</dict>
+		</array>
+	</dict>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -27,8 +55,14 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Meanwise needs Camera Permission</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Meanwise needs location permission while using app to add location stickers on image and videos.</string>
+	<string>Meanwise needs "Location" permission.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Meanwise needs Microphone Permission</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Meanwise needs "Photos" Permission</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>OpenSans-Bold.ttf</string>
@@ -43,6 +77,18 @@
 		<string>Mark Simonson - Proxima Nova Regular.otf</string>
 		<string>Mark Simonson - Proxima Nova Semibold.otf</string>
 		<string>Mark Simonson - Proxima Nova Thin.otf</string>
+		<string>AlfaSlabOne-Regular.ttf</string>
+		<string>Bahiana-Regular.ttf</string>
+		<string>BungeeInline-Regular.ttf</string>
+		<string>Chewy.ttf</string>
+		<string>JustAnotherHand.ttf</string>
+		<string>Skranji-Bold.ttf</string>
+		<string>Anton-Regular.ttf</string>
+		<string>TitilliumWeb-Regular.ttf</string>
+		<string>Slackey.ttf</string>
+		<string>Lalezar-Regular.ttf</string>
+		<string>Cookie-Regular.ttf</string>
+		<string>Bellefair-Regular.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

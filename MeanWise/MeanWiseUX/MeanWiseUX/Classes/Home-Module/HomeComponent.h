@@ -16,14 +16,21 @@
 #import "MessageComponent.h"
 #import "NotificationsComponent.h"
 #import "MWNavBar.h"
+#import "GUIScaleManager.h"
 
 #import "APIManager.h"
 #import "FullCommentDisplay.h"
 #import "ShareComponent.h"
+#import "API_PAGESManager.h"
+
+#define IMAGE_OFFSET_SPEED RX_mainScreenBounds.size.height*0.3
 
 @interface HomeComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate,UIScrollViewDelegate>
 {
-    APIManager *manager;
+    
+    BOOL isRefreshing;
+    API_PAGESManager *pManager;
+
 
     FullCommentDisplay *commentDisplay;
     ShareComponent *sharecompo;
@@ -48,6 +55,7 @@
     EmptyView *emptyView;
     
     NSString *screenIdentifier;
+    NSNumber *refreshIdentifier;
 
     
 }

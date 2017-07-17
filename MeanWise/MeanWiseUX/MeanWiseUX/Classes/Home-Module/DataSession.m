@@ -20,10 +20,13 @@
         
         sharedInstance.homeFeedResults=[[NSMutableArray alloc] init];
         sharedInstance.exploreFeedResults=[[NSMutableArray alloc] init];
+        sharedInstance.searchUserResults=[[NSMutableArray alloc] init];
+
         sharedInstance.signupObject=[[SignupDataObjects alloc] init];
         sharedInstance.notificationsResults=[[NSMutableArray alloc] init];
         sharedInstance.noOfNewNotificationReceived=[NSNumber numberWithInt:0];
         sharedInstance.noOfInstantNotificationReceived=[NSNumber numberWithInt:0];
+        sharedInstance.SocialshareStatus=[NSNumber numberWithInteger:0];
         
         // Do any other initialisation stuff here
     });
@@ -61,6 +64,82 @@
         
     }
     
+    
+}
+-(int)getUpdatedCommentCountForPostId:(NSString *)postId
+{
+    
+    int count=-1;
+    
+    
+    for(int i=0;i<self.homeFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            count=[obj.num_comments intValue];
+            
+        }
+        
+    }
+    
+    if(count==-1)
+    {
+    for(int i=0;i<self.exploreFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            count=[obj.num_comments intValue];
+        }
+        
+    }
+    }
+    return count;
+    
+}
+-(void)updateCommentCountForPostId:(NSString *)postId andCommentCount:(int)commentCount
+{
+    
+    for(int i=0;i<self.homeFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.num_comments=[NSNumber numberWithInt:commentCount];
+            [self.homeFeedResults replaceObjectAtIndex:i withObject:obj];
+            
+        }
+        
+    }
+    
+    for(int i=0;i<self.exploreFeedResults.count;i++)
+    {
+        APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
+        if([obj.postId isEqualToString:postId])
+        {
+            obj.num_comments=[NSNumber numberWithInt:commentCount];
+            [self.exploreFeedResults replaceObjectAtIndex:i withObject:obj];
+            
+        }
+        
+    }
+    
+}
+-(void)userProfileUpdate:(APIObjects_ProfileObj *)userObject
+{
+    for(int i=0;i<self.searchUserResults.count;i++)
+    {
+        APIObjects_ProfileObj *obj=[self.searchUserResults objectAtIndex:i];
+        
+        if([[NSString stringWithFormat:@"%@",userObject.userId] isEqualToString:[NSString stringWithFormat:@"%@",obj.userId]])
+        {
+            [self.searchUserResults replaceObjectAtIndex:i withObject:userObject];
+            
+        }
+
+        
+    }
     
 }
 -(void)postUnliked:(NSString *)postId
@@ -115,3 +194,4 @@
     
   }
 @end
+

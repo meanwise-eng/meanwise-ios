@@ -28,7 +28,7 @@
     searchTerm=@"";
     
     //arrayTopics=[NSArray arrayWithObjects:@"List",@"Idea",@"Fun",@"Work",@"Game",@"Workout",@"Play", nil];
-    arrayTopics=[NSArray array];
+    arrayTopics=[[NSMutableArray alloc] init];
     
     UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumInteritemSpacing = 10;
@@ -72,7 +72,7 @@
     int channelId=[[[channelList objectAtIndex:channelNo] valueForKey:@"id"] intValue];
 
     
-    arrayTopics=[NSArray array];
+    arrayTopics=[NSMutableArray array];
     [topicListView reloadData];
     [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
 
@@ -92,10 +92,12 @@
     if([obj.response isKindOfClass:[NSArray class]])
     {
         
+        NSString *wild = @"*";
         
+        arrayTopics=[NSMutableArray arrayWithArray:(NSArray *)obj.response];
+        [arrayTopics insertObject:wild atIndex:0];
+
         
-        
-        arrayTopics=(NSArray *)obj.response;
         
         [topicListView reloadData];
         [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
@@ -119,11 +121,24 @@
 {
     TopicListCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
     
-    NSString *string=[NSString stringWithFormat:@"@%@",[arrayTopics objectAtIndex:indexPath.row]];
+    NSString *string;
+    
+    if([[arrayTopics objectAtIndex:indexPath.row] isEqualToString:@"*"])
+    {
+        string = @"*";
+        cell.nameLBL.font = [UIFont fontWithName:k_fontRegular size:16];
+    }
+    else{
+        string=[NSString stringWithFormat:@"@%@",[arrayTopics objectAtIndex:indexPath.row]];
+        cell.nameLBL.font = [UIFont fontWithName:k_fontRegular size:16];
+
+    }
+    
     cell.nameLBL.text=string;
     
     cell.bgView.backgroundColor=[Constant colorGlobal:(selectedChannel%13)];
     cell.topicColor=[Constant colorGlobal:(selectedChannel%13)];
+    
     
     return cell;
 }
@@ -138,12 +153,11 @@
     NSDictionary *dictAttributes=@{NSFontAttributeName:[UIFont fontWithName:k_fontSemiBold size:16]};
     
     NSString *dict=[NSString stringWithFormat:@"@%@",[arrayTopics objectAtIndex:indexPath.row]];
-
-
-
     CGSize calCulateSizze =[dict sizeWithAttributes:dictAttributes];
 
+    
     return CGSizeMake(calCulateSizze.width+20, self.frame.size.height);
+
 }
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {

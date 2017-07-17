@@ -366,12 +366,10 @@ NSString *const kIQTextFieldReturnKeyType   =   @"kIQTextFieldReturnKeyType";
     if ([delegate respondsToSelector:@selector(textFieldShouldReturn:)])
     {
         BOOL shouldReturn = [delegate textFieldShouldReturn:textField];
-
         if (shouldReturn)
         {
             shouldReturn = [self goToNextResponderOrResign:textField];
         }
-        
         return shouldReturn;
     }
     else

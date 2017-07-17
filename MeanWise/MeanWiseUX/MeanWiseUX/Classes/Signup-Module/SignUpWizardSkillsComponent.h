@@ -9,36 +9,35 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "Constant.h"
-#import "HMTagList.h"
 #import "DataSession.h"
+#import "EditSCTagListControl.h"
+#import "EditSCSuggestionsComponent.h"
 
-@interface SignUpWizardSkillsComponent : UIView <UITextFieldDelegate,UITableViewDataSource,UITableViewDelegate>
+
+@interface SignUpWizardSkillsComponent : UIView <UITextFieldDelegate>
 {
     
     UIButton *nextBtn;
-    
     UILabel *headLBL,*subHeadLBL;
-    UIButton *forgetPassBtn;
     UIButton *backBtn;
-    
     UIButton *addSkillBtn;
+    UIView *skillBaseView;
+    UILabel *skillHeadLBL;
     
-    UILabel *passHeadLBL,*bioHeadLBL;
-    UIView *passBaseView;
-    UIView *emailBaseView,*bioBaseView;
-    UILabel *emailHeadLBL;
     id delegate;
     SEL Func_backBtnClicked;
     SEL Func_nextBtnClicked;
     
-    
     UITextField *skillField;
-    UITableView *skillSearchTableView;
-  //  NSArray *skillTagsArray;
-    NSArray *skillDBTagsArray;
-    NSArray *filteredTagsArray;
+
     
-    HMTagList *selectedTagListView;
+    
+
+    EditSCTagListControl *tagListControl;
+    EditSCSuggestionsComponent *suggestionBox;
+
+    
+    
     
     
 }

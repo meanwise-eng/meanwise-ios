@@ -20,6 +20,7 @@
     UILabel *usernameHeadLBL;
     UIView *usernameBaseView;
     UITextField *usernameField;
+    UILabel *usernameValidationLBL;
     
     UIButton *nextBtn;
     

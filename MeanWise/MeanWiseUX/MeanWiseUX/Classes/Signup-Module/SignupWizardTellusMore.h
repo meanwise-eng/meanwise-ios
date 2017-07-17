@@ -41,6 +41,7 @@
     UILabel *emailHeadLBL;
     
     UILabel *emailValidationLBL;
+    UILabel *passValidationLBL;
 
     UILabel *dobHeadLBL;
     

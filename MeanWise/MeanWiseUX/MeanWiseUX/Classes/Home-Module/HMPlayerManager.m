@@ -10,6 +10,7 @@
 
 @implementation HMPlayerManager
 
+
 + (instancetype)sharedInstance
 {
     static HMPlayerManager *sharedInstance = nil;
@@ -21,7 +22,8 @@
         sharedInstance.Home_urlIdentifier=@"";
         sharedInstance.Home_isPaused=FALSE;
         sharedInstance.Home_isVisibleBounds=TRUE;
-        
+        sharedInstance.Home_RefreshIdentifier=[NSNumber numberWithLong:1];
+
         sharedInstance.Explore_isPaused=false;
         sharedInstance.Explore_isVisibleBounds=false;
         sharedInstance.Explore_screenIdentifier=@"";
@@ -33,6 +35,7 @@
         sharedInstance.Profile_screenIdentifier=@"";
         sharedInstance.Profile_urlIdentifier=@"";
         sharedInstance.Profile_isKilling=false;
+        sharedInstance.Profile_RefreshIdentifier=[NSNumber numberWithLong:1];
         
         sharedInstance.NotificationPost_isPaused=false;
         sharedInstance.NotificationPost_isVisibleBounds=TRUE;
@@ -40,8 +43,15 @@
         sharedInstance.NotificationPost_urlIdentifier=@"";
         sharedInstance.NotificationPost_isKilling=false;
         
+        sharedInstance.DeepLinkPost_isPaused=false;
+        sharedInstance.DeepLinkPost_isVisibleBounds=TRUE;
+        sharedInstance.DeepLinkPost_screenIdentifier=@"";
+        sharedInstance.DeepLinkPost_urlIdentifier=@"";
+        sharedInstance.DeepLinkPost_isKilling=false;
+        sharedInstance.DeepLink_RefreshIdentifier=[NSNumber numberWithLong:1];
         
-        
+
+        sharedInstance.AllVideosURLIdentifiers=[[NSMutableArray alloc] init];
         
         sharedInstance.All_isPaused=false;
         
@@ -51,6 +61,38 @@
     });
     return sharedInstance;
 }
+
+-(NSNumber *)generateNewDeepLinkRefreshIdentifier
+{
+    NSNumber *number=[NSNumber numberWithLong:[self.DeepLink_RefreshIdentifier intValue]+1];
+    
+    self.DeepLink_RefreshIdentifier=number;
+    
+    return number;
+
+}
+-(NSNumber *)generateNewProfileRefreshIdentifier
+{
+
+    NSNumber *number=[NSNumber numberWithLong:[self.Profile_RefreshIdentifier intValue]+1];
+    
+    self.Profile_RefreshIdentifier=number;
+    
+    return number;
+    
+}
+-(NSNumber *)generateHomeRefreshIdentifier
+{
+    
+    NSNumber *number=[NSNumber numberWithLong:[self.Home_RefreshIdentifier intValue]+1];
+    
+    self.Home_RefreshIdentifier=number;
+    
+    return number;
+    
+}
+
+
 -(void)StartKeepKillingExploreFeedVideosIfAvaialble;
 {
     self.Explore_isKilling=true;
@@ -77,5 +119,40 @@
     self.NotificationPost_isKilling=false;
 }
 
+-(void)StartKeepKillingDeepLinkVideosIfAvaialble
+{
+    self.DeepLinkPost_isKilling=true;
+}
+-(void)StopKeepKillingDeepLinkVideosIfAvaialble
+{
+    self.DeepLinkPost_isKilling=false;
 
+}
+
+
+
+-(void)setNotificationPost_urlIdentifier:(NSString *)NotificationPost_urlIdentifier
+{
+    _NotificationPost_urlIdentifier=NotificationPost_urlIdentifier;
+}
+-(void)setHome_urlIdentifier:(NSString *)Home_urlIdentifier
+{
+    _Home_urlIdentifier=Home_urlIdentifier;
+}
+-(void)setExplore_urlIdentifier:(NSString *)Explore_urlIdentifier
+{
+    _Explore_urlIdentifier=Explore_urlIdentifier;
+}
+-(void)setProfile_urlIdentifier:(NSString *)Profile_urlIdentifier
+{
+    _Profile_urlIdentifier=Profile_urlIdentifier;
+}
+-(void)addNewURLIntoStack:(NSString *)string
+{
+
+    
+    [self.AllVideosURLIdentifiers addObject:string];
+ 
+    
+}
 @end

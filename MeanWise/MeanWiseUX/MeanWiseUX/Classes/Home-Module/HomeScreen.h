@@ -11,6 +11,8 @@
 #import "SearchComponent.h"
 #import "NewPostComponent.h"
 #import "HomeComponent.h"
+#import "InviteCodeComponent.h"
+#import "TutorialComponent.h"
 
 @interface HomeScreen : UIView <UIScrollViewDelegate>
 
@@ -29,8 +31,8 @@
 
     
     int visibleComp;
-    
-    
+    TutorialComponent *tutorialCmp;
+    InviteCodeComponent *inviteCodeComp;
 }
 -(void)setUp;
 

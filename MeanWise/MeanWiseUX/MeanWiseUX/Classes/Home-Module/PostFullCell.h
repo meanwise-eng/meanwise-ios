@@ -47,9 +47,12 @@
     
 }
 -(void)setPlayerScreenIdeantifier:(NSString *)string;
+-(void)setPlayerRefreshIdentifier:(NSNumber *)number;
 
 -(void)setTarget:(id)delegate shareBtnFunc:(SEL)func1 andCommentBtnFunc:(SEL)func2;
 -(void)onDeleteEvent:(SEL)func3;
+
+-(void)UpdateCommentCountIfRequired;
 
 -(void)setCallBackForCommentWrite:(SEL)func3;
 
@@ -63,6 +66,8 @@
 @property (nonatomic, strong) UIImageHM *profileIMGVIEW;
 @property (nonatomic, strong) UILabel *nameLBL;
 @property (nonatomic, strong) UILabel *profLBL;
+
+@property (nonatomic, assign, readwrite) CGPoint imageOffset;
 
 
 @property (nonatomic, strong) UILabel *statusLBL;

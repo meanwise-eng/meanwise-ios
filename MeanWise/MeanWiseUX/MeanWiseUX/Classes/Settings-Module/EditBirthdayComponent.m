@@ -48,8 +48,13 @@
     UIDatePicker *datePicker =[[UIDatePicker alloc]initWithFrame:CGRectMake(0, startingTop+(fieldHeight+1),self.frame.size.width, 300)];
     datePicker.datePickerMode=UIDatePickerModeDate;
     datePicker.hidden=NO;
-    datePicker.maximumDate=[NSDate date];
-    datePicker.date=[NSDate date];
+    
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDate *maxDate = [cal dateByAddingUnit:NSCalendarUnitYear value:-14 toDate:[NSDate date] options:0];
+    
+    datePicker.date=maxDate;
+    datePicker.maximumDate=maxDate;
+    
     [datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
     [self addSubview:datePicker];
     datePicker.tintColor=[UIColor purpleColor];
@@ -64,6 +69,8 @@
     
     birthdateTXT.text=displayFormat;
     
+    
+
     datePicker.date=currentBdate;
     dateSelected=currentBdate;
     
@@ -146,7 +153,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Select your birthdate";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;

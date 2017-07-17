@@ -56,5 +56,6 @@
 -(void)openFullMode:(id)sender;
 -(void)QuickOpen;
 -(NSString *)getCurrentPath;
+
 @end
 

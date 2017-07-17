@@ -11,13 +11,14 @@
 #import "MWNavBar.h"
 #import "APIManager.h"
 #import "EmptyView.h"
+#import "API_PAGESManager.h"
 
 @interface FriendList : UIView <UITableViewDelegate,UITableViewDataSource>
 {
     
     APIManager *manager;
     
-    NSArray *resultData;
+    NSMutableArray *finalArray;
     
 
     
@@ -29,6 +30,8 @@
     
     UITableView *friendListTableView;
     EmptyView *emptyView;
+    
+    API_PAGESManager *pManager;
 
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;

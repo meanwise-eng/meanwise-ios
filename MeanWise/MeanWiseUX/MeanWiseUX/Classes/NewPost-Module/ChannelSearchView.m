@@ -142,6 +142,8 @@
     
     buttonSelect.frame=shortFrame;
 
+    [self.superview bringSubviewToFront:self];
+    
     resultData=[NSArray arrayWithArray:masterData];
     
     [feedTable reloadData];

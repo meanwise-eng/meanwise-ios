@@ -12,15 +12,15 @@
 #import <AVFoundation/AVFoundation.h>
 #import "LoaderMin.h"
 #import "HMPlayerManager.h"
-
+#import "VideoCacheManager.h"
 
 @interface HMPlayer : UIView
 {
     NSString *urlStr;
 
-    UIView *baseProgressView;
-    UIView *currentProgressBar;
-    UIView *bufferProgressBar;
+//    UIView *baseProgressView;
+//    UIView *currentProgressBar;
+//    UIView *bufferProgressBar;
     
     BOOL isPlayerShouldPlay;
     
@@ -29,12 +29,14 @@ AVPlayerViewController *playerViewController;
     LoaderMin *videoLoader;
     NSString *screenIdentifier;
     
+    NSNumber *refreshIdentifier;
     
+    BOOL isVideoLocal;
 }
 
 -(void)setUp;
 -(void)setPlayerScreenIdeantifier:(NSString *)string;
-
+-(void)setUpRefreshIdentifier:(NSNumber *)number;
 
 -(void)setDebugNumber:(NSString *)number;
 -(void)setURL:(NSString *)url;

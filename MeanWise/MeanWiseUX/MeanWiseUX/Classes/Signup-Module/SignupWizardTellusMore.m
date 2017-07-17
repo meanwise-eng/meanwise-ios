@@ -7,6 +7,7 @@
 //
 
 #import "SignupWizardTellusMore.h"
+#import "FTIndicator.h"
 
 
 @implementation SignupWizardTellusMore
@@ -16,6 +17,8 @@
     self.backgroundColor=[UIColor clearColor];
     [Constant setUpGradient:self style:5];
     
+    [self addSubview:[Constant createProgressSignupViewWithWidth:self.frame.size.width andProgress:0.2 toPercentage:0.4]];;
+
     
     isDateSelected=0;
     dataSelectedDate=nil;
@@ -79,7 +82,9 @@
     emailField.center=CGPointMake(self.frame.size.width/2, 230+45);
     emailField.autocapitalizationType=UITextAutocapitalizationTypeNone;
     emailField.autocorrectionType=UITextAutocorrectionTypeNo;
+    emailField.keyboardType=UIKeyboardTypeEmailAddress;
 
+    
     emailValidationLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 20)];
     [self addSubview:emailValidationLBL];
     emailValidationLBL.center=CGPointMake(self.frame.size.width/2, 310);
@@ -89,12 +94,13 @@
     emailValidationLBL.textColor=[UIColor yellowColor];
     emailValidationLBL.hidden=true;
     
+    
 
     
     
     passHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
     [self addSubview:passHeadLBL];
-    passHeadLBL.text=@"PASSWORD";
+    passHeadLBL.text=@"PASSWORD  (MIN 8 CHARACTERS)";
     passHeadLBL.textColor=[UIColor whiteColor];
     passHeadLBL.textAlignment=NSTextAlignmentLeft;
     passHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
@@ -198,6 +204,10 @@ forControlEvents:UIControlEventEditingChanged];
         emailValidationSign.hidden=true;
     }
     
+
+    
+    
+    
     if([passField.text isEqualToString:@""])
     {
         passValidationSign.hidden=true;
@@ -277,9 +287,35 @@ forControlEvents:UIControlEventEditingChanged];
     Func_nextBtnClicked=func;
     
 }
+-(BOOL)isValidPassword:(NSString *)passwordString
+{
+    //    if(![self isValidPassword:reNewPswTXT.text])
+    //    {
+    //
+    //
+    //        [FTIndicator showErrorWithMessage:@"Password must be minimum 8 characters, at least 1 Uppercase Alphabet, 1 Lowercase Alphabet, 1 Number and 1 Special Character"];
+    //
+    //    }
+    //
+    //
+    NSString *stricterFilterString = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}";
+    stricterFilterString=@"^(?=.*\\d).{8,12}$";
+    NSPredicate *passwordTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", stricterFilterString];
+    return [passwordTest evaluateWithObject:passwordString];
+}
 
 -(void)nextBtnClicked:(id)sender
 {
+    if(![self isValidPassword:passField.text])
+    {
+        
+        [FTIndicator showToastMessage:@"Password must be minimum 8 characters with 1 digit"];
+        
+        [passField becomeFirstResponder];
+
+        return;
+    }
+    
     if(nextBtn.hidden==false)
     {
      
@@ -288,14 +324,18 @@ forControlEvents:UIControlEventEditingChanged];
         APIManager *manager=[[APIManager alloc] init];
         [manager sendRequestTocheckIfUserExistWithEmail:[emailField.text lowercaseString] withDelegate:self andSelector:@selector(performNextIfPossible:)];
         
-      
+        
+        [FTIndicator showProgressWithmessage:@"Please wait.." userInteractionEnable:FALSE];
       
     }
 
 }
 -(void)performNextIfPossible:(APIResponseObj *)responseObj
 {
- 
+    [FTIndicator dismissProgress];
+    
+    nextBtn.enabled=true;
+
     
     NSString *string=[responseObj.response valueForKey:@"exists"];
     if([[string lowercaseString] isEqualToString:@"true"])
@@ -409,13 +449,16 @@ forControlEvents:UIControlEventEditingChanged];
     datePicker =[[UIDatePicker alloc]initWithFrame:self.bounds];
     datePicker.datePickerMode=UIDatePickerModeDate;
     datePicker.hidden=NO;
-    datePicker.maximumDate=[NSDate date];
-    datePicker.date=[NSDate date];
     [datePicker addTarget:self action:@selector(dateChanged:) forControlEvents:UIControlEventValueChanged];
     [self addSubview:datePicker];
   //  datePicker.tintColor=[UIColor purpleColor];
     
-    
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDate *maxDate = [cal dateByAddingUnit:NSCalendarUnitYear value:-14 toDate:[NSDate date] options:0];
+
+    datePicker.date=maxDate;
+    datePicker.maximumDate=maxDate;
+
     doneBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, self.frame.size.height-50, self.frame.size.width, 50)];
     [self addSubview:doneBtn];
     doneBtn.titleLabel.font=[UIFont fontWithName:k_fontSemiBold size:20];

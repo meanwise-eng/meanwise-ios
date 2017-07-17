@@ -8,6 +8,9 @@
 
 #import "PreviewMedia_VideoController.h"
 #import "VideoTextItemCell.h"
+#import "Constant.h"
+#import "GUIScaleManager.h"
+
 
 @implementation PreviewMedia_VideoController
 
@@ -337,7 +340,7 @@
 
 -(void)combineAndAddText1:(NSString *)filePath andText:(NSArray *)textArray
 {
-    CGSize requiredVideoSize=[UIScreen mainScreen].bounds.size;
+    CGSize requiredVideoSize=RX_mainScreenBounds.size;
 
     
     requiredVideoSize=CGSizeMake(requiredVideoSize.width*2, requiredVideoSize.height*2);
@@ -550,11 +553,10 @@
     
     
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)objectAtIndex:0];
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
-    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
-    
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
+    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov",@"555"];
+    [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
+
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
     exportSession.videoComposition=videoComposition;
     
     exportSession.outputURL = [NSURL fileURLWithPath:destinationPath];
@@ -812,10 +814,10 @@
     
     NSString *documentsDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES)objectAtIndex:0];
     NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd_HH-mm-ss"];
-    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov", [dateFormatter stringFromDate:[NSDate date]]];
-    
-    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:AVAssetExportPresetMediumQuality];
+    NSString *destinationPath = [documentsDirectory stringByAppendingFormat:@"/utput_%@.mov",@"555"];
+    [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
+
+    AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
     exportSession.videoComposition=videoComposition;
     
     exportSession.outputURL = [NSURL fileURLWithPath:destinationPath];

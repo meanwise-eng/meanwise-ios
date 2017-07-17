@@ -21,7 +21,7 @@
 -(void)setUp
 {
     
-  
+    lastSearchType=-1;
     
     
     self.clipsToBounds=YES;
@@ -33,7 +33,7 @@
     layout.minimumInteritemSpacing = 0;
     layout.minimumLineSpacing = 10;
     layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 320);
+    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
 
     
     
@@ -45,9 +45,18 @@
   //  galleryView.pagingEnabled = YES;
     galleryView.showsHorizontalScrollIndicator = NO;
     galleryView.backgroundColor=[UIColor clearColor];
-    
+    galleryView.allowsSelection=YES;
+    galleryView.allowsMultipleSelection=false;
+    galleryView.bounces=YES;
     [galleryView registerClass:[ProfileCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     
+    refreshControl = [[UIRefreshControl alloc] init];
+    refreshControl.tintColor = [UIColor whiteColor];
+    [refreshControl addTarget:self action:@selector(refershControlAction) forControlEvents:UIControlEventValueChanged];
+    [galleryView addSubview:refreshControl];
+    galleryView.alwaysBounceVertical = true;
+    
+
     
     [self addSubview:galleryView];
 
@@ -138,7 +147,20 @@
     
     searchTypeLBL.frame=CGRectMake(searchBaseView.frame.size.width-5-width, 10, width, 20);
 }
+-(void)refershControlAction
+{
 
+    if(lastSearchType==-1)
+    {
+        [self refreshAction];
+    }
+    else
+    {
+        [self OnOptionSelect:[NSNumber numberWithInteger:lastSearchType]];
+    }
+
+
+}
 
 
 -(void)searchFieldTXTChanged:(id)sender
@@ -151,6 +173,8 @@
 }
 -(void)OnOptionSelect:(NSNumber *)number
 {
+    lastSearchType=number.intValue;
+    
     NSLog(@"%d",number.intValue);
     NSLog(@"%@",searchFieldTXT.text);
     
@@ -159,14 +183,20 @@
     
     if(number.intValue==0)
     {
-        paramKey=@"username";
+        paramKey=@"username__contains";
         [self updateSearchTitle:@"Users"];
+        [AnalyticsMXManager PushAnalyticsEvent:@"Search -User"];
+
     }
     else
     {
-        paramKey=@"skills_text";
+        paramKey=@"skills_text__contains";
         [self updateSearchTitle:@"Skill"];
+        [AnalyticsMXManager PushAnalyticsEvent:@"Search -Skill"];
+
     }
+    
+
     
     NSDictionary *dict=@{@"paramKey":paramKey,@"searchTerm":searchFieldTXT.text};
     
@@ -186,7 +216,7 @@
     
     cell.backgroundColor=[UIColor clearColor];
     
-    APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
+    APIObjects_ProfileObj *obj=[[DataSession sharedInstance].searchUserResults objectAtIndex:indexPath.row];
     
     
 
@@ -200,11 +230,12 @@
     }
     else
     {
-        cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3]];
+      //  cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3]];
 
         
     }
     
+   
 
 //    [cell.profileIMGVIEW setUp:obj.cover_photo];
     
@@ -214,35 +245,41 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return [resultData count];
+    return [[DataSession sharedInstance].searchUserResults count];
 }
 
 -(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    cell.transform=CGAffineTransformMakeScale(0.9, 0.9);
-    cell.alpha=0;
+
+  
+    cell.transform=CGAffineTransformMakeScale(0.8, 0.8);
+    
     
         [UIView animateWithDuration:0.5
                          animations:^{
                              
     cell.transform=CGAffineTransformMakeScale(1, 1);
-                             cell.alpha=1;
 
                              
             }
         completion:^(BOOL finished) {
                              
         }];
-    
+
 }
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+
+   
+    suggestionBox.hidden=true;
+    [searchFieldTXT resignFirstResponder];
+
     
     UICollectionViewLayoutAttributes * theAttributes = [collectionView layoutAttributesForItemAtIndexPath:indexPath];
     
     CGRect cellFrameInSuperview = [collectionView convertRect:theAttributes.frame toView:collectionView.superview];
 
-    APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
+    APIObjects_ProfileObj *obj=[[DataSession sharedInstance].searchUserResults objectAtIndex:indexPath.row];
 
     ProfileFullScreen *com=[[ProfileFullScreen alloc] initWithFrame:self.bounds];
     [self addSubview:com];
@@ -257,8 +294,8 @@
     [cell setHiddenCustom:true];
 
     
-    NSString *imgURL=[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3];
-    [com setImage:imgURL andNumber:indexPath];
+    [com setImage:nil andNumber:indexPath];
+
 
     galleryView.scrollEnabled=false;
     
@@ -351,56 +388,79 @@
     UIColor *colorF=[UIColor colorWithRed:red0+red1*incRatio green:green0+green1*incRatio blue:blue0+incRatio*blue1 alpha:alpha0+incRatio*alpha1];
     
     self.backgroundColor=colorF;
+    
+    if(scrollView==galleryView)
+    {
+    if(scrollView.contentOffset.x<500)
+    {
+        galleryView.bounces = true;
+
+    }
+    else
+    {
+        galleryView.bounces = false;
+    }
+    }
 }
 
 -(void)scrollingEnded
 {
-    CGFloat pageWidth = galleryView.frame.size.width*0.6;
-    float currentPage = (galleryView.contentOffset.x) / pageWidth;
     
-    
-    int pageNumber;
-    
-    if (0.0f != fmodf(currentPage, 1.0f))
-    {
-        pageNumber = currentPage + 1;
-    }
-    else
-    {
-        pageNumber= currentPage;
-    }
-    
-  //  NSLog(@"Page Number : %d", pageNumber);
-    
-    if(resultData.count<=pageNumber)
-    {
-        pageNumber=pageNumber-1;
-    }
-    NSIndexPath *indexPath=[NSIndexPath indexPathForItem:pageNumber inSection:0];
-    
-    
-    CGPoint oldContentOffset=galleryView.contentOffset;
-    [galleryView scrollToItemAtIndexPath:indexPath atScrollPosition:UICollectionViewScrollPositionLeft animated:false];
+    NSIndexPath *centerCellIndexPath =
+    [galleryView indexPathForItemAtPoint:
+     [self convertPoint:[galleryView center] toView:galleryView]];
+
+    [galleryView scrollToItemAtIndexPath:centerCellIndexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:true];
+
+    int pageNumber=(int)centerCellIndexPath.row;
 
     
-    CGPoint newContentOffset=galleryView.contentOffset;
-    galleryView.contentOffset=oldContentOffset;
-
+//    CGFloat pageWidth = galleryView.frame.size.width*0.6;
+//    float currentPage = (galleryView.contentOffset.x) / pageWidth;
+//    
+//    
+//    int pageNumber;
+//    
+//    if (0.0f != fmodf(currentPage, 1.0f))
+//    {
+//        pageNumber = currentPage + 1;
+//    }
+//    else
+//    {
+//        pageNumber= currentPage;
+//    }
+//    
+//  //  NSLog(@"Page Number : %d", pageNumber);
+//    
+//    if(resultData.count<=pageNumber)
+//    {
+//        pageNumber=pageNumber-1;
+//    }
+//    NSIndexPath *indexPath=[NSIndexPath indexPathForItem:pageNumber inSection:0];
+//    
     
     
-    
-    [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-        galleryView.contentOffset=CGPointMake(newContentOffset.x-10, newContentOffset.y);
-
-
-        
-    } completion:^(BOOL finished) {
-        
-      
-        
-    }];
+   // CGPoint oldContentOffset=galleryView.contentOffset;
 
     
+//    CGPoint newContentOffset=galleryView.contentOffset;
+//    galleryView.contentOffset=oldContentOffset;
+//
+//    
+//    
+//    
+//    [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+//        galleryView.contentOffset=CGPointMake(newContentOffset.x-10, newContentOffset.y);
+//
+//
+//        
+//    } completion:^(BOOL finished) {
+//        
+//      
+//        
+//    }];
+//
+//    
 
     
     [UIView animateWithDuration:0.2 animations:^{
@@ -410,7 +470,7 @@
     }];
     
     
-    APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
+    APIObjects_ProfileObj *obj=[[DataSession sharedInstance].searchUserResults objectAtIndex:centerCellIndexPath.row];
     
     if(obj.bio.class!=[NSNull class])
     {
@@ -434,6 +494,8 @@
 #pragma mark - API calls
 -(void)refreshAction
 {
+
+    lastSearchType=-1;
     [self updateSearchTitle:@"Featured Users"];
     
     [searchFieldTXT resignFirstResponder];
@@ -446,26 +508,33 @@
     [searchFieldTXT addTarget:self action:@selector(searchFieldTXTChanged:) forControlEvents:UIControlEventEditingChanged];
     
     [FTIndicator showProgressWithmessage:@"Loading.."];
-    
+    galleryView.userInteractionEnabled=false;
+
     
 }
+
 -(void)userFriendsReceived:(APIResponseObj *)responseObj
 {
+    galleryView.userInteractionEnabled=true;
+
+    [refreshControl endRefreshing];
+
     [FTIndicator dismissProgress];
     
   //  NSLog(@"%@",responseObj.response);
+    
     
     if([responseObj.response isKindOfClass:[NSArray class]])
     {
         NSArray *arrayTemp=(NSArray *)responseObj.response;
         APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-        resultData=[parser parseObjects_PROFILES:arrayTemp];
+        [DataSession sharedInstance].searchUserResults=[NSMutableArray arrayWithArray:[parser parseObjects_PROFILES:arrayTemp]];
         [galleryView reloadData];
         [galleryView setContentOffset:CGPointZero animated:false];
 
        
-        
-        if(resultData.count==0)
+       
+        if([DataSession sharedInstance].searchUserResults.count==0)
         {
             emptyView.hidden=false;
         }
@@ -474,9 +543,9 @@
             emptyView.hidden=true;
         }
         
-        if(resultData.count>0)
+        if([DataSession sharedInstance].searchUserResults.count>0)
         {
-            APIObjects_ProfileObj *obj=[resultData objectAtIndex:0];
+            APIObjects_ProfileObj *obj=[[DataSession sharedInstance].searchUserResults objectAtIndex:0];
             
             
             if(![obj.bio isEqualToString:@""])
@@ -511,7 +580,8 @@
     
     [FTIndicator showProgressWithmessage:@"Loading.."];
     
-    
+    galleryView.userInteractionEnabled=false;
+
     
 }
 

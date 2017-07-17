@@ -15,7 +15,7 @@
     int selectedSegmentIndex;
     UIView *segmentView;
     
-    UIButton *segmentPostsBtn;
+    //UIButton *segmentPostsBtn;
     UIButton *segmentTopicsBtn;
     UIButton *segmentHashtagsBtn;
     

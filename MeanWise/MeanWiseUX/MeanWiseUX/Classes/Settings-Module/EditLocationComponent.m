@@ -68,11 +68,10 @@
     
     navBarTitle=[[UILabel alloc] initWithFrame:CGRectMake(0, 20, self.frame.size.width, 65-20)];
     [navBar addSubview:navBarTitle];
-    navBarTitle.text=@"Location";
+    navBarTitle.text=@"Where are you?";
     navBarTitle.textColor=[UIColor colorWithRed:0.59 green:0.11 blue:1.00 alpha:1.00];
     navBarTitle.textAlignment=NSTextAlignmentCenter;
     navBarTitle.font=[UIFont fontWithName:k_fontSemiBold size:18];
-    
     
     
     UIButton *backBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 60, 25, 25)];
@@ -87,7 +86,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"We promise we won’t stalk you";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;

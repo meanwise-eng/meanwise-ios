@@ -49,6 +49,7 @@
 @property (nonatomic, strong) UIButton *commentBtn;
 @property (nonatomic, strong) UIButton *shareBtn;
 
+-(void)UpdateCommentCountIfRequired;
 
 
 -(void)setFrameX:(CGRect)frame;

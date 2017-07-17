@@ -24,6 +24,7 @@
 @property (nonatomic, strong) NSString* notifier_userLastName;
 @property (nonatomic, strong) NSString* notifier_userUserName;
 @property (nonatomic, strong) NSString* notifier_userThumbURL;
+@property (nonatomic, strong) NSString* notifier_userCoverURL;
 
 @property (nonatomic, strong) NSString* postId;
 @property (nonatomic, strong) NSString* postThumbURL;

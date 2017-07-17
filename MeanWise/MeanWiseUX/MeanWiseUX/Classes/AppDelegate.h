@@ -8,15 +8,22 @@
 
 #import <UIKit/UIKit.h>
 #import "VideoCacheManager.h"
-
+#import "DeepLinkViewer.h"
+#import "VersionUtility.h"
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate>
 {
 
+    VersionUtility *vuti;
+    
 }
 @property (strong, nonatomic) UIWindow *window;
 @property (nonatomic, strong) NSOperationQueue *MeanWise_VideoQueue;
 @property (nonatomic, strong) NSOperationQueue *MeanWise_ImageQueue;
+@property (nonatomic, strong) DeepLinkViewer *deepLinkViewer;
+
+
+@property (nonatomic,strong) UINavigationController *navController;
 
 
 @end

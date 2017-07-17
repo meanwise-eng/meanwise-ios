@@ -8,6 +8,7 @@
 
 #import "LoginTransitionScreen.h"
 #import "UserSession.h"
+#import "FTIndicator.h"
 
 @implementation LoginTransitionScreen
 
@@ -62,12 +63,14 @@
     
     if(responseObj.statusCode!=200)
     {
+        [FTIndicator showToastMessage:responseObj.message];
         [self redirectForFail:responseObj.response];
         manager=nil;
 
     }
     else
     {
+        [AnalyticsMXManager PushAnalyticsEvent:@"Login"];
         
         [self retrivingUserData:[responseObj.response valueForKey:@"token"] andUserId:[responseObj.response valueForKey:@"user_id"]];
         NSLog(@"%@",responseObj.response);
@@ -147,13 +150,13 @@
 -(void)redirectForSuccess:(id)sender
 {
     
-    [delegate performSelector:successFunc withObject:nil afterDelay:1.0f];
+    [delegate performSelector:successFunc withObject:nil afterDelay:0.2f];
     
 }
 -(void)redirectForFail:(NSDictionary *)dict
 {
     
-    [delegate performSelector:failFunc withObject:dict afterDelay:1.0f];
+    [delegate performSelector:failFunc withObject:dict afterDelay:0.2f];
     
 }
 

@@ -39,7 +39,7 @@
     [view1 addSubview:proffesionTXT];
     proffesionTXT.adjustsFontSizeToFitWidth=YES;
     proffesionTXT.placeholder=@"Profession";
-    proffesionTXT.text=[UserSession getProffesion];
+    proffesionTXT.text=[UserSession getXProffesion];
     [proffesionTXT addTarget:self action:@selector(searchTextChangeEvent:) forControlEvents:UIControlEventEditingChanged];
     
     
@@ -198,7 +198,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Eg. Architect, Designer, Musician";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;
@@ -216,7 +216,7 @@
 {
  
     NSDictionary *dict=@{
-                         @"profession":selectedProffesionId,
+                         @"profession_text":selectedProffesionId,
                          };
     
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];

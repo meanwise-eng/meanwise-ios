@@ -10,6 +10,7 @@
 #import "ChatThreadComponent.h"
 #import "EditStoryComponent.h"
 #import "ViewController.h"
+#import "FTIndicator.h"
 
 
 @implementation EditStoryComponent
@@ -22,41 +23,37 @@
     
     [self setUpNavBarAndAll];
     
+    noOfCharacters=350;
+    
+    limitIndicatorLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 66+70, self.frame.size.width, 20)];
+    [self addSubview:limitIndicatorLBL];
+    limitIndicatorLBL.textAlignment=NSTextAlignmentCenter;
+    limitIndicatorLBL.font=[UIFont fontWithName:k_fontBold size:15];
+    limitIndicatorLBL.textColor=[UIColor blackColor];
+    
+
     
     
     
-    storyTitleBGV=[[UIView alloc] initWithFrame:CGRectMake(0, 66+70, self.frame.size.width, 55)];
-    [self addSubview:storyTitleBGV];
-    storyTitleBGV.backgroundColor=[UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.00];
     
-    storyTitleTV=[[UITextView alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 55)];
-    storyTitleTV.backgroundColor=[UIColor clearColor];
-    storyTitleTV.textColor=[UIColor blackColor];
-    storyTitleTV.font=[UIFont fontWithName:k_fontSemiBold size:20];
-    [storyTitleBGV addSubview:storyTitleTV];
-   // storyTitleTV.delegate=self;
-    
-    
-    storyDescBGV=[[UIView alloc] initWithFrame:CGRectMake(0, 66+70+56, self.frame.size.width, 55)];
+    storyDescBGV=[[UIView alloc] initWithFrame:CGRectMake(0, 66+90, self.frame.size.width, 100)];
     [self addSubview:storyDescBGV];
     storyDescBGV.backgroundColor=[UIColor colorWithRed:0.96 green:0.96 blue:0.96 alpha:1.00];
     
-    storyDescTV=[[UITextView alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 55)];
+    storyDescTV=[[SAMTextView alloc] initWithFrame:CGRectMake(10, 0, self.frame.size.width-20, 100)];
     storyDescTV.backgroundColor=[UIColor clearColor];
     storyDescTV.textColor=[UIColor blackColor];
     storyDescTV.font=[UIFont fontWithName:k_fontRegular size:18];
     [storyDescBGV addSubview:storyDescTV];
     storyDescTV.delegate=self;
+    storyDescTV.scrollEnabled=false;
+    storyDescTV.placeholder=@"Type here..";
     
     
-    NSString *storyTitle=[UserSession getProfileStoryTitle];
     NSString *storyDesc=[UserSession getProfileStoryDesc];
     
-    if(storyTitle.class!=[NSNull class])
-    {
-    storyTitleTV.text=storyTitle;
-    }
-
+    [storyDescTV becomeFirstResponder];
+  
     if(storyDesc.class!=[NSNull class])
     {
     storyDescTV.text=storyDesc;
@@ -70,15 +67,40 @@
     
     //CGRect frame=textView.frame;
     
+    int len =(int)textView.text.length;
+    noOfCharacters=350-len;
+    limitIndicatorLBL.text=[NSString stringWithFormat:@"%i",noOfCharacters];
+    //
+    if(noOfCharacters<0)
+    {
+        textView.textColor=[UIColor redColor];
+        limitIndicatorLBL.textColor=[UIColor redColor];
+    }
+    else
+    {
+        textView.textColor=[UIColor blackColor];
+        limitIndicatorLBL.textColor=[UIColor blackColor];
+    }
+
     
     CGFloat fixedWidth = textView.frame.size.width;
     CGSize newSize = [textView sizeThatFits:CGSizeMake(fixedWidth, MAXFLOAT)];
     CGRect newFrame = textView.frame;
-    newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), newSize.height);
+    
+    
+    int height=100;
+    if(newSize.height>100)
+    {
+        height=newSize.height;
+    }
+    
+    newFrame.size = CGSizeMake(fmaxf(newSize.width, fixedWidth), height);
     textView.frame = newFrame;
     
+   
     
-    storyDescBGV.frame=CGRectMake(0, 66+70+56, self.frame.size.width, newFrame.size.height);
+    
+    storyDescBGV.frame=CGRectMake(0, 66+90, self.frame.size.width, newFrame.size.height);
     
     
 }
@@ -120,7 +142,7 @@
     instructionField.backgroundColor=[UIColor whiteColor];
     instructionField.font=[UIFont fontWithName:k_fontBold size:11];
     instructionField.textAlignment=NSTextAlignmentCenter;
-    instructionField.text=@"This is your elevator pitch. Tell the world what you are good at. Bragging is allowed.";
+    instructionField.text=@"Tell the world who you are what you are good at.\nBragging is allowed";
     instructionField.textColor=[UIColor lightGrayColor];
     [self addSubview:instructionField];
     instructionField.numberOfLines=3;
@@ -138,8 +160,18 @@
 }
 -(void)saveBtnClicked:(id)sender
 {
+    
+    int len =(int)storyDescTV.text.length;
+    
+    if(len>350)
+    {
+        [FTIndicator showToastMessage:@"Sorry you are exceeding the limit of characters."];
+    }
+    else
+    {
+    
     NSDictionary *dict=@{
-                         @"profile_story_title":storyTitleTV.text,
+                         @"profile_story_title":@"",
                          @"profile_story_description":storyDescTV.text,
                          
                          };
@@ -147,6 +179,7 @@
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
     [t updateProfileWithDict:dict];
+    }
 
 }
 
@@ -158,6 +191,8 @@
 }
 -(void)backBtnClicked:(id)sender
 {
+        [storyDescTV resignFirstResponder];
+    
     [delegate performSelector:backBtnClicked withObject:nil afterDelay:0.02];
     
     [UIView animateWithDuration:0.2 animations:^{

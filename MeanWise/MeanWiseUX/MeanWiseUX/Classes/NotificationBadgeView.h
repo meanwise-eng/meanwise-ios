@@ -13,6 +13,7 @@
 
 @interface NotificationBadgeView : NSObject
 {
+    UIView *mainView;
     UIButton *fullSizeBtn;
     
     UIView *statusBarNotifierView;
@@ -33,6 +34,13 @@
     
     id objMain;
     
+    
+    NSString *profileIdentifier;
+    NSString *homeIdentifier;
+    NSString *exploreIdentifier;
+    
+    BOOL ifnotificationExpanded;
+    
 }
 -(void)setDelegate:(id)target andFunc1:(SEL)func1 andFunc2:(SEL)func2;
 
@@ -40,4 +48,5 @@
 
 -(void)showProgress;
 -(void)hideProgress;
+
 @end

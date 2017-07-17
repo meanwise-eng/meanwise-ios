@@ -35,9 +35,9 @@
    // NSLog(@"--------- Professtions");
    // NSLog(@"%@",responseObj.response);
     
-    if([responseObj.response isKindOfClass:[NSArray class]])
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
     {
-        NSArray *array=(NSArray *)responseObj.response;
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
         
         
 //        for(int i=0;i<array.count;i++)
@@ -63,9 +63,9 @@
    // NSLog(@"--------- Skills");
    // NSLog(@"%@",responseObj.response);
     
-    if([responseObj.response isKindOfClass:[NSArray class]])
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
     {
-        NSArray *array=(NSArray *)responseObj.response;
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
         
        /* for(int i=0;i<array.count;i++)
         {
@@ -88,12 +88,27 @@
     // NSLog(@"%@",responseObj.response);
 
 
-    if([responseObj.response isKindOfClass:[NSArray class]])
-        {
-            NSArray *array=(NSArray *)responseObj.response;
-            
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
+    {
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
+        
+        
+//        NSMutableArray *arrayT=[[NSMutableArray alloc] initWithArray:array];
+//        
+//        for(int m=0;m<15;m++)
+//        {
+//            int no1=arc4random()%arrayT.count;
+//            int no2=arc4random()%arrayT.count;
+//            if(no1!=no2)
+//            {
+//                [arrayT exchangeObjectAtIndex:no1 withObjectAtIndex:no2];
+//            }
+//        }
+//        
+//            array=[NSArray arrayWithArray:arrayT];
+//        
             [self saveDataAs:array andKey:@"DATA_INTEREST"];
-        }
+    }
     
 }
 -(void)saveDataAs:(NSArray *)array andKey:(NSString *)key

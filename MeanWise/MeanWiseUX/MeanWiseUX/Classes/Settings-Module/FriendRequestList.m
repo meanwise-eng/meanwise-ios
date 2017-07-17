@@ -89,7 +89,8 @@
     emptyView.msgLBL.text=@"No Pending Requests";
     
 
-    
+    pManager=[[API_PAGESManager alloc] initWithRequestCount:50 isVertical:YES];
+
     [self refreshAction];
     
     
@@ -98,7 +99,7 @@
 }
 -(void)refreshAction
 {
-    manager=[[APIManager alloc] init];
+    manager=[pManager getFreshAPIManager];
     
     [manager sendRequestGettingUsersFriends:[UserSession getUserId] status:-1 delegate:self andSelector:@selector(userFriendsReceived:)];
 
@@ -107,11 +108,12 @@
 }
 -(void)userFriendsReceived:(APIResponseObj *)responseObj
 {
+    
   //  NSLog(@"%@",responseObj.response);
     
-    if([responseObj.response isKindOfClass:[NSArray class]])
+    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
     {
-        NSArray *array=(NSArray *)responseObj.response;
+        NSArray *array=[(NSArray *)responseObj.response valueForKey:@"data"];
         APIObjectsParser *parser=[[APIObjectsParser alloc] init];
         resultData=[parser parseObjects_PROFILES:array];
         

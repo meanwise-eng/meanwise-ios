@@ -10,10 +10,14 @@
 
 @implementation SignUpWizardNameComponent
 
+
 -(void)setUp
 {
     self.backgroundColor=[UIColor clearColor];
     [Constant setUpGradient:self style:4];
+    
+    
+    [self addSubview:[Constant createProgressSignupViewWithWidth:self.frame.size.width andProgress:0.0 toPercentage:0.2]];;
     
     
     
@@ -65,9 +69,13 @@
     firstNameHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
     firstNameHeadLBL.center=CGPointMake(self.frame.size.width/2, 230);
     
+    
     firstNameField=[Constant textField_Style1_WithRect:CGRectMake(20, 0, self.frame.size.width-40, 50)];
     [self addSubview:firstNameField];
     firstNameField.center=CGPointMake(self.frame.size.width/2, 230+45);
+    firstNameField.autocorrectionType=UITextAutocorrectionTypeNo;
+    firstNameField.spellCheckingType=UITextSpellCheckingTypeNo;
+
 
 
     
@@ -79,11 +87,13 @@
     passHeadLBL.textAlignment=NSTextAlignmentLeft;
     passHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
     passHeadLBL.center=CGPointMake(self.frame.size.width/2, 350);
-    
+
     
     lastNameField=[Constant textField_Style1_WithRect:CGRectMake(20, 0, self.frame.size.width-40, 50)];
     [self addSubview:lastNameField];
     lastNameField.center=CGPointMake(self.frame.size.width/2, 350+45);
+    lastNameField.autocorrectionType=UITextAutocorrectionTypeNo;
+    lastNameField.spellCheckingType=UITextSpellCheckingTypeNo;
 
     
     firstNameValidationSign=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];

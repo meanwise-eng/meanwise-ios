@@ -17,6 +17,25 @@
     {
         [self createEmptyArray];
     }
+    else
+    {
+        
+        //Clear all pending requests
+        NSArray *list=[self getArray];
+        
+        NSArray *filtered = [list filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"(status == 'DONE')"]];
+
+        
+        NSMutableArray *array=[NSMutableArray arrayWithArray:filtered];
+        
+        NSUserDefaults *default1=[self userDefault];
+        [default1 setObject:array forKey:@"videoCacheArray"];
+        [default1 synchronize];
+        
+        
+        int p=0;
+
+    }
 }
 +(NSUserDefaults *)userDefault
 {
@@ -51,10 +70,21 @@
     else
     {
         
-       
+        NSArray *operations=[self getVideoQueue].operations;
+        
+        for(int i=0;i<operations.count;i++)
+        {
+            
+            NSOperation *op=[operations objectAtIndex:i];
+            if([op.name isEqualToString:urlToSearch])
+            {
+                isPending=1;
+            }
+        }
+        
+        
 
       //  NSLog(@"Video request sent Already");
-        isPending=1;
 
         
     }
@@ -155,6 +185,8 @@
                 NSLog(@"write successfull");
             }
             else{
+                
+                
                 NSLog(@"write failed");
             }
         }
@@ -209,6 +241,20 @@
     NSUserDefaults *default1=[self userDefault];
     [default1 setObject:array forKey:@"videoCacheArray"];
     [default1 synchronize];
+    
+    
+    
+    NSString *dataPath = [self getDocumentPath];
+    
+    
+    
+    NSError *error;
+
+    if (![[NSFileManager defaultManager] fileExistsAtPath:dataPath])
+    {
+        [[NSFileManager defaultManager] createDirectoryAtPath:dataPath withIntermediateDirectories:NO attributes:nil error:&error]; //Create folder
+    }
+
 
     
 }
@@ -224,25 +270,32 @@
 }
 +(void)clearCache;
 {
-    NSArray *list=[self getArray];
+//    NSArray *list=[self getArray];
+//    
+//    for (int i=0; i<list.count; i++) {
+//        
+//        NSString *localPath=[[list objectAtIndex:i] valueForKey:@"localPath"];
+//        
+//        NSString *documentsDirectory=[self getDocumentPath];
+//        
+//        NSString  *filePath = [NSString stringWithFormat:@"%@/%@", documentsDirectory,localPath];
+//        
+//        
+//        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
+//    }
     
-    for (int i=0; i<list.count; i++) {
-        
-        NSString *localPath=[[list objectAtIndex:i] valueForKey:@"localPath"];
-        
-        NSString *documentsDirectory=[self getDocumentPath];
-        
-        NSString  *filePath = [NSString stringWithFormat:@"%@/%@", documentsDirectory,localPath];
-        
-        
-        [[NSFileManager defaultManager] removeItemAtPath:filePath error:nil];
-    }
+    NSString *path=[self getDocumentPath];
+    
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+
     [self createEmptyArray];
 }
 +(NSString *)getDocumentPath
 {
     NSArray   *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString  *documentsDirectory = [paths objectAtIndex:0];
+    
+    documentsDirectory=[documentsDirectory stringByAppendingPathComponent:@"/VideoCache"];
     
     return documentsDirectory;
     

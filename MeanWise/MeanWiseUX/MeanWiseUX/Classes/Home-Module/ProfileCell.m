@@ -20,7 +20,7 @@
       
         
         
-        
+
      
         
         self.profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
@@ -45,6 +45,14 @@
         self.nameLBL.font=[UIFont fontWithName:k_fontBold size:18];
         self.nameLBL.numberOfLines=2;
         
+        [self setSelected:false];
+
+                self.profileIMGVIEW.opaque=true;
+                self.shadowImage.opaque=true;
+                self.nameLBL.opaque=true;
+        self.opaque=true;
+        
+        
     }
     return self;
 }
@@ -55,6 +63,7 @@
     self.hidden=flag;
     
 }
+
 -(void)setFrameX:(CGRect)frame;
 {
     // self.postIMGVIEW.frame=frame;

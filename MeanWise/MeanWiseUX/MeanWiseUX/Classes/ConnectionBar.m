@@ -73,13 +73,13 @@
     
     if(self.hasInet==false)
     {
-        [self showErrorView];
+       // [self showErrorView];
       //  [FTIndicator showToastMessage:@"Internet connection not available."];
         
     }
     else
     {
-        [self hideErrorView];
+      //  [self hideErrorView];
        // [FTIndicator showToastMessage:@"Internet connection available."];
         
     }

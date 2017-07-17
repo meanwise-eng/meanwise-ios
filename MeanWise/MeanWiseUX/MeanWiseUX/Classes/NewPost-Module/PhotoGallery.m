@@ -10,9 +10,17 @@
 #import <malloc/malloc.h>
 #import "PhotoAlbumCCell.h"
 #import "FTIndicator.h"
+#import "MXToolTipView.h"
+#import "UICollectionViewDelegateJSPintLayout.h"
+
 
 
 @implementation PhotoGallery
+
+#define kCollectionCellBorderTop 0
+#define kCollectionCellBorderBottom 0
+#define kCollectionCellBorderLeft 0
+#define kCollectionCellBorderRight 0
 
 -(void)setUpBasics
 {
@@ -24,7 +32,7 @@
     
     masterView=[[UIView alloc] initWithFrame:self.bounds];
     [self addSubview:masterView];
-    masterView.backgroundColor=[UIColor whiteColor];
+    masterView.backgroundColor=[UIColor blackColor];
     
     masterScrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
     [masterView addSubview:masterScrollView];
@@ -36,14 +44,14 @@
     
     
     
-    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(15,20, 40, 40)];
+    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(5,30, 40, 40)];
     [masterView addSubview:cancelBtn];
 
     
-    switchBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-55,25, 40, 40)];
+    switchBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-55,30, 40, 40)];
     [masterView addSubview:switchBtn];
     
-    [cancelBtn setBackgroundImage:[UIImage imageNamed:@"cameraCancelBtn.png"] forState:UIControlStateNormal];
+    [cancelBtn setBackgroundImage:[UIImage imageNamed:@"photoCancelBtn.png"] forState:UIControlStateNormal];
     [switchBtn setBackgroundImage:[UIImage imageNamed:@"cameraSwitchBtn.png"] forState:UIControlStateNormal];
 
     
@@ -63,7 +71,7 @@
     titleLBL.font=[UIFont fontWithName:k_fontSemiBold size:15];
     [masterView addSubview:titleLBL];
     titleLBL.center=CGPointMake(self.frame.size.width/2, 20+25);
-    titleLBL.textColor=[UIColor blackColor];
+    titleLBL.textColor=[UIColor whiteColor];
     titleLBL.textAlignment=NSTextAlignmentCenter;
     titleLBL.text=@"Photo Gallery";
     
@@ -96,6 +104,8 @@
         overlayBlack.backgroundColor=[UIColor blackColor];
     }];
 
+  
+    
     masterScrollView.contentOffset=CGPointMake(self.frame.size.width*section, 0);
     if(section==0)
     { [self updateTitle:@"Photos"];}
@@ -103,9 +113,11 @@
     {[self updateTitle:@"Capture"];}
     
     
-    masterScrollView.contentOffset=CGPointMake(self.frame.size.width, 0);
+    //masterScrollView.contentOffset=CGPointMake(self.frame.size.width, 0);
     [self scrollViewDidScroll:masterScrollView];
 
+    
+    
     
    // [self loadPhotos];
 }
@@ -118,7 +130,7 @@
         {
 
 
-            [cancelBtn setBackgroundImage:[UIImage imageNamed:@"cameraCancelBtn.png"] forState:UIControlStateNormal];
+            [cancelBtn setBackgroundImage:[UIImage imageNamed:@"photoCancelBtn.png"] forState:UIControlStateNormal];
 
             [switchBtn setBackgroundImage:[UIImage imageNamed:@"cameraSwitchBtn.png"] forState:UIControlStateNormal];
 
@@ -207,10 +219,16 @@
     
     
     
-    switchCamBtn.center=CGPointMake(widthMargin+35,imageViewCameraBack.bounds.size.height-60);
-    flashLightBtn.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width-35,imageViewCameraBack.bounds.size.height-60);
+    switchCamBtn.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width-75,imageViewCameraBack.bounds.size.height-60);
+    flashLightBtn.center=CGPointMake(widthMargin+75,imageViewCameraBack.bounds.size.height-60);
+
     
-    
+//    MXToolTipView *tipView=[[MXToolTipView alloc] initWithFrame:self.bounds];
+//    [self addSubview:tipView];
+//    tipView.backgroundColor=[UIColor clearColor];
+//    [tipView setUp];
+//    [tipView setPointDownAt:CGPointMake(self.bounds.size.width/2, self.frame.size.height-60-50)];
+
     
 }
 -(void)capturePhoto:(id)sender
@@ -219,12 +237,14 @@
         if(!error) {
             [camera stop];
             
+            
             image=[self fixOrientationOfImage:image];
             
-            NSData *data=UIImagePNGRepresentation(image);
-            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+           // NSData *data=UIImagePNGRepresentation(image);
+         //   [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
 
             
+            isSourceCamera=true;
             NSString *path=[Constant FM_saveImageAtDocumentDirectory:image];
             [self sendImage:path];
             
@@ -250,52 +270,66 @@
 
 -(void)startRecordingVideo
 {
-
-    
-    NSURL *outputURL = [[[Constant applicationDocumentsDirectory]
-                         URLByAppendingPathComponent:@"test3"] URLByAppendingPathExtension:@"mov"];
    
 
-    [cameraCaptureView startRecordingWithOutputUrl:outputURL didRecord:^(LLSimpleCamera *camera, NSURL *outputFileUrl, NSError *error) {
+    AudioServicesPlaySystemSoundWithCompletion(1117, ^{
+        AudioServicesDisposeSystemSoundID(1117);
         
-        [camera stop];
-
         
-        if(error==nil)
-        {
-            [self fixTheOrientationOfVideo:outputURL];
-
-
-        }
-        else
-        {
-            if (([error code] == AVErrorMaximumDurationReached)) {
-               
+        
+        
+        NSURL *outputURL = [[[Constant applicationDocumentsDirectory]
+                             URLByAppendingPathComponent:@"test3"] URLByAppendingPathExtension:@"mov"];
+        
+        
+        [cameraCaptureView startRecordingWithOutputUrl:outputURL didRecord:^(LLSimpleCamera *camera, NSURL *outputFileUrl, NSError *error) {
+            
+            [camera stop];
+            
+            
+            if(error==nil)
+            {
+                isSourceCamera=true;
                 [self fixTheOrientationOfVideo:outputURL];
-
-
+                
                 
             }
             else
             {
+                if (([error code] == AVErrorMaximumDurationReached)) {
+                    
+                    isSourceCamera=true;
+                    
+                    [self fixTheOrientationOfVideo:outputURL];
+                    
+                    
+                    
+                }
+                else
+                {
+                    
+                    [Constant okAlert:@"Error" withSubTitle:error.localizedDescription onView:self andStatus:1];
+                }
                 
-                [Constant okAlert:@"Error" withSubTitle:error.localizedDescription onView:self andStatus:1];
+                
+                
             }
             
-
             
-        }
+        }];
         
-        
-    }];
 
+    });
 
     
 }
+
 -(void)videoRecordedSuccessfully:(NSURL *)outputURL
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         
+        AudioServicesPlaySystemSound(1118);
+
         NSString *path=[Constant FM_saveVideoAtDocumentDirectory:outputURL];
         [self sendImage:path];
         
@@ -474,7 +508,11 @@
 
 -(void)sendImage:(NSString *)imagePath
 {
-    [delegate performSelector:mediaSelectedFunc withObject:imagePath afterDelay:0.01];
+    
+    NSDictionary *dict=[NSDictionary dictionaryWithObjectsAndKeys:imagePath,@"path",[NSNumber numberWithBool:isSourceCamera],@"isSourceCamera",nil];
+    
+    
+    [delegate performSelector:mediaSelectedFunc withObject:dict afterDelay:0.01];
     
     [UIView animateKeyframesWithDuration:0.5 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         
@@ -488,6 +526,7 @@
         [self removeFromSuperview];
         
     }];
+    
 }
 
 
@@ -499,30 +538,41 @@
     
     
 
-    CGRect collectionViewFrame = CGRectMake(0,65, self.frame.size.width, self.frame.size.height-65);
+    CGRect collectionViewFrame = CGRectMake(0,75, self.frame.size.width, self.frame.size.height-75);
     
     
-    UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
-    layout.minimumInteritemSpacing = 1;
-    layout.minimumLineSpacing = 1;
-    layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-    layout.sectionInset = UIEdgeInsetsMake(0, 1, 0, 1);
+//    UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
+//    layout.minimumInteritemSpacing =1;
+//    layout.minimumLineSpacing = 1;
+//    layout.scrollDirection = UICollectionViewScrollDirectionVertical;
+//    layout.sectionInset = UIEdgeInsetsMake(0, 1, 0, 1);
 
 /*    layout.minimumInteritemSpacing = 10;
     layout.minimumLineSpacing = 10;
     layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
 */
     
-    photoGallery = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout];
-    photoGallery.delegate = self;
-    photoGallery.dataSource = self;
+    numColumns=3;
+    
+    GalleryCollectionViewLayout *customLayout=[[GalleryCollectionViewLayout alloc] init];
+    customLayout.interitemSpacing=1;
+    customLayout.lineSpacing=1;
+    
+
+    columunWidth=(collectionViewFrame.size.width-(customLayout.lineSpacing*(numColumns-1)))/numColumns;
+    
+    
+
+    
+    photoGallery = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:customLayout];
     
     //  photoGallery.pagingEnabled = YES;
-    photoGallery.backgroundColor=[UIColor clearColor];
     [photoGallery registerClass:[PhotoAlbumCCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [masterScrollView addSubview:photoGallery];
-    photoGallery.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+   // photoGallery.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
+    photoGallery.backgroundColor=[UIColor clearColor];
     
+  
 
     
     /*
@@ -568,13 +618,60 @@
     }];*/
     
   
-    arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
-    [photoGallery reloadData];
+
+    [self getAllPhotoDetailsAsync];
     
 }
+-(void)getAllPhotoDetailsAsync
+{
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Add code here to do background processing
+        //
+        //
+
+        dispatch_async( dispatch_get_main_queue(), ^{
+            
+            arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
+            photoGallery.delegate = self;
+            photoGallery.dataSource = self;
+
+            [photoGallery reloadData];
+            
+            NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
+            float y=[[nud valueForKey:@"GALLERY_SCROLLY"] floatValue];
+            photoGallery.contentOffset=CGPointMake(0, y);
+
+        });
+    });
+
+    
+}
+//-(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
+//{
+//    
+//    
+//    cell.alpha=0;
+//    
+//    [UIView animateWithDuration:0.2
+//                     animations:^{
+//                         
+//                         cell.alpha=1;
+//                         
+//                     }
+//                     completion:^(BOOL finished) {
+//                         
+//                     }];
+//    
+//}
+
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    
+    NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
+    [nud setValue:[NSNumber numberWithFloat:photoGallery.contentOffset.y] forKey:@"GALLERY_SCROLLY"];
+    [nud synchronize];
+
     PHAsset *asset=[arrayData objectAtIndex:indexPath.row];
     
     PHImageManager *manager = [PHImageManager defaultManager];
@@ -582,7 +679,7 @@
     
 
     PHImageRequestOptions *requestOptions = [[PHImageRequestOptions alloc] init];
-    requestOptions.resizeMode   = PHImageRequestOptionsResizeModeFast;
+    requestOptions.resizeMode   = PHImageRequestOptionsResizeModeExact;
     requestOptions.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
     
     // this one is key
@@ -591,27 +688,55 @@
 
     if(asset.mediaType==PHAssetMediaTypeVideo)
     {
+        [FTIndicator showProgressWithmessage:@"Preparing.." userInteractionEnable:false];
     [manager requestAVAssetForVideo:asset options:nil resultHandler:^(AVAsset *avAsset, AVAudioMix *audioMix, NSDictionary *info) {
         
         
+        if(([avAsset isKindOfClass:[AVComposition class]] && ((AVComposition *)avAsset).tracks.count == 2)){
+            
+            
+            NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+            NSString *documentsDirectory = paths.firstObject;
+            NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:[NSString stringWithFormat:@"mergeSlowMoVideo-%d.mov",arc4random() % 1000]];
+            NSURL *url = [NSURL fileURLWithPath:myPathDocs];
+            
+            //Begin slow mo video export
+            AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+            exporter.outputURL = url;
+            exporter.outputFileType = AVFileTypeQuickTimeMovie;
+            exporter.shouldOptimizeForNetworkUse = FALSE;
+            
+            [exporter exportAsynchronouslyWithCompletionHandler:^{
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if (exporter.status == AVAssetExportSessionStatusCompleted) {
+                        NSURL *URL = exporter.outputURL;
+                        
+                        [self fixTheOrientationOfVideo:URL];
+
+                        
+                        // NSData *videoData = [NSData dataWithContentsOfURL:URL];
+                        //
+                        //// Upload
+                        //[self uploadSelectedVideo:video data:videoData];
+                    }
+                });
+            }];
+
+        }
+        else
+        {
         NSURL *url = (NSURL *)[[(AVURLAsset *)avAsset URL] fileReferenceURL];
-      //  NSLog(@"url = %@", [url absoluteString]);
-       // NSLog(@"url = %@", [url relativePath]);
         
         dispatch_async(dispatch_get_main_queue(), ^{
-
-            
         NSString *path=[Constant FM_saveVideoAtDocumentDirectory:url];
             
+            isSourceCamera=false;
+            [FTIndicator dismissProgress];
+
             [self fixTheOrientationOfVideo:[NSURL fileURLWithPath:path]];
-
-            NSData *data=[NSData dataWithContentsOfFile:path];
-            
-            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
-
-        //[self sendImage:path];
-
         });
+        }
+        
 
         
     }];
@@ -619,22 +744,48 @@
     else if (asset.mediaType==PHAssetMediaTypeImage)
     {
     
+        CGSize exportSize;
 
+        float width=asset.pixelWidth;
+        float height=asset.pixelHeight;
+        
+        if(width>height)
+        {
+         
+            exportSize=CGSizeMake(1200, 1200*height/width);
+            
+        }
+        else
+        {
+            exportSize=CGSizeMake(800*width/height, 800);
+
+        }
+        
         
     [manager requestImageForAsset:asset
-                       targetSize:CGSizeMake(400, 800)
+                       targetSize:exportSize
                       contentMode:PHImageContentModeAspectFill
                           options:requestOptions
                     resultHandler:^void(UIImage *image, NSDictionary *info) {
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
                             
+                            isSourceCamera=false;
+
+                          //  NSData *data=UIImagePNGRepresentation(image);
+                           // [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
                             
-                            NSData *data=UIImagePNGRepresentation(image);
-                            [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+
                             
                             NSString *path=[Constant FM_saveImageAtDocumentDirectory:image];
+                            if(![path isEqualToString:@""])
+                            {
                             [self sendImage:path];
+                            }
+                            else
+                            {
+                                [FTIndicator showToastMessage:@"Oops Error!"];
+                            }
                             
                         });
                         
@@ -649,8 +800,8 @@
 
     cell.photoView.image=nil;
     [cell setAsset:[arrayData objectAtIndex:indexPath.row]];
-    
-    
+    cell.layer.borderWidth=1;
+    cell.layer.borderColor=[UIColor colorWithWhite:0 alpha:1.0f].CGColor;
     
     return cell;
 }
@@ -667,12 +818,66 @@
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-   
-    return CGSizeMake((self.frame.size.width-5)/4, (self.frame.size.width-5)/4);
+//    PHAsset *asset=[arrayData objectAtIndex:indexPath.row];
+
+    //h-w
+    //x-?
+   // float w=asset.pixelWidth/asset.pixelHeight;
+    
+ //   return CGSizeMake(100, 100*asset.pixelHeight/asset.pixelWidth);
+  //  return CGSizeMake(100*asset.pixelWidth/asset.pixelHeight, 100);
+
+    if(arrayData.count==0)
+    {
+     return CGSizeMake((self.frame.size.width-5)/4, (self.frame.size.width-5)/4);
+    }
+    else
+    {
+        return CGSizeZero;
+    }
   
-  //  return CGSizeMake(50, 50);
+    
+    
+   // return CGSizeMake(0, 0);
 
 }
+- (CGFloat)columnWidthForCollectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout
+{
+    return columunWidth;
+}
+- (NSUInteger)maximumNumberOfColumnsForCollectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout
+{
+    
+    return numColumns;
+}
+- (CGFloat)collectionView:(UICollectionView*)collectionView layout:(UICollectionViewLayout*)collectionViewLayout heightForItemAtIndexPath:(NSIndexPath*)indexPath
+{
+    
+        PHAsset *asset=[arrayData objectAtIndex:indexPath.row];
+
+    
+    
+    CGSize rctSizeOriginal=CGSizeMake(asset.pixelWidth/5,asset.pixelHeight/5);
+    
+    
+    double scale = (columunWidth  - (kCollectionCellBorderLeft + kCollectionCellBorderRight)) / rctSizeOriginal.width;
+    
+    CGSize rctSizeFinal = CGSizeMake(rctSizeOriginal.width * scale,rctSizeOriginal.height * scale);
+    
+    //  imageView.frame = CGRectMake(kCollectionCellBorderLeft,kCollectionCellBorderTop,rctSizeFinal.width,rctSizeFinal.height);
+    
+    CGFloat height = rctSizeFinal.height + 0;
+    
+    
+    
+    
+    return height;
+}
+- (BOOL)collectionView:(UICollectionView*)collectionView shouldShowMenuForItemAtIndexPath:(NSIndexPath*)indexPath
+{
+    return YES;
+}
+
 
 
 
@@ -690,7 +895,9 @@
     //    allPhotosOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
     // allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",mediaType];
     allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"!((mediaSubtype & %d) == %d) AND !((mediaSubtype & %d) == %d)", PHAssetMediaSubtypeVideoHighFrameRate,PHAssetMediaSubtypeVideoHighFrameRate,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse];
-    
+
+  //  allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"!((mediaSubtype & %d) == %d) AND !((mediaSubtype & %d) == %d)", PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse];
+
     
     //  PHFetchResult *allPhotosResult = [PHAsset fetchAssetsWithMediaType:mediaType options:allPhotosOptions];
     PHFetchResult *allPhotosResult = [PHAsset fetchAssetsWithOptions:allPhotosOptions];
@@ -699,6 +906,8 @@
     
     [allPhotosResult enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL *stop) {
         
+        
+
         
         [assets addObject:asset];
         NSLog(@"asset %@", asset);
@@ -738,9 +947,9 @@
 -(void)fixTheOrientationOfVideo:(NSURL *)outputFileUrl
 {
     
-    NSData *data=[NSData dataWithContentsOfFile:outputFileUrl.path];
+   // NSData *data=[NSData dataWithContentsOfFile:outputFileUrl.path];
     
-    [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
+  //  [FTIndicator showToastMessage:[NSString stringWithFormat:@"Image %d kb",(int)data.length/1024]];
 
     
     if(outputFileUrl!=nil)
@@ -890,7 +1099,7 @@
                     
                     
                     
-                    
+
                     NSLog(@"Triming Completed");
                     [self videoRecordedSuccessfully:newVideoURL];
                     

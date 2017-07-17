@@ -11,9 +11,11 @@
 #import "Constant.h"
 #import "ChannelSearchView.h"
 #import "PhotoGallery.h"
-#import "PreviewViewComponent.h"
+//#import "PreviewViewComponent.h"
 #import "MediaCropper.h"
 #import "UIImageHM.h"
+#import "PreviewMaxScreen.h"
+#import "SAMTextView.h"
 
 @interface NewPostComponent : ZoomGestureView<UITextViewDelegate>
 {
@@ -22,9 +24,9 @@
     
     
     
-    UITextView *statusView;
-    PreviewViewComponent *attachedImage;
-    
+    SAMTextView *statusView;
+//    PreviewViewComponent *attachedImage;
+    PreviewMaxScreen *mediaAttachComponent;
     
     
     UILabel *characterCountLBL;
@@ -45,9 +47,13 @@
     id target;
     SEL closeCallBackfunc;
     
+    BOOL isPostHasAttachment;
+    BOOL isMediaFromCamera1;
+
 }
 -(void)setUpWithCellRect:(CGRect)rect;
 -(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
+//-(void)openFullScreen:(id)sender;
 
 @end
 

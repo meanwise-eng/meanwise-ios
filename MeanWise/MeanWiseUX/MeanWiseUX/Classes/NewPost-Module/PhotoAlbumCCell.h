@@ -17,6 +17,8 @@
     PHAsset *asset;
 }
 @property (nonatomic, strong) UIImageView *photoView;
+@property (nonatomic, strong) UIImageView *shadowImage;
+
 @property (nonatomic, strong) UILabel *duration;
 
 -(void)setAsset:(PHAsset *)assetReceived;

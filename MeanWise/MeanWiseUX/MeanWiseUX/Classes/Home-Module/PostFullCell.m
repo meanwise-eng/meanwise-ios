@@ -21,6 +21,11 @@
     [target performSelector:shareBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
     
 }
+-(void)setPlayerRefreshIdentifier:(NSNumber *)number
+{
+    [player setUpRefreshIdentifier:number];
+    
+}
 -(void)setPlayerScreenIdeantifier:(NSString *)string
 {
     screenIdentifier=string;
@@ -58,9 +63,34 @@
 
 -(void)commentBtnClicked:(id)sender
 {
+    
+
     [target performSelector:commentBtnClickedFunc withObject:dataObj.postId afterDelay:0.2];
     
 }
+-(void)UpdateCommentCountIfRequired
+{
+    int count=[[DataSession sharedInstance] getUpdatedCommentCountForPostId:dataObj.postId];
+    
+    if(count!=-1)
+    {
+        self.commentCountLBL.text=[NSString stringWithFormat:@"%d",count];
+
+    }
+    int p=0;
+    
+}
+- (void)setImageOffset:(CGPoint)imageOffset
+{
+    _imageOffset = imageOffset;
+    
+    CGRect frame = self.postIMGVIEW.bounds;
+    CGRect offsetFrame = CGRectOffset(frame, _imageOffset.x, _imageOffset.y);
+    self.postIMGVIEW.frame = offsetFrame;
+    player.frame = offsetFrame;
+}
+
+
 -(void)onDeleteEvent:(SEL)func3;
 {
     onDeleteClickedFunc=func3;
@@ -110,7 +140,7 @@
          self.shadowImage.image=[UIImage imageNamed:@"fullpostshadow.png"];
          self.shadowImage.contentMode=UIViewContentModeScaleAspectFill;
          [self.contentView addSubview:self.shadowImage];
-         self.shadowImage.alpha=0.8;
+         self.shadowImage.alpha=0.2;
         
         
         self.contentView.autoresizingMask=UIViewAutoresizingFlexibleHeight|UIViewAutoresizingFlexibleWidth;
@@ -136,8 +166,8 @@
         self.profLBL.textColor=[UIColor whiteColor];
         self.profLBL.textAlignment=NSTextAlignmentLeft;
         self.profLBL.font=[UIFont fontWithName:k_fontRegular size:16];
-
-        
+        self.profLBL.numberOfLines=2;
+        self.profLBL.adjustsFontSizeToFitWidth=YES;
         
         
         ////
@@ -241,6 +271,7 @@
 
 */
 
+        [self setShadowsCustom];
         
         [self setFrameX:frame];
         
@@ -249,6 +280,37 @@
 
     }
     return self;
+}
+-(void)setShadowsCustom
+{
+//    self.statusLBL.shadowOffset=CGSizeMake(0, 0);
+//    self.profLBL.shadowOffset=CGSizeMake(0, 0);
+//    self.nameLBL.shadowOffset=CGSizeMake(0,0);
+//    self.tagName.shadowOffset=CGSizeMake(0,0);
+    
+    
+    self.profLBL.layer.shadowOffset=CGSizeMake(0, 0);
+    self.profLBL.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.profLBL.layer.shadowOpacity=0.5;
+    self.profLBL.layer.shadowRadius=1;
+
+    self.nameLBL.layer.shadowOffset=CGSizeMake(0, 0);
+    self.nameLBL.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.nameLBL.layer.shadowOpacity=0.5;
+    self.nameLBL.layer.shadowRadius=1;
+
+    self.tagName.layer.shadowOffset=CGSizeMake(0, 0);
+    self.tagName.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.tagName.layer.shadowOpacity=0.5;
+    self.tagName.layer.shadowRadius=1;
+    
+    self.timeLBL.layer.shadowOffset=CGSizeMake(0, 0);
+    self.timeLBL.layer.shadowColor=[UIColor blackColor].CGColor;
+    self.timeLBL.layer.shadowOpacity=0.5;
+    self.timeLBL.layer.shadowRadius=1;
+    
+    
+    
 }
 -(void)deleteBtnClicked:(id)sender
 {
@@ -297,7 +359,12 @@
 }
 -(void)profileBtnClicked:(NSDictionary *)userDict
 {
-    if(![screenIdentifier isEqualToString:@"PROFILE"])
+    if(RX_isiPhone4Res)
+    {
+        return;
+    }
+    
+    if(![screenIdentifier isEqualToString:@"PROFILE"] && ![screenIdentifier isEqualToString:@"DEEPLINKPOST"] && ![screenIdentifier isEqualToString:@"NOTIFICATIONPOST"])
     {
         if([screenIdentifier isEqualToString:@"EXPLORE"])
         {
@@ -317,7 +384,7 @@
         [compo setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
     
     
-    NSLog(@"%@",userDict);
+        NSLog(@"%@",userDict);
     }
 }
 -(void)ProfilecloseBtnClicked:(id)sender
@@ -642,6 +709,12 @@
         self.statusLBL.font=[UIFont fontWithName:k_fontExtraBold size:40];
         self.statusLBL.numberOfLines=0;
         self.statusLBL.adjustsFontSizeToFitWidth=YES;
+        
+        self.statusLBL.layer.shadowOffset=CGSizeMake(0, 0);
+        self.statusLBL.layer.shadowColor=[UIColor blackColor].CGColor;
+        self.statusLBL.layer.shadowOpacity=0;
+        
+
     //    commmentComp.frame=CGRectMake(0, self.frame.size.height-250, self.frame.size.width, 140);
         
         self.shadowImage.hidden=true;
@@ -657,6 +730,11 @@
         self.statusLBL.font=[UIFont fontWithName:k_fontRegular size:15];
         self.statusLBL.numberOfLines=0;
         self.statusLBL.adjustsFontSizeToFitWidth=false;
+
+        self.statusLBL.layer.shadowOffset=CGSizeMake(0, 0);
+        self.statusLBL.layer.shadowColor=[UIColor blackColor].CGColor;
+        self.statusLBL.layer.shadowOpacity=0.5;
+        self.statusLBL.layer.shadowRadius=1;
 
         
         self.shadowImage.hidden=false;

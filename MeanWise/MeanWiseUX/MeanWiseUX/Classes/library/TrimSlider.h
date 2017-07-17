@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <AVKit/AVKit.h>
 #import <AVFoundation/AVFoundation.h>
+#import "FTIndicator.h"
 
 @interface TrimSlider : UIView
 {
@@ -16,6 +17,7 @@
     float videoDuration;
     
     float distanceFor2Seconds;
+    float distanceFor25Seconds;
     
     UIView *baseSlider;
     UIView *node1Slider;
@@ -34,6 +36,8 @@
     
     id target;
     SEL onTrimmingDidChangeFunc;
+    
+    int alertCount;
     
 }
 -(void)setUp:(NSString *)path;

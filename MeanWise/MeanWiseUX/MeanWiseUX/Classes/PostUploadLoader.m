@@ -87,7 +87,7 @@
 {
     
     statusBarNotifierView.backgroundColor=[UIColor colorWithRed:0.63 green:0.40 blue:0.82 alpha:1.00];
-    statusBarNotifierText.text=@"Successfully submitted";
+    statusBarNotifierText.text=@"Done!";
     
     
     [self performSelector:@selector(hideDone) withObject:nil afterDelay:2.0f];
@@ -99,7 +99,7 @@
 {
     
     statusBarNotifierView.backgroundColor=[UIColor redColor];
-    statusBarNotifierText.text=@"Fail to submitted!";
+    statusBarNotifierText.text=@"Fail!";
     
     
     [self performSelector:@selector(hideDone) withObject:nil afterDelay:2.0f];

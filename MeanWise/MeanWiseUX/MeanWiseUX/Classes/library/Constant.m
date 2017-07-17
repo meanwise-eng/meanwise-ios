@@ -68,6 +68,7 @@
     return blackColor;
 }
 
+
 +(UITextField *)textField_Style1_WithRect:(CGRect)frame
 {
     UITextField *field=[[UITextField alloc] initWithFrame:frame];
@@ -78,6 +79,44 @@
     field.enablesReturnKeyAutomatically=YES;
     return field;
     
+}
++(BOOL)isNewPostTutorialFinished
+{
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    
+    
+    int number=(int)[[ud valueForKey:@"Tutorial_NEWPOST"] intValue];
+    
+    [ud setInteger:1 forKey:@"Tutorial_NEWPOST"];
+    
+    if(number==1)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+    
+}
++(BOOL)isHomePageTutorialFinished
+{
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    
+
+    int number=(int)[[ud valueForKey:@"Tutorial_HOME"] intValue];
+    
+    [ud setInteger:1 forKey:@"Tutorial_HOME"];
+    
+    if(number==1)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+        
 }
 +(void)okAlert:(NSString *)alertTitle withSubTitle:(NSString *)subtitle onView:(UIView *)view andStatus:(int)status
 {
@@ -185,6 +224,16 @@
         color3=[UIColor colorWithHue:0.3 saturation:0.80 brightness:0 alpha:1.00];
         
     }
+    else if(number==202)
+    {
+        //FFA7E7
+        //EA6362
+        
+        color3=[UIColor colorWithRed:0.92 green:0.39 blue:0.38 alpha:1.00];
+        color2=[UIColor colorWithRed:0.96 green:0.52 blue:0.69 alpha:1.00];
+        color1=[UIColor colorWithRed:1.00 green:0.65 blue:0.91 alpha:1.00];
+        
+    }
     
     CAGradientLayer *gradient = [CAGradientLayer layer];
     
@@ -194,6 +243,25 @@
     gradient.endPoint=CGPointMake(0.7, 1.2f);
     [view.layer insertSublayer:gradient atIndex:0];
 
+}
+
++(UIView *)createProgressSignupViewWithWidth:(float)width andProgress:(float)percentage toPercentage:(float)toPercentage
+{
+    UIView *progressView=[[UIView alloc] initWithFrame:CGRectMake(0, 20, width*percentage, 3)];
+    progressView.backgroundColor=[UIColor colorWithWhite:0 alpha:0.2];
+    
+    [UIView animateWithDuration:0.3 delay:1 options:UIViewAnimationOptionCurveLinear animations:^{
+        progressView.frame=CGRectMake(0, 20, width*toPercentage, 3);
+        
+    } completion:^(BOOL finished) {
+        
+    }];
+    
+    
+    return progressView;
+    
+    
+    
 }
 #pragma mark - File Manager
 
@@ -220,11 +288,18 @@
 }
 +(NSString *)FM_saveImageAtDocumentDirectory:(UIImage *)image
 {
-    
     NSString *savedImagePath = [[self applicationDocumentsDirectoryPath] stringByAppendingPathComponent:@"savedImage.png"];
+    
+    [[NSFileManager defaultManager] removeItemAtPath:savedImagePath error:nil];
+
     NSData *imageData = UIImagePNGRepresentation(image);
     BOOL flag=[imageData writeToFile:savedImagePath atomically:YES];
     
+    
+//    if (!flag) {
+//        savedImagePath=@"";
+//    }
+
     return savedImagePath;
 
 }
@@ -274,7 +349,7 @@
     UIImage *inputImage=[UIImage imageWithContentsOfFile:sourcePath];
     
     CGFloat compression = 0.9f;
-    CGFloat maxCompression = 0.49f;
+    CGFloat maxCompression = 0.39f;
     int maxFileSize = (int)(1024);
     
     NSData *imageData = UIImageJPEGRepresentation(inputImage, compression);

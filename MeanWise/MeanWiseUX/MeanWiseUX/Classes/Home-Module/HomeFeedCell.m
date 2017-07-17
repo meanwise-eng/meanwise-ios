@@ -30,12 +30,12 @@
         
         
         
-        /*        self.shadowImage=[[UIImageView alloc] initWithFrame:CGRectZero];
-         self.shadowImage.image=[UIImage imageNamed:@"BlackShadow.png"];
+        self.shadowImage=[[UIImageView alloc] initWithFrame:CGRectZero];
+         self.shadowImage.image=[UIImage imageNamed:@"fullpostshadow.png"];
          self.shadowImage.contentMode=UIViewContentModeScaleAspectFill;
          [self addSubview:self.shadowImage];
-         self.shadowImage.alpha=0.5;
-         */
+         self.shadowImage.alpha=0.8;
+         
         
         
         
@@ -87,6 +87,8 @@
         self.profLBL.textColor=[UIColor whiteColor];
         self.profLBL.textAlignment=NSTextAlignmentLeft;
         self.profLBL.font=[UIFont fontWithName:k_fontSemiBold size:12];
+        self.profLBL.adjustsFontSizeToFitWidth=YES;
+        self.profLBL.numberOfLines=2;
         
         self.likeCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 15)];
         [self addSubview:self.likeCountLBL];
@@ -154,11 +156,16 @@
     if(dict.mediaType.intValue!=0)
     {
         [self.postIMGVIEW setUp:dict.image_url];
+        self.shadowImage.alpha=0.8;
+
     }
     else
     {
         [self.postIMGVIEW clearImageAll];
+        self.shadowImage.alpha=0;
+
     }
+    
     if(liked==1)
     {
         [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
@@ -287,22 +294,20 @@
     
     
     self.likeBtn.frame=CGRectMake(frame.size.width-150, frame.size.height-40-35, 40, 40);
-    
     self.commentBtn.frame=CGRectMake(frame.size.width-100, frame.size.height-40-35, 40, 40);
-    
     self.shareBtn.frame=CGRectMake(frame.size.width-50, frame.size.height-40-35, 40, 40);
     
     
     
     ////
     
-    self.profileIMGVIEW.frame=CGRectMake(15, 15, 50, 50);
-    self.profileIMGVIEW.layer.cornerRadius=25;
-    self.nameLBL.frame=CGRectMake(15+50+5, 15+10, 200, 15);
-    self.profLBL.frame=CGRectMake(15+50+5, 15+25, 200, 15);
+    self.profileIMGVIEW.frame=CGRectMake(15, 15+5, 40, 40);
+    self.profileIMGVIEW.layer.cornerRadius=20;
+    self.nameLBL.frame=CGRectMake(15+40+5, 15+10, 200, 15);
+    self.profLBL.frame=CGRectMake(15+40+5, 15+25, 200, 15);
     
-    self.tagName.frame=CGRectMake(15, frame.size.height-110, frame.size.width-30, 30);
-    self.timeLBL.frame=CGRectMake(15, frame.size.height-110, frame.size.width-30, 30);
+    self.tagName.frame=CGRectMake(15, frame.size.height-100, frame.size.width-30, 30);
+    self.timeLBL.frame=CGRectMake(15, frame.size.height-100, frame.size.width-30, 30);
     // self.statusLBL.frame=CGRectMake(15,  frame.size.height-50, frame.size.width-30,70);
     
     
@@ -311,11 +316,8 @@
     
     self.likeCountLBL.frame=CGRectMake(15, frame.size.height-70, 50, 20);
     self.commentCountLBL.frame=CGRectMake(frame.size.width/2-25, frame.size.height-70, 50, 20);
-    
     self.likeBtn.frame=CGRectMake(15, frame.size.height-60, 50, 50);
-    
     self.commentBtn.frame=CGRectMake(frame.size.width/2-25, frame.size.height-60, 50, 50);
-    
     self.shareBtn.frame=CGRectMake(frame.size.width-15-50, frame.size.height-60, 50, 50);
     
     
@@ -329,7 +331,7 @@
     {
         [self.postIMGVIEW clearImageAll];
         self.backgroundColor=[Constant colorGlobal:Cnumber];
-        self.statusLBL.frame=CGRectMake(15, 15+50, self.frame.size.width-30, self.frame.size.height-170);
+        self.statusLBL.frame=CGRectMake(15, 15+80, self.frame.size.width-30, self.frame.size.height-170-30);
         
         self.statusLBL.font=[UIFont fontWithName:k_fontExtraBold size:25];
         self.statusLBL.numberOfLines=0;
@@ -338,8 +340,11 @@
     }
     else
     {
-        self.statusLBL.frame=CGRectMake(15, self.frame.size.height-200, self.frame.size.width-30, 70);
         
+        int height=30;
+       
+        self.statusLBL.frame=CGRectMake(15, self.frame.size.height-90-height, self.frame.size.width-30, height);
+
         self.backgroundColor=[UIColor whiteColor];
         
         self.statusLBL.font=[UIFont fontWithName:k_fontRegular size:17];
@@ -350,6 +355,7 @@
     
     
 }
+
 
 
 
@@ -460,6 +466,16 @@
     
 }
 
+-(void)UpdateCommentCountIfRequired
+{
+    int count=[[DataSession sharedInstance] getUpdatedCommentCountForPostId:dataObj.postId];
+    
+    if(count!=-1)
+    {
+        self.commentCountLBL.text=[NSString stringWithFormat:@"%d",count];
+    }
 
+    
+}
 
 @end

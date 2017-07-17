@@ -8,7 +8,7 @@
 
 #import "ProfileViewController.h"
 #import "CGGeometryExtended.h"
-
+#import "GUIScaleManager.h"
 
 
 @interface ProfileViewController ()
@@ -27,34 +27,34 @@
     self.view.backgroundColor=[UIColor blackColor];
     [self setNeedsStatusBarAppearanceUpdate];
     
-    scrollView=[[UIScrollView alloc] initWithFrame:CGXRectMake(0, 0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [self.view addSubview:scrollView];
     
     
     
-    scrollView.contentSize=CGXSizeMake(CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()*4);
+    scrollView.contentSize=CGSizeMake(RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height*4);
     scrollView.backgroundColor=[UIColor blackColor];
     
     scrollView.showsHorizontalScrollIndicator=false;
     scrollView.showsVerticalScrollIndicator=false;
     
     
-    coverView=[[CoverView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()*0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    coverView=[[CoverView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height*0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [scrollView addSubview:coverView];
     [coverView setUpUIComponents];
     
     
     
-    bioView=[[BioView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight(), CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    bioView=[[BioView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [scrollView addSubview:bioView];
     [bioView setUpUIComponents];
     
     
-    videoView=[[VideoView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()*2, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    videoView=[[VideoView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height*2, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [scrollView addSubview:videoView];
     [videoView setUpUIComponents];
     
-    portfolioView=[[PortfolioView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()*3, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    portfolioView=[[PortfolioView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height*3, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [scrollView addSubview:portfolioView];
     [portfolioView setUpUIComponents];
     
@@ -103,7 +103,7 @@
 {
     CGFloat pageWidth = scrollView1.frame.size.height;
     CGFloat scrollY=scrollView1.contentOffset.y;
-    CGFloat screenHeight=CGX_DeviceMaxHeight();
+    CGFloat screenHeight=RX_mainScreenBounds.size.height;
     CGFloat deltaY=scrollY/screenHeight;
     
     //portfolioView.transform=CGAffineTransformMakeScale(4-ePara, 4-ePara);
@@ -121,10 +121,10 @@
         CGFloat pageWidth = scrollView1.frame.size.height;
     
     
-       int page = floor((scrollView1.contentOffset.y - CGX_ScreenMaxHeight()/ 2) / pageWidth) + 1;
+       int page = floor((scrollView1.contentOffset.y - RX_mainScreenBounds.size.height/ 2) / pageWidth) + 1;
     
     CGFloat scrollY=scrollView1.contentOffset.y;
-    CGFloat screenHeight=CGX_DeviceMaxHeight();
+    CGFloat screenHeight=RX_mainScreenBounds.size.height;
     
     
 
@@ -157,17 +157,17 @@
 {
     
     
-    [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight(), CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:YES];
+    [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:YES];
     
 }
 -(void)scrollToVideoView
 {
-    [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight()*2, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:YES];
+    [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height*2, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:YES];
     
 }
 -(void)scrollToPortfolioView
 {
-    [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight()*3, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:YES];
+    [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height*3, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:YES];
     
 }
 -(void)dismissThisController
@@ -205,7 +205,7 @@
             
             [UIView animateWithDuration:1.0 delay:4 options:UIViewAnimationOptionCurveLinear animations:^{
                 
-                [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight(), CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:false];
+                [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:false];
                 
             } completion:^(BOOL finished) {
                 
@@ -220,7 +220,7 @@
             
             [UIView animateWithDuration:1.0 delay:4 options:UIViewAnimationOptionCurveLinear animations:^{
                 
-                [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight()*2, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:false];
+                [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height*2, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:false];
                 
             } completion:^(BOOL finished) {
                 
@@ -234,7 +234,7 @@
             
             [UIView animateWithDuration:1.0 delay:4 options:UIViewAnimationOptionCurveLinear animations:^{
                 
-                [scrollView scrollRectToVisible:CGXRectMake(0, CGX_ScreenMaxHeight()*3, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight()) animated:false];
+                [scrollView scrollRectToVisible:CGRectMake(0, RX_mainScreenBounds.size.height*3, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height) animated:false];
                 
             } completion:^(BOOL finished) {
                 
@@ -286,13 +286,13 @@
     imageView.image=[UIImage imageNamed:@"CoverPhoto.jpg"];
     imageView.contentMode=UIViewContentModeScaleAspectFill;
     
-    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()/2,CGX_ScreenMaxWidth(),CGX_ScreenMaxHeight()/2)];
+    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height/2,RX_mainScreenBounds.size.width,RX_mainScreenBounds.size.height/2)];
     [self addSubview:shadow1];
     shadow1.image=[UIImage imageNamed:@"BlackShadow.png"];
     shadow1.contentMode=UIViewContentModeScaleToFill;
     shadow1.alpha=0.8;
     
-    bioTitle=[[UILabel alloc] initWithFrame:CGXRectMake(40, CGX_ScreenMaxHeight()/2-50, CGX_ScreenMaxWidth()-80, 180)];
+    bioTitle=[[UILabel alloc] initWithFrame:CGRectMake(40, RX_mainScreenBounds.size.height/2-50, RX_mainScreenBounds.size.width-80, 180)];
     [self addSubview:bioTitle];
     bioTitle.textColor=[UIColor whiteColor];
     bioTitle.textAlignment=NSTextAlignmentLeft;
@@ -301,54 +301,54 @@
     bioTitle.adjustsFontSizeToFitWidth=YES;
     bioTitle.font=[UIFont fontWithName:k_fontBold size:90];
     
-    connectionCount=[[UILabel alloc] initWithFrame:CGXRectMake(0, 0, 100, 20)];
+    connectionCount=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
     connectionCount.textColor=[UIColor whiteColor];
     connectionCount.textAlignment=NSTextAlignmentCenter;
     connectionCount.text=@"50K";
     [self addSubview:connectionCount];
     connectionCount.font=[UIFont fontWithName:k_fontBold size:14];
     
-    connectionLabel=[[UILabel alloc] initWithFrame:CGXRectMake(0, 0, 100, 20)];
+    connectionLabel=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
     connectionLabel.textColor=[UIColor whiteColor];
     connectionLabel.textAlignment=NSTextAlignmentCenter;
     connectionLabel.text=@"connections";
     [self addSubview:connectionLabel];
     connectionLabel.font=[UIFont fontWithName:k_fontSemiBold size:12];
     
-    profileViewCount=[[UILabel alloc] initWithFrame:CGXRectMake(0, 0, 100, 20)];
+    profileViewCount=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
     profileViewCount.textColor=[UIColor whiteColor];
     profileViewCount.textAlignment=NSTextAlignmentCenter;
     profileViewCount.text=@"750K";
     [self addSubview:profileViewCount];
     profileViewCount.font=[UIFont fontWithName:k_fontBold size:14];
     
-    profileLabel=[[UILabel alloc] initWithFrame:CGXRectMake(0, 0, 100, 20)];
+    profileLabel=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 20)];
     profileLabel.textColor=[UIColor whiteColor];
     profileLabel.textAlignment=NSTextAlignmentCenter;
     profileLabel.text=@"profile views";
     [self addSubview:profileLabel];
     profileLabel.font=[UIFont fontWithName:k_fontSemiBold size:12];
     
-    closeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:closeBtn];
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-50);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-50);
     [closeBtn setBackgroundImage:[UIImage imageNamed:@"closeBtn.png"] forState:UIControlStateNormal];
     closeBtn.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.1];
     closeBtn.layer.cornerRadius=45/2*CGX_scaleFactor();
     closeBtn.clipsToBounds=YES;
     [closeBtn addTarget:self action:@selector(closeBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
-    downBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    downBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:downBtn];
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
     
     [downBtn setBackgroundImage:[UIImage imageNamed:@"Arrow_down.png"] forState:UIControlStateNormal];
     [downBtn addTarget:self action:@selector(downBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
     
-    addBtn=[[UIButton alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()-25, 25, 45, 45)];
+    addBtn=[[UIButton alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width-25, 25, 45, 45)];
     [self addSubview:addBtn];
-    addBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-40, 58);
+    addBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-40, 58);
     [addBtn setBackgroundImage:[UIImage imageNamed:@"addBtn.png"] forState:UIControlStateNormal];
     
     
@@ -374,17 +374,17 @@
     closeBtn.alpha=0;
     addBtn.alpha=0;
     
-    bioTitle.frame=CGXRectMake(22, CGX_ScreenMaxHeight()/2+200, (CGX_ScreenMaxWidth()-44)*0.65, 115);
+    bioTitle.frame=CGRectMake(22, RX_mainScreenBounds.size.height/2+200, (RX_mainScreenBounds.size.width-44)*0.65, 115);
     
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35+200);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35+200);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35+200);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35+200);
     
-    connectionCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-95);
-    connectionLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-80);
-    profileViewCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-95);
-    profileLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-80);
+    connectionCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-95);
+    connectionLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-80);
+    profileViewCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-95);
+    profileLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-80);
     
-    addBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-40, 58-200);
+    addBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-40, 58-200);
     
     
 }
@@ -392,18 +392,18 @@
 {
     
     
-    bioTitle.frame=CGXRectMake(22, CGX_ScreenMaxHeight()/2-0, (CGX_ScreenMaxWidth()-44)*0.65, 115);
-    connectionCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-95);
-    connectionLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-80);
-    profileViewCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-95);
-    profileLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-80);
+    bioTitle.frame=CGRectMake(22, RX_mainScreenBounds.size.height/2-0, (RX_mainScreenBounds.size.width-44)*0.65, 115);
+    connectionCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-95);
+    connectionLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-80);
+    profileViewCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-95);
+    profileLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-80);
     
-    addBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-40, 58);
+    addBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-40, 58);
     
     
     
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     
     downBtn.alpha=1;
     closeBtn.alpha=1;
@@ -423,7 +423,7 @@
     
     [UIView animateWithDuration:1.0 animations:^{
         
-        bioTitle.frame=CGXRectMake(22, CGX_ScreenMaxHeight()/2-0, (CGX_ScreenMaxWidth()-44)*0.65, 115);
+        bioTitle.frame=CGRectMake(22, RX_mainScreenBounds.size.height/2-0, (RX_mainScreenBounds.size.width-44)*0.65, 115);
         bioTitle.alpha=1;
         
     }];
@@ -431,10 +431,10 @@
     
     [UIView animateWithDuration:1.0f delay:1.0 options:UIViewAnimationOptionCurveLinear animations:^{
         
-        connectionCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-95);
-        connectionLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2-85, CGX_ScreenMaxHeight()-80);
-        profileViewCount.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-95);
-        profileLabel.center=CGXPointMake(CGX_ScreenMaxWidth()/2+85, CGX_ScreenMaxHeight()-80);
+        connectionCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-95);
+        connectionLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2-85, RX_mainScreenBounds.size.height-80);
+        profileViewCount.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-95);
+        profileLabel.center=CGXPointMake(RX_mainScreenBounds.size.width/2+85, RX_mainScreenBounds.size.height-80);
         
         connectionCount.alpha=1;
         connectionLabel.alpha=1;
@@ -448,13 +448,13 @@
     
     [UIView animateWithDuration:1.0f delay:1.5 options:UIViewAnimationOptionCurveLinear animations:^{
         
-        downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-        closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+        downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+        closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
         
         downBtn.alpha=1;
         closeBtn.alpha=1;
         
-        addBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-40, 58);
+        addBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-40, 58);
         addBtn.alpha=1;
         
     } completion:^(BOOL finished) {
@@ -531,25 +531,25 @@
     
     self.backgroundColor=[UIColor colorWithRed:229/255.0f green:58/255.0f blue:63/255.0f alpha:1.0f];
   //  self.backgroundColor=[UIColor blackColor];
-    scrollView=[[UIScrollView alloc] initWithFrame:CGXRectMake(0, 0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [self addSubview:scrollView];
-    scrollView.contentSize=CGXSizeMake(CGX_ScreenMaxWidth()*3, CGX_ScreenMaxHeight());
+    scrollView.contentSize=CGSizeMake(RX_mainScreenBounds.size.width*3, RX_mainScreenBounds.size.height);
     scrollView.showsHorizontalScrollIndicator=false;
     scrollView.showsVerticalScrollIndicator=false;
     scrollView.pagingEnabled=YES;
     
     for(int i=0;i<[dataArray count];i++)
     {
-        BioItemView *view=[[BioItemView alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()*i, 0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+        BioItemView *view=[[BioItemView alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width*i, 0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
         [scrollView addSubview:view];
         [view setUpData:[dataArray objectAtIndex:i]];
         [view setUpUIComponents];
     }
     
     
-    closeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:closeBtn];
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     [closeBtn setBackgroundImage:[UIImage imageNamed:@"closeBtn.png"] forState:UIControlStateNormal];
     closeBtn.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.1];
     closeBtn.layer.cornerRadius=45/2*CGX_scaleFactor();
@@ -557,9 +557,9 @@
     [closeBtn addTarget:self action:@selector(closeBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
     
-    downBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 50, 50)];
+    downBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     [self addSubview:downBtn];
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
     [downBtn setBackgroundImage:[UIImage imageNamed:@"Arrow_down.png"] forState:UIControlStateNormal];
     
     [downBtn addTarget:self action:@selector(downBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -589,8 +589,8 @@
 {
     scrollView.alpha=0;
     
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35+200);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35+200);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35+200);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35+200);
     
     downBtn.alpha=0;
     closeBtn.alpha=0;
@@ -599,8 +599,8 @@
 {
     scrollView.alpha=1;
     
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     
     downBtn.alpha=1;
     closeBtn.alpha=1;
@@ -623,8 +623,8 @@
     
     [UIView animateWithDuration:1.0f delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         
-        downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-        closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+        downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+        closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
         
         downBtn.alpha=1;
         closeBtn.alpha=1;
@@ -645,8 +645,8 @@
 -(void)IntroAnimationStateStart
 {
     
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35+200);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35+200);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35+200);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35+200);
     
     downBtn.alpha=0;
     closeBtn.alpha=0;
@@ -655,8 +655,8 @@
 }
 -(void)IntroAnimationStateEnd
 {
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     
     downBtn.alpha=1;
     closeBtn.alpha=1;
@@ -709,8 +709,8 @@
     
     [UIView animateWithDuration:1.0f delay:0 options:UIViewAnimationOptionCurveLinear animations:^{
         
-        downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-        closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+        downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+        closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
         
         downBtn.alpha=1;
         closeBtn.alpha=1;
@@ -747,7 +747,7 @@
     
     
     
-    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()/2,CGX_ScreenMaxWidth(),CGX_ScreenMaxHeight()/2)];
+    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height/2,RX_mainScreenBounds.size.width,RX_mainScreenBounds.size.height/2)];
     [self addSubview:shadow1];
     shadow1.image=[UIImage imageNamed:@"BlackShadow.png"];
     shadow1.contentMode=UIViewContentModeScaleToFill;
@@ -758,15 +758,15 @@
     
     
     
-    playBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 80, 80)];
+    playBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
     [self addSubview:playBtn];
-    playBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()/2);
+    playBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height/2);
     [playBtn setBackgroundImage:[UIImage imageNamed:@"playBtn.png"] forState:UIControlStateNormal];
     [playBtn addTarget:self action:@selector(playBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
-    closeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:closeBtn];
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     [closeBtn setBackgroundImage:[UIImage imageNamed:@"closeBtn.png"] forState:UIControlStateNormal];
     closeBtn.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.1];
     closeBtn.layer.cornerRadius=45/2*CGX_scaleFactor();
@@ -774,9 +774,9 @@
     [closeBtn addTarget:self action:@selector(closeBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
     
-    downBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 50, 50)];
+    downBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     [self addSubview:downBtn];
-    downBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
+    downBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
     [downBtn setBackgroundImage:[UIImage imageNamed:@"Arrow_down.png"] forState:UIControlStateNormal];
     [downBtn addTarget:self action:@selector(downBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -836,12 +836,12 @@
     pagesArray=[[NSMutableArray alloc] init];
     
     
-    scrollView=[[UIScrollView alloc] initWithFrame:CGXRectMake(0, 0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+    scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
     [self addSubview:scrollView];
     
     
     
-    scrollView.contentSize=CGXSizeMake(CGX_ScreenMaxWidth()*3, CGX_ScreenMaxHeight());
+    scrollView.contentSize=CGSizeMake(RX_mainScreenBounds.size.width*3, RX_mainScreenBounds.size.height);
     scrollView.backgroundColor=[UIColor blackColor];
     
     scrollView.showsHorizontalScrollIndicator=false;
@@ -856,7 +856,7 @@
     
     for(int i=0;i<3;i++)
     {
-        PortfolioItemView *view=[[PortfolioItemView alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()*i, 0, CGX_ScreenMaxWidth(), CGX_ScreenMaxHeight())];
+        PortfolioItemView *view=[[PortfolioItemView alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width*i, 0, RX_mainScreenBounds.size.width, RX_mainScreenBounds.size.height)];
         [scrollView addSubview:view];
         [view setUpPortfolioItemViewWithPageNo:i andMax:3];
         
@@ -867,13 +867,13 @@
     
     
     
-    prevBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    prevBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:prevBtn];
     [prevBtn setBackgroundImage:[UIImage imageNamed:@"Arrow_left.png"] forState:UIControlStateNormal];
     
     
     
-    closeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:closeBtn];
     [closeBtn setBackgroundImage:[UIImage imageNamed:@"closeBtn.png"] forState:UIControlStateNormal];
     closeBtn.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.1];
@@ -882,7 +882,7 @@
     [closeBtn addTarget:self action:@selector(closeBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
     
-    nextBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 45, 45)];
+    nextBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 45, 45)];
     [self addSubview:nextBtn];
     [nextBtn setBackgroundImage:[UIImage imageNamed:@"Arrow_right.png"] forState:UIControlStateNormal];
     
@@ -892,7 +892,7 @@
     
     
     
-    lineView=[[UIView alloc] initWithFrame:CGXRectMake(12, CGX_ScreenMaxHeight()-69, CGX_ScreenMaxWidth()-24, 1)];
+    lineView=[[UIView alloc] initWithFrame:CGRectMake(12, RX_mainScreenBounds.size.height-69, RX_mainScreenBounds.size.width-24, 1)];
     [self addSubview:lineView];
     lineView.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.2];
     
@@ -900,7 +900,7 @@
     
     
     
-    likeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(12, CGX_ScreenMaxHeight()-112, 40, 40)];
+    likeBtn=[[UIButton alloc] initWithFrame:CGRectMake(12, RX_mainScreenBounds.size.height-112, 40, 40)];
     [self addSubview:likeBtn];
     [likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
     
@@ -908,11 +908,11 @@
     
     
     
-    commentBtn=[[UIButton alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()/2-40/2, CGX_ScreenMaxHeight()-112, 40, 40)];
+    commentBtn=[[UIButton alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width/2-40/2, RX_mainScreenBounds.size.height-112, 40, 40)];
     [self addSubview:commentBtn];
     [commentBtn setBackgroundImage:[UIImage imageNamed:@"comments.png"] forState:UIControlStateNormal];
     
-    shareBtn=[[UIButton alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()-12-40, CGX_ScreenMaxHeight()-112, 40, 40)];
+    shareBtn=[[UIButton alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width-12-40, RX_mainScreenBounds.size.height-112, 40, 40)];
     [self addSubview:shareBtn];
     [shareBtn setBackgroundImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
     
@@ -920,14 +920,14 @@
     
     
     
-    likeCount=[[UILabel alloc] initWithFrame:CGXRectMake(12, CGX_ScreenMaxHeight()-132, 40, 30)];
+    likeCount=[[UILabel alloc] initWithFrame:CGRectMake(12, RX_mainScreenBounds.size.height-132, 40, 30)];
     likeCount.text=@"12";
     likeCount.textColor=[UIColor whiteColor];
     [self addSubview:likeCount];
     likeCount.textAlignment=NSTextAlignmentCenter;
     likeCount.font=[UIFont fontWithName:k_fontSemiBold size:14];
     
-    commentCount=[[UILabel alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()/2-20, CGX_ScreenMaxHeight()-132, 40, 30)];
+    commentCount=[[UILabel alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width/2-20, RX_mainScreenBounds.size.height-132, 40, 30)];
     commentCount.text=@"5";
     commentCount.textColor=[UIColor whiteColor];
     [self addSubview:commentCount];
@@ -937,23 +937,23 @@
     
     
     
-    lineView.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-69, CGX_ScreenMaxWidth()-24, 1);
-    likeBtn.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-112, 40, 40);
-    commentBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-40/2, CGX_ScreenMaxHeight()-112, 40, 40);
-    shareBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()-12-40, CGX_ScreenMaxHeight()-112, 40, 40);
-    commentCount.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-20, CGX_ScreenMaxHeight()-132, 40, 30);
-    likeCount.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-132, 40, 30);
+    lineView.frame=CGRectMake(12, RX_mainScreenBounds.size.height-69, RX_mainScreenBounds.size.width-24, 1);
+    likeBtn.frame=CGRectMake(12, RX_mainScreenBounds.size.height-112, 40, 40);
+    commentBtn.frame=CGRectMake(RX_mainScreenBounds.size.width/2-40/2, RX_mainScreenBounds.size.height-112, 40, 40);
+    shareBtn.frame=CGRectMake(RX_mainScreenBounds.size.width-12-40, RX_mainScreenBounds.size.height-112, 40, 40);
+    commentCount.frame=CGRectMake(RX_mainScreenBounds.size.width/2-20, RX_mainScreenBounds.size.height-132, 40, 30);
+    likeCount.frame=CGRectMake(12, RX_mainScreenBounds.size.height-132, 40, 30);
     
     
     
     
-    tagLabel=[[UILabel alloc] initWithFrame:CGXRectMake(22, CGX_ScreenMaxHeight()-160, CGX_ScreenMaxWidth()-60, 20)];
+    tagLabel=[[UILabel alloc] initWithFrame:CGRectMake(22, RX_mainScreenBounds.size.height-160, RX_mainScreenBounds.size.width-60, 20)];
     tagLabel.text=@"Wild Life";
     tagLabel.textColor=[UIColor whiteColor];
     [self addSubview:tagLabel];
     tagLabel.font=[UIFont fontWithName:k_fontSemiBold size:14];
     
-    timeLabel=[[UILabel alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()-100, CGX_ScreenMaxHeight()-160, 100-22, 20)];
+    timeLabel=[[UILabel alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width-100, RX_mainScreenBounds.size.height-160, 100-22, 20)];
     timeLabel.text=@"3 hrs";
     timeLabel.textColor=[UIColor whiteColor];
     [self addSubview:timeLabel];
@@ -963,7 +963,7 @@
     
     
     
-    photoLabel=[[UILabel alloc] initWithFrame:CGXRectMake(22, CGX_ScreenMaxHeight()-220, CGX_ScreenMaxWidth()-44, 50)];
+    photoLabel=[[UILabel alloc] initWithFrame:CGRectMake(22, RX_mainScreenBounds.size.height-220, RX_mainScreenBounds.size.width-44, 50)];
     photoLabel.text=@"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
     photoLabel.textColor=[UIColor whiteColor];
     photoLabel.numberOfLines=2;
@@ -1013,30 +1013,30 @@
     photoLabel.alpha=0;
     lineView.alpha=0;
     
-    prevBtn.center=CGXPointMake(50, CGX_ScreenMaxHeight()-50+200);
-    nextBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2*2-50, CGX_ScreenMaxHeight()-50+200);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35+200);
+    prevBtn.center=CGXPointMake(50, RX_mainScreenBounds.size.height-50+200);
+    nextBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2*2-50, RX_mainScreenBounds.size.height-50+200);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35+200);
     
-    lineView.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-69+200, CGX_ScreenMaxWidth()-24, 1);
-    likeBtn.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-112+200, 40, 40);
-    commentBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-40/2, CGX_ScreenMaxHeight()-112+200, 40, 40);
-    shareBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()-12-40, CGX_ScreenMaxHeight()-112+200, 40, 40);
-    commentCount.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-20, CGX_ScreenMaxHeight()-132+200, 40, 30);
-    likeCount.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-132+200, 40, 30);
+    lineView.frame=CGRectMake(12, RX_mainScreenBounds.size.height-69+200, RX_mainScreenBounds.size.width-24, 1);
+    likeBtn.frame=CGRectMake(12, RX_mainScreenBounds.size.height-112+200, 40, 40);
+    commentBtn.frame=CGRectMake(RX_mainScreenBounds.size.width/2-40/2, RX_mainScreenBounds.size.height-112+200, 40, 40);
+    shareBtn.frame=CGRectMake(RX_mainScreenBounds.size.width-12-40, RX_mainScreenBounds.size.height-112+200, 40, 40);
+    commentCount.frame=CGRectMake(RX_mainScreenBounds.size.width/2-20, RX_mainScreenBounds.size.height-132+200, 40, 30);
+    likeCount.frame=CGRectMake(12, RX_mainScreenBounds.size.height-132+200, 40, 30);
     
 }
 -(void)IntroAnimationStateEnd
 {
-    prevBtn.center=CGXPointMake(25, CGX_ScreenMaxHeight()-35);
-    nextBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+    prevBtn.center=CGXPointMake(25, RX_mainScreenBounds.size.height-35);
+    nextBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
     
-    lineView.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-69, CGX_ScreenMaxWidth()-24, 1);
-    likeBtn.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-112, 40, 40);
-    commentBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-40/2, CGX_ScreenMaxHeight()-112, 40, 40);
-    shareBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()-12-40, CGX_ScreenMaxHeight()-112, 40, 40);
-    commentCount.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-20, CGX_ScreenMaxHeight()-132, 40, 30);
-    likeCount.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-132, 40, 30);
+    lineView.frame=CGRectMake(12, RX_mainScreenBounds.size.height-69, RX_mainScreenBounds.size.width-24, 1);
+    likeBtn.frame=CGRectMake(12, RX_mainScreenBounds.size.height-112, 40, 40);
+    commentBtn.frame=CGRectMake(RX_mainScreenBounds.size.width/2-40/2, RX_mainScreenBounds.size.height-112, 40, 40);
+    shareBtn.frame=CGRectMake(RX_mainScreenBounds.size.width-12-40, RX_mainScreenBounds.size.height-112, 40, 40);
+    commentCount.frame=CGRectMake(RX_mainScreenBounds.size.width/2-20, RX_mainScreenBounds.size.height-132, 40, 30);
+    likeCount.frame=CGRectMake(12, RX_mainScreenBounds.size.height-132, 40, 30);
     
     
     prevBtn.alpha=1;
@@ -1055,9 +1055,9 @@
 -(void)IntroAnimation
 {
     
-    //    prevBtn.center=CGXPointMake(50, CGX_ScreenMaxHeight()-50+200);
-    //    nextBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2*2-50, CGX_ScreenMaxHeight()-50+200);
-    //    closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-50+200);
+    //    prevBtn.center=CGXPointMake(50, RX_mainScreenBounds.size.height-50+200);
+    //    nextBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2*2-50, RX_mainScreenBounds.size.height-50+200);
+    //    closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-50+200);
     //
     //
     //    prevBtn.alpha=0;
@@ -1091,12 +1091,12 @@
     [UIView animateKeyframesWithDuration:0.5 delay:0.8 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
         
         
-        lineView.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-69, CGX_ScreenMaxWidth()-24, 1);
-        likeBtn.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-112, 40, 40);
-        commentBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-40/2, CGX_ScreenMaxHeight()-112, 40, 40);
-        shareBtn.frame=CGXRectMake(CGX_ScreenMaxWidth()-12-40, CGX_ScreenMaxHeight()-112, 40, 40);
-        commentCount.frame=CGXRectMake(CGX_ScreenMaxWidth()/2-20, CGX_ScreenMaxHeight()-132, 40, 30);
-        likeCount.frame=CGXRectMake(12, CGX_ScreenMaxHeight()-132, 40, 30);
+        lineView.frame=CGRectMake(12, RX_mainScreenBounds.size.height-69, RX_mainScreenBounds.size.width-24, 1);
+        likeBtn.frame=CGRectMake(12, RX_mainScreenBounds.size.height-112, 40, 40);
+        commentBtn.frame=CGRectMake(RX_mainScreenBounds.size.width/2-40/2, RX_mainScreenBounds.size.height-112, 40, 40);
+        shareBtn.frame=CGRectMake(RX_mainScreenBounds.size.width-12-40, RX_mainScreenBounds.size.height-112, 40, 40);
+        commentCount.frame=CGRectMake(RX_mainScreenBounds.size.width/2-20, RX_mainScreenBounds.size.height-132, 40, 30);
+        likeCount.frame=CGRectMake(12, RX_mainScreenBounds.size.height-132, 40, 30);
         
         likeBtn.alpha=1;
         commentBtn.alpha=1;
@@ -1106,9 +1106,9 @@
         lineView.alpha=1;
         
         
-        prevBtn.center=CGXPointMake(25, CGX_ScreenMaxHeight()-35);
-        nextBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-25, CGX_ScreenMaxHeight()-35);
-        closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()/2, CGX_ScreenMaxHeight()-35);
+        prevBtn.center=CGXPointMake(25, RX_mainScreenBounds.size.height-35);
+        nextBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-25, RX_mainScreenBounds.size.height-35);
+        closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width/2, RX_mainScreenBounds.size.height-35);
         
         prevBtn.alpha=1;
         closeBtn.alpha=1;
@@ -1131,7 +1131,7 @@
 -(void)nextBtnClicked:(id)sender
 {
     CGFloat pageWidth = scrollView.frame.size.width;
-    int page = floor((scrollView.contentOffset.x - CGX_ScreenMaxWidth()/ 2) / pageWidth) + 1;
+    int page = floor((scrollView.contentOffset.x - RX_mainScreenBounds.size.width/ 2) / pageWidth) + 1;
     
     page=page+1;
     
@@ -1147,7 +1147,7 @@
 -(void)prevBtnClicked:(id)sender
 {
     CGFloat pageWidth = scrollView.frame.size.width;
-    int page = floor((scrollView.contentOffset.x - CGX_ScreenMaxWidth()/ 2) / pageWidth) + 1;
+    int page = floor((scrollView.contentOffset.x - RX_mainScreenBounds.size.width/ 2) / pageWidth) + 1;
     
     page=page-1;
     
@@ -1162,7 +1162,7 @@
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView1
 {
     CGFloat pageWidth = scrollView.frame.size.width;
-    int page = floor((scrollView.contentOffset.x - CGX_ScreenMaxWidth()/ 2) / pageWidth) + 1;
+    int page = floor((scrollView.contentOffset.x - RX_mainScreenBounds.size.width/ 2) / pageWidth) + 1;
     
     if(page==0)
     {
@@ -1228,7 +1228,7 @@
     imageView.clipsToBounds=YES;
     
     self.clipsToBounds=YES;
-    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGXRectMake(0, CGX_ScreenMaxHeight()/2,CGX_ScreenMaxWidth(),CGX_ScreenMaxHeight()/2)];
+    UIImageView *shadow1=[[UIImageView alloc] initWithFrame:CGRectMake(0, RX_mainScreenBounds.size.height/2,RX_mainScreenBounds.size.width,RX_mainScreenBounds.size.height/2)];
     [self addSubview:shadow1];
     shadow1.image=[UIImage imageNamed:@"BlackShadow.png"];
     shadow1.contentMode=UIViewContentModeScaleToFill;
@@ -1272,7 +1272,7 @@
 }
 -(void)setUpUIComponents
 {
-    UILabel *screenTitle=[[UILabel alloc] initWithFrame:CGXRectMake(20, 70, 200, 30)];
+    UILabel *screenTitle=[[UILabel alloc] initWithFrame:CGRectMake(20, 70, 200, 30)];
     [self addSubview:screenTitle];
     screenTitle.textColor=[UIColor whiteColor];
     screenTitle.textAlignment=NSTextAlignmentLeft;
@@ -1280,7 +1280,7 @@
     screenTitle.font=[UIFont fontWithName:k_fontExtraBold size:15];
     
     
-    UILabel *storyTitle=[[UILabel alloc] initWithFrame:CGXRectMake(20, 105, CGX_ScreenMaxWidth()-40, CGX_ScreenMaxHeight()-285)];
+    UILabel *storyTitle=[[UILabel alloc] initWithFrame:CGRectMake(20, 105, RX_mainScreenBounds.size.width-40, RX_mainScreenBounds.size.height-285)];
     [self addSubview:storyTitle];
     storyTitle.textColor=[UIColor whiteColor];
     storyTitle.textAlignment=NSTextAlignmentLeft;
@@ -1312,7 +1312,7 @@
     
     
     
-    UIButton *readMoreBtn=[[UIButton alloc] initWithFrame:CGXRectMake(CGX_ScreenMaxWidth()-140, CGX_ScreenMaxHeight()-180, 100, 20)];
+    UIButton *readMoreBtn=[[UIButton alloc] initWithFrame:CGRectMake(RX_mainScreenBounds.size.width-140, RX_mainScreenBounds.size.height-180, 100, 20)];
     [self addSubview:readMoreBtn];
     [readMoreBtn setTitle:@"Read More" forState:UIControlStateNormal];
     readMoreBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:15.0f];
@@ -1323,7 +1323,7 @@
     
     
     
-    UILabel *tagContent=[[UILabel alloc] initWithFrame:CGXRectMake(20, CGX_ScreenMaxHeight()-140, CGX_ScreenMaxWidth()-40, 60)];
+    UILabel *tagContent=[[UILabel alloc] initWithFrame:CGRectMake(20, RX_mainScreenBounds.size.height-140, RX_mainScreenBounds.size.width-40, 60)];
     [self addSubview:tagContent];
     tagContent.textColor=[UIColor whiteColor];
     tagContent.textAlignment=NSTextAlignmentJustified;
@@ -1343,7 +1343,7 @@
      fullScreenPreview.backgroundColor=[UIColor colorWithRed:229/255.0f green:58/255.0f blue:63/255.0f alpha:1.0f];
      
      
-     UITextView *storyTitle=[[UITextView alloc] initWithFrame:CGXRectMake(20, 30, CGX_ScreenMaxWidth()-40, CGX_ScreenMaxHeight()-60-30-40)];
+     UITextView *storyTitle=[[UITextView alloc] initWithFrame:CGRectMake(20, 30, RX_mainScreenBounds.size.width-40, RX_mainScreenBounds.size.height-60-30-40)];
      [fullScreenPreview addSubview:storyTitle];
      storyTitle.backgroundColor=[UIColor clearColor];
      storyTitle.textColor=[UIColor whiteColor];
@@ -1378,7 +1378,7 @@
      
      
      
-     UILabel *tagContent=[[UILabel alloc] initWithFrame:CGXRectMake(20, CGX_ScreenMaxHeight()-60, CGX_ScreenMaxWidth()-40, 60)];
+     UILabel *tagContent=[[UILabel alloc] initWithFrame:CGRectMake(20, RX_mainScreenBounds.size.height-60, RX_mainScreenBounds.size.width-40, 60)];
      [fullScreenPreview addSubview:tagContent];
      tagContent.textColor=[UIColor whiteColor];
      tagContent.textAlignment=NSTextAlignmentJustified;
@@ -1390,9 +1390,9 @@
      
      
      
-     UIButton *closeBtn=[[UIButton alloc] initWithFrame:CGXRectMake(0, 0, 50, 50)];
+     UIButton *closeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
      [fullScreenPreview addSubview:closeBtn];
-     closeBtn.center=CGXPointMake(CGX_ScreenMaxWidth()-50, 50);
+     closeBtn.center=CGXPointMake(RX_mainScreenBounds.size.width-50, 50);
      [closeBtn setBackgroundImage:[UIImage imageNamed:@"closeBtn.png"] forState:UIControlStateNormal];
      closeBtn.backgroundColor=[UIColor colorWithWhite:1.0 alpha:0.1];
      closeBtn.layer.cornerRadius=25;

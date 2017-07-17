@@ -34,11 +34,11 @@
     NSString *keyValue=@"";
     if(selectedSegmentIndex==0)
     {
-        CGRect tempRect=segmentPostsBtn.frame;
+       /* CGRect tempRect=segmentPostsBtn.frame;
         
         frame=CGRectMake(tempRect.origin.x+tempRect.size.width-40, 10, 20, 20);
         
-        keyValue=@"post";
+        keyValue=@"post";*/
     }
     else if(selectedSegmentIndex==1)
     {
@@ -121,28 +121,28 @@
  //   UIButton *segmentTopicsBtn;
   //  UIButton *segmentHashtagsBtn;
     
-    segmentPostsBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width/3, 40)];
-    [self addSubview:segmentPostsBtn];
-    [segmentPostsBtn setTitle:@"POSTS" forState:UIControlStateNormal];
-    segmentPostsBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:11];
-    
-    segmentTopicsBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width/3, 0, self.frame.size.width/3, 40)];
+//    segmentPostsBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width/3, 40)];
+//    [self addSubview:segmentPostsBtn];
+//    [segmentPostsBtn setTitle:@"POSTS" forState:UIControlStateNormal];
+//    segmentPostsBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:11];
+//    
+    segmentTopicsBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width/2, 40)];
     [self addSubview:segmentTopicsBtn];
     [segmentTopicsBtn setTitle:@"TOPICS" forState:UIControlStateNormal];
     [segmentTopicsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.5] forState:UIControlStateNormal];
     segmentTopicsBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:11];
     
-    segmentHashtagsBtn=[[UIButton alloc] initWithFrame:CGRectMake(2*self.frame.size.width/3, 0, self.frame.size.width/3, 40)];
+    segmentHashtagsBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width/2, 0, self.frame.size.width/2, 40)];
     [self addSubview:segmentHashtagsBtn];
     [segmentHashtagsBtn setTitle:@"TAGS" forState:UIControlStateNormal];
     [segmentHashtagsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:1.0] forState:UIControlStateNormal];
     segmentHashtagsBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:11];
     
-    segmentPostsBtn.tag=0;
+    //segmentPostsBtn.tag=0;
     segmentTopicsBtn.tag=1;
     segmentHashtagsBtn.tag=2;
     
-    [segmentPostsBtn addTarget:self action:@selector(setSegmentIndex:) forControlEvents:UIControlEventTouchUpInside];
+//    [segmentPostsBtn addTarget:self action:@selector(setSegmentIndex:) forControlEvents:UIControlEventTouchUpInside];
     [segmentTopicsBtn addTarget:self action:@selector(setSegmentIndex:) forControlEvents:UIControlEventTouchUpInside];
     [segmentHashtagsBtn addTarget:self action:@selector(setSegmentIndex:) forControlEvents:UIControlEventTouchUpInside];
     
@@ -161,8 +161,9 @@
     [self addSubview:activityView];
 
     
-    [self setSegmentIndex:segmentPostsBtn];
+    [self setSegmentIndex:segmentTopicsBtn];
     
+ //   segmentPostsBtn.hidden=true;
     
     tableViewBgView=[[UIView alloc] initWithFrame:CGRectMake(0, 40, self.frame.size.width, self.frame.size.height-40)];
     [self addSubview:tableViewBgView];
@@ -199,7 +200,7 @@
 {
     selectedSegmentIndex=(int)button.tag;
     
-    [segmentPostsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.5] forState:UIControlStateNormal];
+  //  [segmentPostsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.5] forState:UIControlStateNormal];
     [segmentTopicsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.5] forState:UIControlStateNormal];
     [segmentHashtagsBtn setTitleColor:[UIColor colorWithWhite:1.0 alpha:0.5] forState:UIControlStateNormal];
 

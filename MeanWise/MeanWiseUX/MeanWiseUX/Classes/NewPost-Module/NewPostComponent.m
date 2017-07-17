@@ -13,16 +13,8 @@
 
 @implementation NewPostComponent
 
--(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
-{
-    target=targetReceived;
-    closeCallBackfunc=func1;
-    
-}
--(void)zoomDownOut
-{
-    [target performSelector:closeCallBackfunc withObject:nil afterDelay:0.01];
-}
+
+
 -(void)setUpWithCellRect:(CGRect)rect
 {
     [self setUpCellRect:rect];
@@ -31,10 +23,9 @@
     
     containerView.clipsToBounds=YES;
     
-    
-    
-    
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-In"];
+
+     isPostHasAttachment=false;
     
     UIView *navBar=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 65)];
     [containerView addSubview:navBar];
@@ -105,21 +96,34 @@
 
     
     
-    statusView=[[UITextView alloc] initWithFrame:CGRectMake(15, 65+70, self.frame.size.width-40, 42)];
+    statusView=[[SAMTextView alloc] initWithFrame:CGRectMake(15, 65+70, self.frame.size.width-40, 42*2)];
     [containerView addSubview:statusView];
     statusView.font=[UIFont fontWithName:k_fontRegular size:20];
     statusView.delegate=self;
+    statusView.keyboardType=UIKeyboardTypeTwitter;
+    statusView.scrollEnabled=false;
+    statusView.placeholder=@"Write a caption here use '@' to attach topics and '#' for hashtags";
    
     
     int height=self.frame.size.height-statusView.frame.origin.y-statusView.frame.size.height-170;
     
-    attachedImage=[[PreviewViewComponent alloc] initWithFrame:CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, height)];
-    attachedImage.backgroundColor=[UIColor grayColor];
-    [containerView addSubview:attachedImage];
-    attachedImage.hidden=true;
-    attachedImage.clipsToBounds=YES;
+    mediaAttachComponent=[[PreviewMaxScreen alloc] initWithFrame:CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, height)];
+    mediaAttachComponent.backgroundColor=[UIColor grayColor];
+    [containerView addSubview:mediaAttachComponent];
+    mediaAttachComponent.hidden=true;
+    mediaAttachComponent.clipsToBounds=YES;
+    [mediaAttachComponent setTarget:self showFullScreenCallBack:@selector(mediaManupulatorOpen:) andShowThumbCallBack:@selector(mediaManupulatorClose:)];
+
+    [mediaAttachComponent setAttachmentRemoveCallBack:@selector(attachmentRemove:)];
+
     
-    [attachedImage setTarget:self showFullScreenCallBack:@selector(mediaManupulatorOpen:) andShowThumbCallBack:@selector(mediaManupulatorClose:)];
+    //attachedImage=[[PreviewViewComponent alloc] initWithFrame:CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, height)];
+//    attachedImage.backgroundColor=[UIColor grayColor];
+   // [containerView addSubview:attachedImage];
+   // attachedImage.hidden=true;
+  //  attachedImage.clipsToBounds=YES;
+    
+ //   [attachedImage setTarget:self showFullScreenCallBack:@selector(mediaManupulatorOpen:) andShowThumbCallBack:@selector(mediaManupulatorClose:)];
     
     
    // attachedImage.center=CGPointMake(self.frame.size.width/2, attachedImage.center.y);
@@ -174,7 +178,7 @@
     photoControllerBtns=[[PhotosBtnController alloc] initWithFrame:CGRectMake(0, self.frame.size.height-50, self.frame.size.width, 50)];
     [containerView addSubview:photoControllerBtns];
     [photoControllerBtns setUp];
-    [photoControllerBtns setTarget:self andSel1:@selector(gallerySelect:) andSel2:@selector(cameraSelect:)];
+    [photoControllerBtns setTarget:self andSel1:@selector(cameraSelect:) andSel2:@selector(gallerySelect:)];
     
 
     channelSelectionView=[[ChannelSearchView alloc] initWithFrame:self.bounds];
@@ -182,8 +186,7 @@
     [containerView addSubview:channelSelectionView];
     [channelSelectionView setState1Frame:CGRectMake(20, self.frame.size.height-115, self.frame.size.width, 50)];
 
-    
-    
+   
 //    
 //    gallery=[[PhotoGallery alloc] initWithFrame:CGRectMake(0, 160+85+200, self.frame.size.width, self.frame.size.height- (160+85+200))];
 //    [containerView addSubview:gallery];
@@ -195,22 +198,24 @@
     
     
 }
-
--(void)mediaManupulatorOpen:(id)sender
+-(void)showTutorial
 {
-    NSLog(@"openFull");
-    [self setGestureEnabled:false];
+    
+    if([Constant isNewPostTutorialFinished]==false)
+    {
+        [FTIndicator showToastMessage:@"The post can include topics and hashtags to make it easier to be found. To create a topic type the topic name followed by the @symbol. To create hashtags use the #symbol."];
+        
+    }
 
+    
+   
 }
--(void)mediaManupulatorClose:(id)sender
-{
-    NSLog(@"openSmall");
-    [self setGestureEnabled:true];
 
-}
+#pragma mark - Item Setup
 
 -(void)gallerySelect:(id)sender
 {
+
     [self setGestureEnabled:false];
     photoGallery=[[PhotoGallery alloc] initWithFrame:self.bounds];
     [containerView addSubview:photoGallery];
@@ -220,6 +225,7 @@
 }
 -(void)cameraSelect:(id)sender
 {
+
     [self setGestureEnabled:false];
     photoGallery=[[PhotoGallery alloc] initWithFrame:self.bounds];
     [containerView addSubview:photoGallery];
@@ -227,40 +233,93 @@
     [photoGallery setUp:1];
     
 }
--(void)cancelBtnClicked:(id)sender
+-(void)RepickAnother:(id)sender
 {
-    [self setGestureEnabled:true];
-
+    [self gallerySelect:nil];
+    
 }
--(void)attachmentRemove:(id)sender
-{
-    [attachedImage cleanUp];
-
-    attachedImage.hidden=true;
-
-}
--(void)mediaSelected:(NSString *)path
+-(void)mediaSelected:(NSDictionary *)dict
 {
 
+    NSString *path=[dict valueForKey:@"path"];
+    BOOL isSourceCamera=[[dict valueForKey:@"isSourceCamera"] boolValue];
+    
 
+    
     cropperControl=[[MediaCropper alloc] initWithFrame:self.bounds];
     [cropperControl setUpWithPath:path];
-    [cropperControl setTarget:self andDoneBtn:@selector(showAttachImage:) andCancelBtn:nil];
+    [cropperControl setTarget:self andDoneBtn:@selector(showAttachImage:) andCancelBtn:@selector(RepickAnother:)];
+    
     [self addSubview:cropperControl];
+
+    if(isSourceCamera==true)
+    {
+        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-From Camera attached"];
+
+        [cropperControl setDirectCrop];
+
+    }
+    else
+    {
+        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-From Gallery attached"];
+
+    }
+    
+//    if(isMediaFromCamera==true)
+//    {
+//        [cropperControl setDirectCrop];
+//    }
    
 }
 -(void)showAttachImage:(NSString *)path
 {
-    attachedImage.hidden=false;
     
-    CGRect frame=attachedImage.frame;
-    [attachedImage cleanUp];
-    [attachedImage setUp:path andRect:frame];
-    [attachedImage openFullMode:nil];
+
+    mediaAttachComponent.hidden=false;
+    CGRect frame=mediaAttachComponent.frame;
+    [mediaAttachComponent cleanUp];
+    [mediaAttachComponent seUpBasics:frame];
+    [mediaAttachComponent setUpPath:path];
+    [mediaAttachComponent openFullScreen:nil];
+    
+    isPostHasAttachment=true;
+    
+    
+    
+//    attachedImage.hidden=false;
+//    CGRect frame=attachedImage.frame;
+//    [attachedImage cleanUp];
+//    [attachedImage setUp:path andRect:frame];
+//    [attachedImage openFullMode:nil];
     
 }
+#pragma mark - Post Actions
+
+-(void)attachmentRemove:(id)sender
+{
+    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Attachment Remove"];
+
+        [mediaAttachComponent cleanUp];
+        mediaAttachComponent.hidden=true;
+
+    isPostHasAttachment=false;
+//    [attachedImage cleanUp];
+//    attachedImage.hidden=true;
+    
+}
+
+
+-(void)cancelBtnClicked:(id)sender
+{
+    [self showTutorial];
+    [self setGestureEnabled:true];
+    
+}
+
 -(void)cancelPostBtnClicked:(id)sender
 {
+    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Cancel Post"];
+
     
     [statusView resignFirstResponder];
 
@@ -281,6 +340,8 @@
 
     [alert doneActionBlock:^{
         
+        [mediaAttachComponent cleanUp];
+
         [FTIndicator setIndicatorStyle:UIBlurEffectStyleDark];
         [FTIndicator showToastMessage:@"Post Cancelled"];
         
@@ -320,9 +381,12 @@
 }
 -(void)postBtnClicked:(id)sender
 {
-    
+    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Button Clicked"];
+
+
     NSString *statusString=statusView.text;
-    NSString *mediaPath=[attachedImage getCurrentPath];
+    
+    
     int channelId=[channelSelectionView getSelectedChannelId];
     if(channelId==-1)
     {
@@ -343,38 +407,7 @@
     
     
     
-    
-
-    if(mediaPath==nil) {
-     
-        mediaPath=@"";
-    }
-    else
-    {
-        
-        NSString *ext = [mediaPath pathExtension];
-        
-        
-        
-        if([ext.lowercaseString isEqualToString:@"png"])
-        {
-            mediaPath=[Constant getCompressedPathFromImagePath:mediaPath];
-        }
-        else
-        {
-            
-            int p=0;
-        }
-        
-        
-        NSData *data=[NSData dataWithContentsOfFile:mediaPath];
-        
-        [FTIndicator showToastMessage:[NSString stringWithFormat:@"final %d kb",(int)data.length/1024]];
-
-
-    }
-    
-    
+    //Retriving Topic and Hashtags
     NSString *topicValue=@"";
     if(topicArray.count==0)
     {
@@ -406,30 +439,99 @@
         
     }
     
+
     
-    NSDictionary *dict=@{
-                @"text":statusString,
-                @"interest":[NSString stringWithFormat:@"%d",channelId],
-                @"media":mediaPath,
-                @"topic_names":topicValue,
-                @"tags":hashTagValue
-                };
-        
-   
+    //If validation is correct
+
+  
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
     ViewController *t=(ViewController *)vc.topViewController;
-    [t newPostSubmit:dict];
 
     
+    if(isPostHasAttachment==true && [mediaAttachComponent isMediaTypeVideo]==false)
+    {
+        NSString *mediaPath=[mediaAttachComponent getFinalOutPutPath];
+        
+        if(mediaPath==nil)
+        {
+            mediaPath=@"";
+        }
+        else
+        {
+            
+            NSString *ext = [mediaPath pathExtension];
+            
+            if([ext.lowercaseString isEqualToString:@"png"])
+            {
+                mediaPath=[Constant getCompressedPathFromImagePath:mediaPath];
+            }
+           // NSData *data=[NSData dataWithContentsOfFile:mediaPath];
+          //  [FTIndicator showToastMessage:[NSString stringWithFormat:@"final %d kb",(int)data.length/1024]];
+            
+        }
+        
+        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Image Posted"];
 
+        
+        NSDictionary *dict=@{
+                             @"text":statusString,
+                             @"interest":[NSString stringWithFormat:@"%d",channelId],
+                             @"media":mediaPath,
+                             @"topic_names":topicValue,
+                             @"tags":hashTagValue
+                             };
+        [t newPostSubmit:dict];
+
+        
+    }
+    else if(isPostHasAttachment==false)
+    {
+        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Text Posted"];
+
+        NSDictionary *dict=@{
+                             @"text":statusString,
+                             @"interest":[NSString stringWithFormat:@"%d",channelId],
+                             @"media":@"",
+                             @"topic_names":topicValue,
+                             @"tags":hashTagValue
+                             };
+        [t newPostSubmit:dict];
+
+        
+    }
+    else if(isPostHasAttachment==true && [mediaAttachComponent isMediaTypeVideo]==true)
+    {
+        
+        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Video Posted"];
+
+        
+        NSString *mediaPath=[mediaAttachComponent getCroppedVideoPath];
+        
+        UIImage *image=[mediaAttachComponent getOverLayVideoImage];
+        
+        
+        NSDictionary *dict=@{
+                             @"text":statusString,
+                             @"interest":[NSString stringWithFormat:@"%d",channelId],
+                             @"topic_names":topicValue,
+                             @"tags":hashTagValue
+                             };
+        [t renderVideoAndPost:dict witPath:mediaPath overlayImage:image];
+        
+    }
+    
+    
+    
+    
+    
+    
+    
+    
     [statusView resignFirstResponder];
-    
+    [mediaAttachComponent cleanUp];
     
     [UIView animateWithDuration:0.1 animations:^{
-        // statusLabel.alpha=0;
-        // galleryView.alpha=0;
-        // label.alpha=0;
-        
+    
         
     } completion:^(BOOL finished) {
         
@@ -446,33 +548,87 @@
 
         }];
         
-        
-        
     }];
     
     
     
 }
 
+
+
+#pragma mark - Helper
+-(void)setTopic:(NSArray *)array
+{
+    if(array.count==0)
+    {
+        replyToLBL.text=@"@topic";
+        replyToLBL.textColor=[UIColor lightGrayColor];
+    }
+    else
+    {
+        
+        NSString *string=[NSString stringWithFormat:@"@%@",[array componentsJoinedByString: @" @"]];
+        
+        replyToLBL.text=string;
+        
+        replyToLBL.textColor=[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00];
+        
+    }
+    
+}
+-(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
+{
+    target=targetReceived;
+    closeCallBackfunc=func1;
+    
+}
+
+-(void)mediaManupulatorOpen:(id)sender
+{
+    [statusView resignFirstResponder];
+    
+    [containerView bringSubviewToFront:mediaAttachComponent];
+    
+    NSLog(@"openFull");
+    [self setGestureEnabled:false];
+    
+}
+-(void)mediaManupulatorClose:(id)sender
+{
+        [self showTutorial];
+    NSLog(@"openSmall");
+    [self setGestureEnabled:true];
+    
+}
+
+-(void)zoomDownOut
+{
+    [target performSelector:closeCallBackfunc withObject:nil afterDelay:0.01];
+}
+
+#pragma mark - Text Methods
 -(void)textViewDidChange:(UITextView *)textView
 {
     
     CGSize size = [textView sizeThatFits:CGSizeMake(statusView.frame.size.width, FLT_MAX)];
     float height=size.height;
     
-    if(height<42)
+    if(height<42*2)
     {
-        height=42;
+        height=42*2;
     }
-        
+    
     statusView.frame=CGRectMake(statusView.frame.origin.x, statusView.frame.origin.y, statusView.frame.size.width, height);
-
+    
     
     int heightAttached=self.frame.size.height-statusView.frame.origin.y-statusView.frame.size.height-170;
+    
+    
+    mediaAttachComponent.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
 
-    attachedImage.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
-
-
+//    attachedImage.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
+    
+    
     
     int len =(int)statusView.text.length;
     characterCountLBL.text=[NSString stringWithFormat:@"%i",200-len];
@@ -491,20 +647,20 @@
                   range:NSMakeRange(0, string.length)];
     
     NSError *error1 = nil;
-        NSError *error2 = nil;
+    NSError *error2 = nil;
     NSRegularExpression *regex1 = [NSRegularExpression regularExpressionWithPattern:@"#(\\w+)" options:0 error:&error1];
     NSRegularExpression *regex2 = [NSRegularExpression regularExpressionWithPattern:@"@(\\w+)" options:0 error:&error2];
-
+    
     NSArray *matches1 = [regex1 matchesInString:string options:0 range:NSMakeRange(0, string.length)];
     NSArray *matches2 = [regex2 matchesInString:string options:0 range:NSMakeRange(0, string.length)];
     
     
-   
-
+    
+    
     topicArray=[[NSMutableArray alloc] init];
     hashTagArray=[[NSMutableArray alloc] init];
-
-
+    
+    
     for (NSTextCheckingResult *match in matches1)
     {
         NSRange wordRange = [match rangeAtIndex:0];
@@ -517,7 +673,7 @@
         
         NSRange hashTagRange = [match rangeAtIndex:1];
         NSString* hashTag = [string substringWithRange:hashTagRange];
-
+        
         [hashTagArray addObject:hashTag];
         
     }
@@ -534,34 +690,18 @@
         
         NSRange topicRange = [match rangeAtIndex:1];
         NSString* topicName = [string substringWithRange:topicRange];
-
+        
         [topicArray addObject:topicName];
         
-
+        
     }
-        [self setTopic:topicArray];
+    [self setTopic:topicArray];
     
     
     textView.attributedText=hogan;
-   
     
-
-}
--(void)setTopic:(NSArray *)array
-{
-    if(array.count==0)
-    {
-    replyToLBL.text=@"@topic";
-    replyToLBL.textColor=[UIColor lightGrayColor];
-    }
-    else
-    {
-        replyToLBL.text=[array componentsJoinedByString: @" "];
-
-        replyToLBL.textColor=[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00];
-
-    }
-
+    
+    
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text

@@ -18,9 +18,14 @@
 {
     screenIdentifier=string;
 }
+-(void)setUpRefreshIdentifier:(NSNumber *)number;
+{
+    refreshIdentifier=number;
+    
+}
 -(void)setUp
 {
-    
+    isVideoLocal=false;
     isPlayerShouldPlay=false;
     urlStr=nil;
     self.backgroundColor=[UIColor clearColor];
@@ -44,30 +49,35 @@
     videoLoader.center=CGPointMake(self.bounds.size.width/2,150);
     
     
-    baseProgressView=[[UIView alloc] initWithFrame:CGRectMake(0, 1, self.frame.size.width, 2)];
-    baseProgressView.backgroundColor=[UIColor clearColor];
-    [self addSubview:baseProgressView];
-    
-    bufferProgressBar=[[UIView alloc] initWithFrame:CGRectMake(0, 1, 0, 2)];
-    bufferProgressBar.backgroundColor=[UIColor colorWithWhite:1 alpha:0.5];
-    [self addSubview:bufferProgressBar];
-    
-    currentProgressBar=[[UIView alloc] initWithFrame:CGRectMake(0, 1, 0, 2)];
-    currentProgressBar.backgroundColor=[UIColor whiteColor];
-    [self addSubview:currentProgressBar];
-    
+//    baseProgressView=[[UIView alloc] initWithFrame:CGRectMake(0, 1, self.frame.size.width, 2)];
+//    baseProgressView.backgroundColor=[UIColor clearColor];
+//    [self addSubview:baseProgressView];
+//    
+//    bufferProgressBar=[[UIView alloc] initWithFrame:CGRectMake(0, 1, 0, 2)];
+//    bufferProgressBar.backgroundColor=[UIColor colorWithWhite:1 alpha:0.5];
+//    [self addSubview:bufferProgressBar];
+//    
+//    currentProgressBar=[[UIView alloc] initWithFrame:CGRectMake(0, 1, 0, 2)];
+//    currentProgressBar.backgroundColor=[UIColor whiteColor];
+//    [self addSubview:currentProgressBar];
+//    
+//    baseProgressView.hidden=true;
+//    bufferProgressBar.hidden=true;
+//    currentProgressBar.hidden=true;
 
 }
 -(void)setURL:(NSString *)url
 {
     
+    
+    
     urlStr=url;
     
-    baseProgressView.frame=CGRectMake(0, 1, self.frame.size.width, 2);
+  //  baseProgressView.frame=CGRectMake(0, 1, self.frame.size.width, 2);
     
-    bufferProgressBar.frame=CGRectMake(0, 1, 0, 2);
+   // bufferProgressBar.frame=CGRectMake(0, 1, 0, 2);
     
-    currentProgressBar.frame=CGRectMake(0, 1, 0, 2);
+   // currentProgressBar.frame=CGRectMake(0, 1, 0, 2);
     [self killPlayer];
     
 }
@@ -81,6 +91,7 @@
     [playerViewController.player pause];
     [playerViewController.player replaceCurrentItemWithPlayerItem:nil];
     playerViewController.player=nil;
+    playerViewController.view.hidden=true;
    // [playerViewController.view removeFromSuperview];
    // playerViewController=nil;
     
@@ -99,18 +110,45 @@
     
     playerViewController.view.hidden=true;
     
-    NSURL *url=[NSURL URLWithString:urlStr];
+    NSURL *url;
+
+    if(urlStr!=nil)
+    {
+        NSString *string=[VideoCacheManager getCachePathIfExists:urlStr];
+    
+        if(string)
+        {
+                isVideoLocal=YES;
+            videoLoader.alpha=0;
+            
+                url = [NSURL fileURLWithPath:string];
+        
+        }
+        else
+        {
+                isVideoLocal=FALSE;
+            videoLoader.alpha=1;
+                url=[[NSURL alloc] initWithString:urlStr];
+        }
+    }
+    else
+    {
+        isVideoLocal=FALSE;
+        url=[NSURL URLWithString:urlStr];
+    }
+    
+//    NSURL *
     playerViewController.player=[AVPlayer playerWithURL:url];
     [playerViewController.player play];
     
     videoLoader.hidden=false;
     [videoLoader startAnimation];
     
-    baseProgressView.frame=CGRectMake(0, 1, self.frame.size.width, 2);
+  //  baseProgressView.frame=CGRectMake(0, 1, self.frame.size.width, 2);
     
-    bufferProgressBar.frame=CGRectMake(0, 1, 0, 2);
+   // bufferProgressBar.frame=CGRectMake(0, 1, 0, 2);
     
-    currentProgressBar.frame=CGRectMake(0, 1, 0, 2);
+   // currentProgressBar.frame=CGRectMake(0, 1, 0, 2);
 
 
     [NSObject cancelPreviousPerformRequestsWithTarget:self
@@ -129,7 +167,7 @@
 
     if(![urlStr isEqualToString:@""] && [HMPlayerManager sharedInstance].All_isPaused==false)
     {
-        if([HMPlayerManager sharedInstance].Home_isPaused==false && [HMPlayerManager sharedInstance].Home_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Home_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Home_urlIdentifier])
+        if([HMPlayerManager sharedInstance].Home_isPaused==false && [HMPlayerManager sharedInstance].Home_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Home_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Home_urlIdentifier] && [HMPlayerManager sharedInstance].Home_RefreshIdentifier==refreshIdentifier)
         {
         
                // self.hidden=false;
@@ -141,7 +179,7 @@
           //  self.hidden=false;
             isPlayerShouldPlay=true;
         }
-        else if([HMPlayerManager sharedInstance].Profile_isPaused==false && [HMPlayerManager sharedInstance].Profile_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Profile_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Profile_urlIdentifier])
+        else if([HMPlayerManager sharedInstance].Profile_isPaused==false && [HMPlayerManager sharedInstance].Profile_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].Profile_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].Profile_urlIdentifier] && [HMPlayerManager sharedInstance].Profile_RefreshIdentifier==refreshIdentifier)
         {
             
             //  self.hidden=false;
@@ -152,6 +190,12 @@
             
             //  self.hidden=false;
             isPlayerShouldPlay=true;
+        }
+        else if([HMPlayerManager sharedInstance].DeepLinkPost_isPaused==false && [HMPlayerManager sharedInstance].DeepLinkPost_isVisibleBounds==true && [screenIdentifier isEqualToString:[HMPlayerManager sharedInstance].DeepLinkPost_screenIdentifier] && [urlStr isEqualToString:[HMPlayerManager sharedInstance].DeepLinkPost_urlIdentifier] && [HMPlayerManager sharedInstance].DeepLink_RefreshIdentifier==refreshIdentifier)
+        {
+            
+            isPlayerShouldPlay=true;
+   
         }
         else
         {
@@ -176,7 +220,7 @@
     if([HMPlayerManager sharedInstance].Explore_isKilling==true && [[HMPlayerManager sharedInstance].Explore_screenIdentifier isEqualToString:screenIdentifier])
     {
         
-        NSLog(@"Kill");
+        //NSLog(@"Kill");
 
         [self killPlayer];
         urlStr=nil;
@@ -190,7 +234,7 @@
     if([HMPlayerManager sharedInstance].Profile_isKilling==true && [[HMPlayerManager sharedInstance].Profile_screenIdentifier isEqualToString:screenIdentifier])
     {
         
-        NSLog(@"Kill Profile player");
+     //   NSLog(@"Kill Profile player");
         
         [self killPlayer];
         urlStr=nil;
@@ -204,7 +248,21 @@
     if([HMPlayerManager sharedInstance].NotificationPost_isKilling==true && [[HMPlayerManager sharedInstance].NotificationPost_screenIdentifier isEqualToString:screenIdentifier])
     {
         
-        NSLog(@"Kill Notification player");
+      //  NSLog(@"Kill Notification player");
+        
+        [self killPlayer];
+        urlStr=nil;
+        isPlayerShouldPlay=false;
+        [playerViewController.view removeFromSuperview];
+        playerViewController=nil;
+        
+        [self removeFromSuperview];
+        
+    }
+    if([HMPlayerManager sharedInstance].DeepLinkPost_isKilling==true && [[HMPlayerManager sharedInstance].DeepLinkPost_screenIdentifier isEqualToString:screenIdentifier])
+    {
+        
+     //   NSLog(@"Kill Deep link player");
         
         [self killPlayer];
         urlStr=nil;
@@ -216,6 +274,7 @@
         
     }
     
+    
 
     
     
@@ -224,7 +283,7 @@
     if(isPlayerShouldPlay==true && urlStr!=nil)
     {
 
-        NSLog(@"YES-%@ %@",screenIdentifier,debugNumber);
+      //  NSLog(@"YES-%@ %@",screenIdentifier,debugNumber);
         
     //Getting durations
     float dur = CMTimeGetSeconds([playerViewController.player.currentItem duration]);
@@ -316,7 +375,7 @@
         
         if(currentProgress!=NAN)
         {
-            currentProgressBar.frame=CGRectMake(0, 1, currentProgress, 2);
+          //  currentProgressBar.frame=CGRectMake(0, 1, currentProgress, 2);
         }
     }
     
@@ -353,7 +412,7 @@
             length=self.frame.size.width*length;
             start=self.frame.size.width*start;
             
-            bufferProgressBar.frame=CGRectMake(start, 1, length, 2);
+          //  bufferProgressBar.frame=CGRectMake(start, 1, length, 2);
         }
         
         

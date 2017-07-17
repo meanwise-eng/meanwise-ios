@@ -20,9 +20,15 @@
 #import "EditMobileNoComponent.h"
 #import "EditNameComponent.h"
 #import "EditPasswordComponent.h"
-#import "EditProffesionComponent.h"
-#import "EditSkillsComponent.h"
+#import "FTIndicator.h"
 #import "EditStoryComponent.h"
+#import "VideoCacheManager.h"
+
+#import "EditSCComponent.h"
+#import "EditPCComponent.h"
+
+//
+//#import "EditSkillsComponent.h"
 
 @implementation SettingsComponent
 
@@ -33,9 +39,11 @@
 
     passed=0;
     
-    items1=[NSArray arrayWithObjects:@"Intro",@"Story",@"*Intro Video",@"Skills",@"Profession",@"Location", nil];
     
-    items2=[NSArray arrayWithObjects:@"Name",@"*UserName",@"Birthday",@"Mobile Number",@"*Email",@"Password",@"Logout", nil];
+    
+    items1=[NSArray arrayWithObjects:@"Intro",@"Story",@"Skills",@"Profession",@"Location", nil];
+    
+    items2=[NSArray arrayWithObjects:@"Name",@"Birthday",@"Mobile Number",@"Password",@"Clear Cache",@"Logout", nil];
 
     
     self.blackOverLayView=[[UIImageView alloc] initWithFrame:CGRectMake(-self.frame.size.width, 0, self.frame.size.width, self.frame.size.height)];
@@ -212,7 +220,7 @@
         }];
         
     }
-    if(indexPath.row==2 && indexPath.section==0)
+    if(indexPath.row==15 && indexPath.section==0)
     {
         
         EditIntroVideoComponent *Compo=[[EditIntroVideoComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -229,10 +237,27 @@
             Compo.backgroundColor=[UIColor whiteColor];
         }];
     }
+    if(indexPath.row==2 && indexPath.section==0)
+    {
+        
+        EditSCComponent *Compo=[[EditSCComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+        
+        [Compo setUp];
+        Compo.blackOverLayView.image=[Constant takeScreenshot];
+        Compo.blackOverLayView.alpha=1;
+        [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+        
+        [self addSubview:Compo];
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            Compo.frame=self.bounds;
+            Compo.backgroundColor=[UIColor whiteColor];
+        }];
+    }
     if(indexPath.row==3 && indexPath.section==0)
     {
         
-        EditSkillsComponent *Compo=[[EditSkillsComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+        EditPCComponent *Compo=[[EditPCComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
         
         [Compo setUp];
         Compo.blackOverLayView.image=[Constant takeScreenshot];
@@ -247,23 +272,6 @@
         }];
     }
     if(indexPath.row==4 && indexPath.section==0)
-    {
-        
-        EditProffesionComponent *Compo=[[EditProffesionComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
-        
-        [Compo setUp];
-        Compo.blackOverLayView.image=[Constant takeScreenshot];
-        Compo.blackOverLayView.alpha=1;
-        [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
-        
-        [self addSubview:Compo];
-        
-        [UIView animateWithDuration:0.3 animations:^{
-            Compo.frame=self.bounds;
-            Compo.backgroundColor=[UIColor whiteColor];
-        }];
-    }
-    if(indexPath.row==5 && indexPath.section==0)
     {
         
         EditLocationComponent *Compo=[[EditLocationComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -303,7 +311,7 @@
             Compo.backgroundColor=[UIColor whiteColor];
         }];
     }
-    if(indexPath.row==2 && indexPath.section==1)
+    if(indexPath.row==1 && indexPath.section==1)
     {
         
         EditBirthdayComponent *Compo=[[EditBirthdayComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -320,7 +328,7 @@
             Compo.backgroundColor=[UIColor whiteColor];
         }];
     }
-    if(indexPath.row==3 && indexPath.section==1)
+    if(indexPath.row==2 && indexPath.section==1)
     {
         
         EditMobileNoComponent *Compo=[[EditMobileNoComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -337,7 +345,7 @@
             Compo.backgroundColor=[UIColor whiteColor];
         }];
     }
-    if(indexPath.row==5 && indexPath.section==1)
+    if(indexPath.row==3 && indexPath.section==1)
     {
         
         EditPasswordComponent *Compo=[[EditPasswordComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
@@ -355,22 +363,85 @@
         }];
     }
     
-    if(indexPath.row==1 && indexPath.section==1)
-    {
-        passed=0;
-    }
+//    if(indexPath.row==1 && indexPath.section==1)
+//    {
+//        passed=0;
+//    }
+//    if(indexPath.row==3 && indexPath.section==1)
+//    {
+//        passed=0;
+//    }
     if(indexPath.row==4 && indexPath.section==1)
     {
+        
+        [self clearcache];
         passed=0;
+
     }
-    if(indexPath.row==6 && indexPath.section==1)
+    if(indexPath.row==5 && indexPath.section==1)
     {
         UINavigationController *vc=(UINavigationController *)[Constant topMostController];
         ViewController *t=(ViewController *)vc.topViewController;
         [t MasterlogoutBtnClicked:nil];
+
     }
+}
+-(int)cacheSizeCalculate
+{
+    NSString *path=[Constant applicationDocumentsDirectoryPath];
+
+        NSDictionary *fileDictionary = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        if (fileDictionary) {
+            // make use of attributes
+        } else {
+            // handle error found in 'error'
+        }
+        int size=(int)[fileDictionary fileSize]/1024;
+    return size;
     
 }
+-(void)clearcache
+{
+
+
+    
+    [FTIndicator showToastMessage:@"Cache Cleared!"];
+    
+
+    NSString *path=[self getDocumentImageCachePath];
+
+    BOOL success = [[NSFileManager defaultManager] removeItemAtPath:path error:nil];
+    
+
+        [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
+    
+
+    
+        NSArray *array=[[NSArray alloc] init];
+        [[NSUserDefaults standardUserDefaults] setObject:array forKey:@"DATA_IMAGECACHE"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+   
+    [VideoCacheManager clearCache];
+    
+
+}
+-(NSString *)getDocumentImageCachePath
+{
+    NSArray   *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString  *documentsDirectory = [paths objectAtIndex:0];
+    
+    documentsDirectory=[documentsDirectory stringByAppendingPathComponent:@"/ImageCache"];
+    
+    return documentsDirectory;
+    
+}
+
+
+
+
+
+
+
 -(void)backFromSetting:(id)sender
 {
     passed=0;

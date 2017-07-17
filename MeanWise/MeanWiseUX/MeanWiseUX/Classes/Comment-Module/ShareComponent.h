@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Constant.h"
+#import "APIObjects_FeedObj.h"
 
 @interface ShareComponent : UIView <UICollectionViewDelegate,UICollectionViewDataSource>
 {
@@ -29,11 +30,16 @@
 
     id delegate;
     SEL closeBtnClicked;
-
     
+    UIActivityViewController *activityViewControntroller;
+
+    APIObjects_FeedObj *mainData;
+    NSString *postIdReceived;
 }
 -(void)setUp;
 -(void)setTarget:(id)target andCloseBtnClicked:(SEL)func1;
+-(void)setMainData:(APIObjects_FeedObj *)feed;
+-(void)setPostId:(NSString *)postId;
 
 @end
 

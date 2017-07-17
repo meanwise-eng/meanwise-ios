@@ -9,12 +9,16 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
+#import "SAMTextView.h"
 
 @interface EditIntroBioComponent : UIView <UITextViewDelegate>
 {
     
+    int noOfCharacters;
+    UILabel *limitIndicatorLBL;
+
     UIView *bioBgView;
-    UITextView *bioTextView;
+    SAMTextView *bioTextView;
     
     UIView *navBar;
     UILabel *navBarTitle;
