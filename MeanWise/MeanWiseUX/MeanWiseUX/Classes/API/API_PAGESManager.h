@@ -20,6 +20,7 @@
 @property(nonatomic) NSInteger AP_lastPageNumberRequested;
 @property(nonatomic) NSInteger AP_countForRequest;
 @property(nonatomic) BOOL AP_isVertical;
+@property(nonatomic) BOOL AP_isPageBasedOnRecords;
 
 - (id) initWithRequestCount:(int)pageCount isVertical:(BOOL)vertical;
 -(void)resetAll;

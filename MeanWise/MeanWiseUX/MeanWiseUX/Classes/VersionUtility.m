@@ -51,9 +51,15 @@
         }
         else if([obj.message isEqualToString:@"3"])
         {
-           
+           if([obj.response isKindOfClass:[NSString class]])
+           {
+               
+           }
+            else
+            {
             NSString *newVersion=[[obj.response valueForKey:@"latest_version"] valueForKey:@"version"];
             [self showAlertForce:newVersion];
+            }
          
             
         }

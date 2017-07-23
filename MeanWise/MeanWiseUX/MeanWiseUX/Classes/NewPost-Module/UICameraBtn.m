@@ -123,6 +123,7 @@
     //    self.layer.cornerRadius=30;
     
 }
+
 -(void)cameraBtnTapDown:(id)sender
 {
     time=0;

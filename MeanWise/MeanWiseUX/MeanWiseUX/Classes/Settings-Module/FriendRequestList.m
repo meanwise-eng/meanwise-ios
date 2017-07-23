@@ -124,7 +124,7 @@
             
             APIObjects_ProfileObj *obj=[resultData objectAtIndex:i];
             
-            if([obj.friendShipStatus isEqualToString:@"Pending"])
+            if([obj.friend_request_status isEqualToString:@"Pending"])
             {
             [resultArray addObject:obj];
             }

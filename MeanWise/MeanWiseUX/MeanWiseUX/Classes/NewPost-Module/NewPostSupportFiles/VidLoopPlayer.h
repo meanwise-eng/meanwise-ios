@@ -22,10 +22,10 @@
     
 }
 -(void)setUp;
--(void)cleanUpAndsetPath:(NSString *)path;
+-(void)cleanUpAndsetPath:(NSString *)path; //Clean and Set New Path
 
--(void)killPlayer;
--(void)pauseBtnClicked:(id)sender;
--(void)resumeBtnClicked:(id)sender;
-
+-(void)killPlayer; //kill the player
+-(void)pauseBtnClicked:(id)sender; //Pause the player
+-(void)resumeBtnClicked:(id)sender; //Resume the player
+-(void)setSoundSettings:(BOOL)flag; //Mute on/Off
 @end

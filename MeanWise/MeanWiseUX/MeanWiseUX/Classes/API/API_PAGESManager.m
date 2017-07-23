@@ -17,6 +17,7 @@
     {
         self.AP_countForRequest = pageCount; // do your own initialisation here
         self.AP_isVertical = vertical;
+        self.AP_isPageBasedOnRecords=false;
     }
     return self;
 }
@@ -38,13 +39,18 @@
     if(self.AP_isVertical==true)
     {
         
-        
-        if(curPosition.y>(totalSize.height-scrollView.frame.size.height)*0.7)
+        if(self.AP_isPageBasedOnRecords==false)
         {
-            
-            if(self.AP_totalNumberOfPageAvailble>self.AP_lastPageNumberReceived && self.AP_lastPageNumberRequested==self.AP_lastPageNumberReceived)
+            if(curPosition.y>(totalSize.height-scrollView.frame.size.height)*0.7)
             {
-                return true;
+                if(self.AP_totalNumberOfPageAvailble>self.AP_lastPageNumberReceived && self.AP_lastPageNumberRequested==self.AP_lastPageNumberReceived)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
             }
             else
             {
@@ -53,9 +59,22 @@
         }
         else
         {
+            if(curPosition.y>(totalSize.height-cellHeight*5))
+            {
+                if(self.AP_totalNumberOfPageAvailble>self.AP_lastPageNumberReceived && self.AP_lastPageNumberRequested==self.AP_lastPageNumberReceived)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
             
-            
-            return false;
         }
     }
     else

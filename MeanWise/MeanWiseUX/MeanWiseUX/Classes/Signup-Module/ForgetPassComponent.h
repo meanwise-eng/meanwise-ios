@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "Constant.h"
 
-@interface ForgetPassComponent : UIView
+@interface ForgetPassComponent : UIView 
 {
     
     UIButton *nextBtn;

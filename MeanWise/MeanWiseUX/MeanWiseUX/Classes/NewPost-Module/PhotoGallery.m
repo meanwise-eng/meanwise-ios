@@ -181,15 +181,21 @@
     [masterScrollView addSubview:cameraBtnMax];
     [cameraBtnMax setTarget:self andPhotoCapture:@selector(capturePhoto:)];
     [cameraBtnMax setTarget:self andVideoStart:@selector(videoStart:) andVideoClose:@selector(videoEnd:)];
-    
-    
-    
-    
     [cameraBtnMax setUp];
+    cameraBtnMax.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width/2,imageViewCameraBack.bounds.size.height-60);
+
+    
+    handsFreeBtn=[[HandsFreeBtn alloc] initWithFrame:CGRectMake(0, 0, 80, 80)];
+    [masterScrollView addSubview:handsFreeBtn];
+    [handsFreeBtn setUpWithTime:25.0f];
+    [handsFreeBtn setTarget:self OnVideoStopCallBack:@selector(handsfreeBtnClicked:)];
+    handsFreeBtn.hidden=true;
+    handsFreeBtn.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width/2,imageViewCameraBack.bounds.size.height-70);
+
+    
 
     
     
-    cameraBtnMax.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width/2,imageViewCameraBack.bounds.size.height-60);
 
     
     
@@ -218,10 +224,27 @@
     [masterScrollView addSubview:flashLightBtn];
     
     
+    timerBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
+    [timerBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [timerBtn setBackgroundImage:[UIImage imageNamed:@"timerIcon.png"] forState:UIControlStateNormal];
+    [timerBtn setShowsTouchWhenHighlighted:YES];
+    timerBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:12];
+    timerBtn.titleLabel.adjustsFontSizeToFitWidth=YES;
+    timerBtn.layer.cornerRadius=25;
+    [timerBtn addTarget:self action:@selector(timerBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    [masterScrollView addSubview:timerBtn];
     
-    switchCamBtn.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width-75,imageViewCameraBack.bounds.size.height-60);
-    flashLightBtn.center=CGPointMake(widthMargin+75,imageViewCameraBack.bounds.size.height-60);
+    
+    
+    
+    switchCamBtn.center=CGPointMake(widthMargin+imageViewCameraBack.bounds.size.width-100,imageViewCameraBack.bounds.size.height-60);
+    
+    flashLightBtn.center=CGPointMake(widthMargin+100,imageViewCameraBack.bounds.size.height-60);
+    timerBtn.center=CGPointMake(widthMargin+35,imageViewCameraBack.bounds.size.height-60);
 
+    timerControl=nil;
+    timePicker=nil;
+    
     
 //    MXToolTipView *tipView=[[MXToolTipView alloc] initWithFrame:self.bounds];
 //    [self addSubview:tipView];
@@ -229,6 +252,67 @@
 //    [tipView setUp];
 //    [tipView setPointDownAt:CGPointMake(self.bounds.size.width/2, self.frame.size.height-60-50)];
 
+    
+}
+
+-(void)timerBtnClicked:(id)sender
+{
+    
+    timePicker=[[HCDropDown alloc] initWithFrame:masterView.frame];
+    [timePicker setUp:[[NSArray alloc] initWithObjects:@"5",@"10",@"15",@"25", nil] target:self callBack:@selector(timerTimeSelected:)];
+    [masterView addSubview:timePicker];
+    [timePicker setPopUpPoint:CGPointMake(35, masterView.bounds.size.height-60-25)];
+
+}
+-(void)timerTimeSelected:(NSNumber *)number
+{
+    NSLog(@"selected = %d",[number intValue]);
+    
+    if([number intValue]!=-1)
+    {
+        NSLog(@"selected = %d",[number intValue]);
+
+        int index=[number intValue];
+        
+        int time=5;
+        if(index==1) time=10;
+        if(index==2) time=15;
+        if(index==3) time=25;
+
+        
+        masterScrollView.scrollEnabled=false;
+        timerBtn.hidden=true;
+        cameraBtnMax.hidden=true;
+        cancelBtn.hidden=true;
+        switchBtn.hidden=true;
+        
+        handsFreeBtn.hidden=false;
+        [handsFreeBtn continueAnimation];
+        
+        timerControl=[[TimerCountDownControl alloc] initWithFrame:masterView.bounds];
+        [timerControl setUpWithTime:time];
+        [timerControl setTarget:self callBack:@selector(timerFinished:)];
+        [masterView addSubview:timerControl];
+        timerControl.userInteractionEnabled=false;
+
+    }
+    else
+    {
+        
+    }
+    [timePicker removeFromSuperview];
+    timePicker=nil;
+
+    
+        
+}
+-(void)timerFinished:(id)sender
+{
+    [timerControl removeFromSuperview];
+    timerControl=nil;
+    NSLog(@"Start");
+
+    [self handsfreeBtnClicked:nil];
     
 }
 -(void)capturePhoto:(id)sender
@@ -253,8 +337,56 @@
     }];
     NSLog(@"YO:photo capture");
 }
+-(void)handsfreeBtnClicked:(id)sender
+{
+    
+    if(switchCamBtn.hidden==false)
+    {
+        cameraBtnMax.hidden=true;
+        switchCamBtn.hidden=true;
+        flashLightBtn.hidden=true;
+        
+        masterScrollView.scrollEnabled=false;
+        timerBtn.hidden=true;
+        cameraBtnMax.hidden=true;
+        cancelBtn.hidden=true;
+        switchBtn.hidden=true;
+        
+        [self startRecordingVideo];
+        [handsFreeBtn startAnimation];
+
+
+    }
+    else
+    {
+        
+        cameraBtnMax.hidden=false;
+        switchCamBtn.hidden=false;
+        flashLightBtn.hidden=false;
+          timerBtn.hidden=false;
+        masterScrollView.scrollEnabled=true;
+        
+        cancelBtn.hidden=false;
+        switchBtn.hidden=false;
+
+        [cameraCaptureView stopRecording];
+        
+    }
+    
+
+}
+
 -(void)videoStart:(id)sender
 {
+    switchCamBtn.hidden=true;
+    flashLightBtn.hidden=true;
+    masterScrollView.scrollEnabled=false;
+    handsFreeBtn.hidden=true;
+    timerBtn.hidden=true;
+    
+    cancelBtn.hidden=true;
+    switchBtn.hidden=true;
+
     [self startRecordingVideo];
 
     NSLog(@"YO:video start capture");
@@ -262,8 +394,14 @@
 }
 -(void)videoEnd:(id)sender
 {
+    switchCamBtn.hidden=false;
+    flashLightBtn.hidden=false;
+        masterScrollView.scrollEnabled=true;
     [cameraCaptureView stopRecording];
-
+    handsFreeBtn.hidden=true;
+timerBtn.hidden=false;
+    cancelBtn.hidden=false;
+    switchBtn.hidden=false;
     NSLog(@"YO:video end capture");
     
 }
@@ -536,94 +674,88 @@
 -(void)setUpGallerySection
 {
     
+    currentSegmentIndex=0;
     
+    segmentControl=[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"All",@"Favorites", nil]];
+    [masterScrollView addSubview:segmentControl];
+    segmentControl.frame=CGRectMake(5, 80, self.frame.size.width-10, 30);
+    segmentControl.tintColor=[UIColor whiteColor];
+    segmentControl.selectedSegmentIndex=0;
+    [segmentControl addTarget:self action:@selector(mediaAlbumChange:) forControlEvents:UIControlEventValueChanged];
 
-    CGRect collectionViewFrame = CGRectMake(0,75, self.frame.size.width, self.frame.size.height-75);
-    
-    
-//    UICollectionViewFlowLayout* layout = [[UICollectionViewFlowLayout alloc] init];
-//    layout.minimumInteritemSpacing =1;
-//    layout.minimumLineSpacing = 1;
-//    layout.scrollDirection = UICollectionViewScrollDirectionVertical;
-//    layout.sectionInset = UIEdgeInsetsMake(0, 1, 0, 1);
 
-/*    layout.minimumInteritemSpacing = 10;
-    layout.minimumLineSpacing = 10;
-    layout.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
-*/
+
+    [self setUpGalleryUI];
+  
+
+    [self getAllPhotosDetailsAsync];
     
+}
+-(void)setUpGalleryUI
+{
+    
+    CGRect collectionViewFrame = CGRectMake(0,75+40, self.frame.size.width, self.frame.size.height-75-40);
     numColumns=3;
-    
     GalleryCollectionViewLayout *customLayout=[[GalleryCollectionViewLayout alloc] init];
     customLayout.interitemSpacing=1;
     customLayout.lineSpacing=1;
-    
-
     columunWidth=(collectionViewFrame.size.width-(customLayout.lineSpacing*(numColumns-1)))/numColumns;
-    
-    
-
-    
     photoGallery = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:customLayout];
     
-    //  photoGallery.pagingEnabled = YES;
     [photoGallery registerClass:[PhotoAlbumCCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     [masterScrollView addSubview:photoGallery];
-   // photoGallery.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
     photoGallery.backgroundColor=[UIColor clearColor];
     
-  
-
-    
-    /*
-    PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
-    
-    if (status == PHAuthorizationStatusAuthorized) {
-        
-        arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
-        [photoGallery reloadData];
-
-        // Access has been granted.
-    }
-    
-    else if (status == PHAuthorizationStatusDenied) {
-        
-        // Access has been denied.
-    }
-    
-    
-    else if (status == PHAuthorizationStatusNotDetermined) {
-     
-    }
-    
-    else if (status == PHAuthorizationStatusRestricted) {
-        // Restricted access - normally won't happen.
-    }
-    
-    
-    // Access has not been determined.
-    [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
-        
-        if (status == PHAuthorizationStatusAuthorized) {
-            
-           
-            
-            // Access has been granted.
-        }
-        
-        else {
-            
-            // Access has been denied.
-        }
-    }];*/
-    
-  
-
-    [self getAllPhotoDetailsAsync];
-    
 }
--(void)getAllPhotoDetailsAsync
+-(void)mediaAlbumChange:(UISegmentedControl *)sender
 {
+
+  
+    photoGallery.delegate=nil;
+    photoGallery.dataSource=nil;
+    [photoGallery removeFromSuperview];
+    photoGallery=nil;
+    
+    
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        // Add code here to do background processing
+        //
+        //
+        
+        dispatch_async( dispatch_get_main_queue(), ^{
+            
+            if(sender.selectedSegmentIndex==0)
+            {
+                currentSegmentIndex=0;
+                arrayData=[NSArray arrayWithArray:allImagesList];
+                
+            }
+            else
+            {
+                currentSegmentIndex=1;
+                arrayData=[NSArray arrayWithArray:favoritesImages];
+            }
+            
+            [self setUpGalleryUI];
+            photoGallery.dataSource=self;
+            photoGallery.delegate=self;
+
+//            [photoGallery reloadData];
+            
+        });
+    });
+    
+
+  
+
+}
+-(void)getAllPhotosDetailsAsync
+{
+    NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
+    float y=[[nud valueForKey:@"GALLERY_SCROLLY"] floatValue];
+    currentSegmentIndex=[[nud valueForKey:@"CURRENT_SEGMENT"] intValue];
+    segmentControl.selectedSegmentIndex=currentSegmentIndex;
+
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         // Add code here to do background processing
         //
@@ -631,15 +763,23 @@
 
         dispatch_async( dispatch_get_main_queue(), ^{
             
-            arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
+        [self getListOfPhotos:PHAssetMediaTypeImage];
+            
+            if(currentSegmentIndex==0)
+            {
+            arrayData=allImagesList;
+            }
+            else
+            {
+                arrayData=favoritesImages;
+            }
             photoGallery.delegate = self;
             photoGallery.dataSource = self;
 
             [photoGallery reloadData];
             
-            NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
-            float y=[[nud valueForKey:@"GALLERY_SCROLLY"] floatValue];
             photoGallery.contentOffset=CGPointMake(0, y);
+            
 
         });
     });
@@ -670,6 +810,8 @@
     
     NSUserDefaults *nud=[NSUserDefaults standardUserDefaults];
     [nud setValue:[NSNumber numberWithFloat:photoGallery.contentOffset.y] forKey:@"GALLERY_SCROLLY"];
+    [nud setValue:[NSNumber numberWithInt:currentSegmentIndex] forKey:@"CURRENT_SEGMENT"];
+
     [nud synchronize];
 
     PHAsset *asset=[arrayData objectAtIndex:indexPath.row];
@@ -808,6 +950,7 @@
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
+
     int numberOfPhotos=(int)arrayData.count;
     /*if(numberOfPhotos>50)
     {
@@ -881,7 +1024,7 @@
 
 
 
--(NSArray *)getListOfPhotos:(PHAssetMediaType)mediaType
+-(void)getListOfPhotos:(PHAssetMediaType)mediaType
 {
     PHFetchOptions *allPhotosOptions = [PHFetchOptions new];
     
@@ -903,11 +1046,17 @@
     PHFetchResult *allPhotosResult = [PHAsset fetchAssetsWithOptions:allPhotosOptions];
     
     NSMutableArray *assets=[[NSMutableArray alloc] init];
+    NSMutableArray *assetFavorites=[[NSMutableArray alloc] init];
     
     [allPhotosResult enumerateObjectsUsingBlock:^(PHAsset *asset, NSUInteger idx, BOOL *stop) {
         
         
 
+
+        if(asset.isFavorite)
+        {
+            [assetFavorites addObject:asset];
+        }
         
         [assets addObject:asset];
         NSLog(@"asset %@", asset);
@@ -915,11 +1064,10 @@
         
     }];
     
-    return assets;
     
     
-    
-    
+    favoritesImages=assetFavorites;
+    allImagesList=assets;
     
     
     
@@ -1130,6 +1278,53 @@
 {
     titleLBL.text=title;
 }
+-(void)PhotosPermission
+{
+    
+    /*
+     PHAuthorizationStatus status = [PHPhotoLibrary authorizationStatus];
+     
+     if (status == PHAuthorizationStatusAuthorized) {
+     
+     arrayData=[self getListOfPhotos:PHAssetMediaTypeImage];
+     [photoGallery reloadData];
+     
+     // Access has been granted.
+     }
+     
+     else if (status == PHAuthorizationStatusDenied) {
+     
+     // Access has been denied.
+     }
+     
+     
+     else if (status == PHAuthorizationStatusNotDetermined) {
+     
+     }
+     
+     else if (status == PHAuthorizationStatusRestricted) {
+     // Restricted access - normally won't happen.
+     }
+     
+     
+     // Access has not been determined.
+     [PHPhotoLibrary requestAuthorization:^(PHAuthorizationStatus status) {
+     
+     if (status == PHAuthorizationStatusAuthorized) {
+     
+     
+     
+     // Access has been granted.
+     }
+     
+     else {
+     
+     // Access has been denied.
+     }
+     }];*/
+    
+}
+
 
 -(void)getThumb:(NSString *)path
 {

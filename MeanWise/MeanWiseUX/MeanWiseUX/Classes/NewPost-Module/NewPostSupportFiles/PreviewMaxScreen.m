@@ -43,28 +43,25 @@
 -(void)setUpMediaSection
 {
     
-    
     mediaView=[[UIView alloc] initWithFrame:fullRect];
     [self addSubview:mediaView];
-    mediaImageView=[[UIFilterImageView alloc] initWithFrame:fullRect];
+    mediaImageView=[[HCFilterImageView alloc] initWithFrame:fullRect];
     [mediaView addSubview:mediaImageView];
+    [mediaImageView setUp];
     [mediaImageView cleanUp];
     
     
     
-    loopPlayer=[[VidLoopPlayer alloc] initWithFrame:fullRect];
+    loopPlayer=[[HCFilterVideoView alloc] initWithFrame:fullRect];
     [self addSubview:loopPlayer];
     [loopPlayer setUp];
     
-    videoOverLayView=[[UIFilterOverLayView alloc] initWithFrame:fullRect];
-    [self addSubview:videoOverLayView];
-    [videoOverLayView setUp];
-    
-    
+   
     
 }
 -(void)setUpPath:(NSString *)path
 {
+    audioOption=1;
     actualMediaPath=path;
     
     NSString *ext = [path pathExtension];
@@ -75,18 +72,21 @@
         
         mediaType=0;
         loopPlayer.hidden=true;
-        [mediaImageView setUpWithImage:path];
-        videoOverLayView.hidden=true;
-        int p=0;
+        [mediaImageView setUpPath:path];
+        
+        filterBtn.hidden=true;
+        soundToggleBtn.hidden=true;
     }
     else
     {
         
         mediaType=1;
         mediaImageView.hidden=true;
-        videoOverLayView.hidden=false;
         
         [loopPlayer cleanUpAndsetPath:path];
+        filterBtn.hidden=true;
+        soundToggleBtn.hidden=false;
+
     }
     
     
@@ -121,6 +121,9 @@
     [self addSubview:textFilterPhaseBtn];
     textFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10, 25+15);
     
+
+
+    
     
     trashIcon=[self getButton:@"MX_TrashIcon.png" andCallBack:nil];
     [self addSubview:trashIcon];
@@ -132,6 +135,15 @@
     [self addSubview:locationFilterPhaseBtn];
     locationFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10,100+15);
     
+    isFilterModeOn=false;
+    
+    filterBtn=[self getButton:@"MX_addLocation.png" andCallBack:@selector(filterBtnClicked:)];
+    [self addSubview:filterBtn];
+    filterBtn.center=CGPointMake(fullRect.size.width-25-10,100+150);
+    
+    soundToggleBtn=[self getButton:@"MX_Volume_unMute.png" andCallBack:@selector(soundToggleBtnClicked:)];
+    [self addSubview:soundToggleBtn];
+    soundToggleBtn.center=CGPointMake(fullRect.size.width/2,25+15);
     
     UITapGestureRecognizer *gestureTap=[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
     [self addGestureRecognizer:gestureTap];
@@ -152,6 +164,60 @@
     
     
 }
+-(void)soundToggleBtnClicked:(id)sender
+{
+    if(audioOption==0)
+    {
+        audioOption=1;
+
+        [soundToggleBtn setBackgroundImage:[UIImage imageNamed:@"MX_Volume_unMute.png"] forState:UIControlStateNormal];
+
+
+        [loopPlayer setSoundSettings:false];
+
+    }
+    else
+    {
+
+        [soundToggleBtn setBackgroundImage:[UIImage imageNamed:@"MX_Volume_mute.png"] forState:UIControlStateNormal];
+
+
+        audioOption=0;
+
+        [loopPlayer setSoundSettings:true];
+
+     
+    }
+}
+-(void)filterBtnClicked:(id)sender
+{
+
+    if(isFilterModeOn==false)
+    {
+        filterBtn.center=CGPointMake(fullRect.size.width-25-10, 25+15);
+        isFilterModeOn=true;
+        mediaCancelThisMediaBtn.hidden=true;
+        mediaNextBtn.hidden=true;
+        mediaDownloadBtn.hidden=true;
+        locationFilterPhaseBtn.hidden=true;
+        textFilterPhaseBtn.hidden=true;
+        trashIcon.hidden=true;
+        fullScreenBtn.hidden=true;
+    }
+    else
+    {
+        filterBtn.center=CGPointMake(fullRect.size.width-25-10,100+150);
+        isFilterModeOn=false;
+        mediaCancelThisMediaBtn.hidden=false;
+        mediaNextBtn.hidden=false;
+        mediaDownloadBtn.hidden=false;
+        locationFilterPhaseBtn.hidden=false;
+        textFilterPhaseBtn.hidden=false;
+        trashIcon.hidden=false;
+                fullScreenBtn.hidden=false;
+    }
+}
+
 
 -(void)textFilterPhaseBtnClicked:(id)sender
 {
@@ -235,7 +301,18 @@
     
     [self bringSubviewToFront:overLayStickerKeyboardBar];
     
-    overLayStickerKeyboardBar.frame=CGRectMake(0, self.frame.size.height-height-100, self.frame.size.width, 100);
+    
+    int heightTop=self.frame.size.height-height-100;
+    
+    if(RX_isiPhone5Res)
+    {
+        heightTop=heightTop-45;
+    }
+    if(RX_isiPhone7PlusRes)
+    {
+        heightTop=heightTop+30;
+    }
+    overLayStickerKeyboardBar.frame=CGRectMake(0, heightTop, self.frame.size.width, 100);
     
     
     
@@ -366,16 +443,16 @@
                                        @selector(thisImage:hasBeenSavedInPhotoAlbumWithError:usingContextInfo:), // the selector to tell the method to call on completion
                                        NULL); // you generally won't need a contextInfo here
         
-        int p=0;
     }
     else
     {
         [AnalyticsMXManager PushAnalyticsEvent:@"Media-save-Video"];
 
+        NSDictionary *dict=[self getMetaDataOptions];
         UIImage *image=[self getOverLayVideoImage];
-        [self exportVideoWithOverLay:image];
         
-        //  [self exportVideoWithOverLay1:image];
+//        [self exportVideoWithOverLay:image withMetadata:dict];
+        [self exportCompositionToVideo:image withMetadata:dict];
         
         
         NSString *path=[self FM_saveImageAtDocumentDirectory:image];
@@ -387,7 +464,39 @@
     }
     
 }
+-(NSDictionary *)getMetaDataOptions;
+{
+    
 
+
+    NSDictionary *dict2=[loopPlayer getFilterDict];
+    
+    //        NSDictionary *dict=[[NSDictionary alloc] initWithObjectsAndKeys:snapshotImage,@"OVERLAY",currentCompo,@"COMPOSITION",nil];
+
+    if(dict2.allKeys.count!=0)
+    {
+    
+    NSDictionary *dict=@{
+                         @"audioOption":[NSNumber numberWithInt:audioOption],
+                         @"COMPOSITION":[dict2 valueForKey:@"COMPOSITION"],
+                         @"OVERLAY":[dict2 valueForKey:@"OVERLAY"]
+                         
+                         };
+        return dict;
+
+    }
+    else
+    {
+        NSDictionary *dict=@{
+                             @"audioOption":[NSNumber numberWithInt:audioOption],
+                             
+                             };
+        return dict;
+
+    }
+    
+   
+}
 -(UIImage *)getOverLayVideoImage
 {
     mediaCancelThisMediaBtn.hidden=true;
@@ -396,7 +505,7 @@
     locationFilterPhaseBtn.hidden=true;
     textFilterPhaseBtn.hidden=true;
     trashIcon.hidden=true;
-    
+    soundToggleBtn.hidden=true;
     loopPlayer.hidden=true;
     
     self.backgroundColor=[UIColor clearColor];
@@ -423,7 +532,10 @@
     locationFilterPhaseBtn.hidden=false;
     textFilterPhaseBtn.hidden=false;
     trashIcon.hidden=false;
-    
+    if(mediaType==1)
+    {
+        soundToggleBtn.hidden=false;
+    }
     return image;
     
 }
@@ -486,6 +598,8 @@
         locationFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10,100+15);
         [mediaCancelThisMediaBtn setBackgroundImage:[UIImage imageNamed:@"MX_cCloseBtn.png"] forState:UIControlStateNormal];
         
+        soundToggleBtn.center=CGPointMake(fullRect.size.width/2,25+15);
+        
         self.frame=fullRect;
         
         fullScreenBtn.hidden=true;
@@ -505,7 +619,8 @@
             mediaCancelThisMediaBtn.center=CGPointMake(25, 25+15);
             textFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10, 25+15);
             locationFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10,100+15);
-            
+            soundToggleBtn.center=CGPointMake(fullRect.size.width/2,25+15);
+
             self.frame=fullRect;
             
         } completion:^(BOOL finished) {
@@ -537,7 +652,8 @@
         mediaCancelThisMediaBtn.center=CGPointMake(fullRect.size.width-25, 25);
         textFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10, -100);
         locationFilterPhaseBtn.center=CGPointMake(fullRect.size.width-25-10,-100);
-        
+        soundToggleBtn.center=CGPointMake(fullRect.size.width/2,-100);
+
         self.frame=smallRect;
         
     } completion:^(BOOL finished) {
@@ -557,7 +673,6 @@
 }
 -(void)setTarget:(id)delegate showFullScreenCallBack:(SEL)func1 andShowThumbCallBack:(SEL)func2
 {
-    
     target=delegate;
     showFullScreenFunc=func1;
     showThumbScreenFunc=func2;
@@ -590,32 +705,31 @@
     
     
 }
--(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
-{
-    if(touches.count==1 && mediaType==0)
-    {
-        UITouch *touch=[touches anyObject];
-        CGPoint location=[touch locationInView:self];
-        
-        if(touch.tapCount==2)
-        {
-            [AnalyticsMXManager PushAnalyticsEvent:@"Media-imageFilter"];
-
-            [mediaImageView generateNewEffectPoint:location];
-        }
-    }
-    else if(touches.count==1 && mediaType==1)
-    {
-        UITouch *touch=[touches anyObject];
-        CGPoint location=[touch locationInView:self];
-        
-        if(touch.tapCount==2)
-        {
-            [videoOverLayView generateNewEffectPoint:location];
-        }
-        
-    }
-}
+//-(void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+//{
+//    if(touches.count==1 && mediaType==0)
+//    {
+//        UITouch *touch=[touches anyObject];
+//        CGPoint location=[touch locationInView:self];
+//        
+//        if(touch.tapCount==2)
+//        {
+//            [AnalyticsMXManager PushAnalyticsEvent:@"Media-imageFilter"];
+//
+//            [mediaImageView generateNewEffectPoint:location];
+//        }
+//    }
+//    else if(touches.count==1 && mediaType==1)
+//    {
+//        UITouch *touch=[touches anyObject];
+//        CGPoint location=[touch locationInView:self];
+//        
+//        if(touch.tapCount==2)
+//        {
+//        }
+//        
+//    }
+//}
 -(NSString *)FM_saveImageAtDocumentDirectory:(UIImage *)image
 {
     
@@ -633,7 +747,7 @@
     
     return documentsPath;
 }
--(void)exportVideoWithOverLay1:(UIImage *)overLayImage
+-(void)exportVideoWithOver2Lay1:(UIImage *)overLayImage
 {
     
     
@@ -758,8 +872,90 @@
     }];
     
 }
--(void)exportVideoWithOverLay:(UIImage *)overLayImage
+-(void)exportCompositionToVideo:(UIImage *)overLayImage withMetadata:(NSDictionary *)dict
 {
+    AVMutableVideoComposition *currentCompo=[dict valueForKey:@"COMPOSITION"];
+    
+    if(currentCompo==nil)
+    {
+        [self exportVideoWithOverLay:overLayImage withMetadata:dict withNewPath:actualMediaPath];
+
+    }
+    else
+    {
+    AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:[NSURL fileURLWithPath:actualMediaPath] options:nil];
+    AVAssetTrack *track = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CGSize dimensions = CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform);
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *destinationPath =  [documentsDirectory stringByAppendingPathComponent:
+                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", arc4random() % 1000]];
+    [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
+    
+    
+    
+    SDAVAssetExportSession *encoder = [SDAVAssetExportSession.alloc initWithAsset:[AVAsset assetWithURL:[NSURL fileURLWithPath:actualMediaPath]]];
+    encoder.outputFileType = AVFileTypeQuickTimeMovie;
+    encoder.outputURL = [NSURL fileURLWithPath:destinationPath];
+    encoder.videoComposition=currentCompo;
+    
+    encoder.videoSettings = @
+    {
+    AVVideoCodecKey: AVVideoCodecH264,
+    AVVideoWidthKey: [NSNumber numberWithFloat:dimensions.width],
+    AVVideoHeightKey: [NSNumber numberWithFloat:dimensions.height],
+    AVVideoCompressionPropertiesKey: @
+        {
+        AVVideoAverageBitRateKey: @1100000,
+        AVVideoProfileLevelKey: AVVideoProfileLevelH264High40,
+        },
+    };
+    encoder.audioSettings = @
+    {
+    AVFormatIDKey: @(kAudioFormatMPEG4AAC),
+    AVNumberOfChannelsKey: @2,
+    AVSampleRateKey: @(44100/2),
+    AVEncoderBitRateKey: @(128000/2),
+    };
+    
+    
+    
+    [encoder exportAsynchronouslyWithCompletionHandler:^
+     {
+         if (encoder.status == AVAssetExportSessionStatusCompleted)
+         {
+
+                    [self exportVideoWithOverLay:overLayImage withMetadata:dict withNewPath:destinationPath];
+
+//             NSLog(@"Export OK %@",destinationPath);
+//             if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(destinationPath)) {
+//                 UISaveVideoAtPathToSavedPhotosAlbum(destinationPath, self, @selector(thisImage:hasBeenSavedInPhotoAlbumWithError:usingContextInfo:), nil);
+//             }
+//             
+             NSLog(@"Video export succeeded 1");
+         }
+         else if (encoder.status == AVAssetExportSessionStatusCancelled)
+         {
+             NSLog(@"Video cancel error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+         }
+         else
+         {
+             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+         }
+     }];
+    }
+
+    
+
+}
+-(void)exportVideoWithOverLay:(UIImage *)overLayImage withMetadata:(NSDictionary *)dict withNewPath:(NSString *)filteredPath
+{
+    
+    int kAudioOption=[[dict valueForKey:@"audioOption"] intValue];
+    
+    UIImage *imageFirst=[dict valueForKey:@"OVERLAY"];
+    
     
     
     CGSize requiredVideoSize=RX_mainScreenBounds.size;
@@ -768,7 +964,7 @@
     requiredVideoSize=CGSizeMake(requiredVideoSize.width*2, requiredVideoSize.height*2);
     
     
-    AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:[NSURL fileURLWithPath:actualMediaPath] options:nil];
+    AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:[NSURL fileURLWithPath:filteredPath] options:nil];
     
     
     
@@ -780,7 +976,7 @@
 
     [compositionVideoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:clipVideoTrack atTime:kCMTimeZero error:nil];
 
-    if([videoAsset tracksWithMediaType:AVMediaTypeAudio].count>0)
+    if([videoAsset tracksWithMediaType:AVMediaTypeAudio].count>0 && kAudioOption!=0)
     {
     AVMutableCompositionTrack *compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
     
@@ -788,7 +984,6 @@
         [compositionAudioTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:clipAudioTrack atTime:kCMTimeZero error:nil];
 
     }
-    //If you need audio as well add the Asset Track for audio here
     
     
     
@@ -810,6 +1005,13 @@
     parentLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
     videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
     [parentLayer addSublayer:videoLayer];
+    
+    
+    CALayer *firstLayer = [CALayer layer];
+    firstLayer.contents = (id)imageFirst.CGImage;
+    //titleLayer.frame = CGRectMake(15, 15, 600/8, 600/8);
+    firstLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    [parentLayer addSublayer:firstLayer];
     
     
     CALayer *titleLayer = [CALayer layer];
@@ -899,13 +1101,13 @@
                  UISaveVideoAtPathToSavedPhotosAlbum(destinationPath, self, @selector(thisImage:hasBeenSavedInPhotoAlbumWithError:usingContextInfo:), nil);
              }
              
-             NSLog(@"Export OK %@",destinationPath);
+             NSLog(@"Export OK %@ ",destinationPath);
              
-             NSLog(@"Video export succeeded");
+             NSLog(@"Video export succeeded 2");
          }
          else if (encoder.status == AVAssetExportSessionStatusCancelled)
          {
-             NSLog(@"Video export cancelled");
+             NSLog(@"Video cancel error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
          }
          else
          {

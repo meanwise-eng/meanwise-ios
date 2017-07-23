@@ -93,8 +93,23 @@
         
     }
     
+    int flag=[[dict valueForKey:@"is_liked"] intValue];
+
     
-    NSArray *likedBy=[dict valueForKey:@"liked_by"];
+    if(flag==1)
+    {
+        self.is_liked=[NSNumber numberWithInt:1];
+
+    }
+    else
+    {
+        self.is_liked=[NSNumber numberWithInt:0];
+
+    }
+    
+    /*NSArray *likedBy=[dict valueForKey:@"liked_by"];
+    
+    
     
     if(likedBy!=0)
     {
@@ -110,6 +125,8 @@
         }
         
     }
+*/
+    
     
     
 }

@@ -41,7 +41,7 @@
         APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
         if([obj.postId isEqualToString:postId])
         {
-            obj.IsUserLiked=[NSNumber numberWithInt:1];
+            obj.is_liked=[NSNumber numberWithInt:1];
             obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]+1];
             
             [self.homeFeedResults replaceObjectAtIndex:i withObject:obj];
@@ -55,7 +55,7 @@
         APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
         if([obj.postId isEqualToString:postId])
         {
-            obj.IsUserLiked=[NSNumber numberWithInt:1];
+            obj.is_liked=[NSNumber numberWithInt:1];
             obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]+1];
             
             [self.exploreFeedResults replaceObjectAtIndex:i withObject:obj];
@@ -149,7 +149,7 @@
         APIObjects_FeedObj *obj=[self.homeFeedResults objectAtIndex:i];
         if([obj.postId isEqualToString:postId])
         {
-            obj.IsUserLiked=[NSNumber numberWithInt:0];
+            obj.is_liked=[NSNumber numberWithInt:0];
             obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]-1];
             
             [self.homeFeedResults replaceObjectAtIndex:i withObject:obj];
@@ -162,7 +162,7 @@
         APIObjects_FeedObj *obj=[self.exploreFeedResults objectAtIndex:i];
         if([obj.postId isEqualToString:postId])
         {
-            obj.IsUserLiked=[NSNumber numberWithInt:0];
+            obj.is_liked=[NSNumber numberWithInt:0];
             obj.num_likes=[NSNumber numberWithInt:[obj.num_likes intValue]-1];
             
             [self.exploreFeedResults replaceObjectAtIndex:i withObject:obj];

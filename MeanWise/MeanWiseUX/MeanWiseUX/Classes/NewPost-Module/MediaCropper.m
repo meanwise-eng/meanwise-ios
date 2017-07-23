@@ -45,16 +45,16 @@
 
 -(void)setUpWithPath:(NSString *)stringPath
 {
-    
-    
-    
-    isPlayerPaused=false;
-    
+    defaultOrientation=0;
     self.backgroundColor=[UIColor blackColor];
+
     
+    [self setUpContainerAndScroll];
+    
+
     filePathStr=stringPath;
     NSString *ext = [filePathStr pathExtension];
-    
+        isPlayerPaused=false;
     if([ext.lowercaseString isEqualToString:@"png"] || [ext.lowercaseString isEqualToString:@"jpg"] || [ext.lowercaseString isEqualToString:@"jpeg"])
     {
         isVideo=false;
@@ -64,42 +64,32 @@
         isVideo=true;
     }
     
-    containerView=[[UIView alloc] initWithFrame:self.bounds];
-    [self addSubview:containerView];
-    containerView.clipsToBounds=false;
-    
-    
-    scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
-    [containerView addSubview:scrollView];
-    scrollView.center=self.center;
-    scrollView.showsHorizontalScrollIndicator=false;
-    scrollView.showsVerticalScrollIndicator=false;
-    scrollView.clipsToBounds=false;
-    scrollView.layer.borderWidth=1;
-    scrollView.layer.borderColor=[UIColor whiteColor].CGColor;
-    scrollView.delegate=self;
-    scrollView.minimumZoomScale=1.0f;
-    scrollView.maximumZoomScale=1.1f;
-    
+ 
     
     if(isVideo==false)
     {
-        UIImage *image=[UIImage imageWithContentsOfFile:filePathStr];
-        CGSize imageViewSize=CGSizeMake(image.size.width, image.size.height);
+        sourceImage=[UIImage imageWithContentsOfFile:filePathStr];
+        imageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0,0 , 0)];
+        imageView.image=sourceImage;
+        [commonView addSubview:imageView];
+
         
-        if(image.size.width>=image.size.height)
+        
+        CGSize imageViewSize=CGSizeMake(sourceImage.size.width, sourceImage.size.height);
+        
+        if(sourceImage.size.width>=sourceImage.size.height)
         {
-            ratio=scrollView.frame.size.height/image.size.height;
-            float width=ratio*image.size.width;
+            ratio=scrollView.frame.size.height/sourceImage.size.height;
+            float width=ratio*sourceImage.size.width;
             imageViewSize=CGSizeMake(width, scrollView.frame.size.height);
         }
         else
         {
-            ratio=scrollView.frame.size.width/image.size.width;
-            float height=ratio*image.size.height;
+            ratio=scrollView.frame.size.width/sourceImage.size.width;
+            float height=ratio*sourceImage.size.height;
             imageViewSize=CGSizeMake(scrollView.frame.size.width, height);
             
-            if(imageViewSize.height<scrollView.frame.size.height)
+            if(imageViewSize.height<scrollView.frame.size.height) //bruteforce
             {
                 float newratio=1.0f;
                 for(int i=0;i<20;i++)
@@ -124,10 +114,11 @@
         }
         
         scrollView.contentSize=imageViewSize;
+        commonView.frame=CGRectMake(0, 0,imageViewSize.width , imageViewSize.height);
+        imageView.frame=CGRectMake(0, 0,imageViewSize.width , imageViewSize.height);
         
-        imageView=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0,imageViewSize.width , imageViewSize.height)];
-        imageView.image=image;
-        [scrollView addSubview:imageView];
+        
+        
     }
     else
     {
@@ -141,10 +132,11 @@
         playerStartTime=kCMTimeZero;
         playerEndTime=playerViewControl.player.currentItem.duration;
         
-        //  playerViewControl.videoGravity=AVLayerVideoGravityResize;
-        
-        // CGSize mediaSize = track.naturalSize;
-        
+        [commonView addSubview:playerViewControl.view];
+        playerViewControl.view.userInteractionEnabled=false;
+        playerViewControl.videoGravity=AVLayerVideoGravityResizeAspect;
+        [self performSelector:@selector(autoplayContinue:) withObject:nil afterDelay:0.2f];
+
         
         CGSize mediaSize=[self getTheSizeFromVideoPath:filePathStr];
         
@@ -184,19 +176,55 @@
         }
         
         
-        scrollView.contentSize=mediaSize;
         
+        
+        scrollView.contentSize=mediaSize;
+        commonView.frame=CGRectMake(0, 0,mediaSize.width , mediaSize.height);
         playerViewControl.view.frame=CGRectMake(0, 0, mediaSize.width, mediaSize.height);
-        [scrollView addSubview:playerViewControl.view];
-        playerViewControl.view.userInteractionEnabled=false;
-        playerViewControl.videoGravity=AVLayerVideoGravityResizeAspect;
-        [self performSelector:@selector(autoplayContinue:) withObject:nil afterDelay:0.2f];
         
         
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
     [self setUpBoundriesAndGrid];
     
+    [self setUpButtons];
+    
+  
+}
+-(void)setUpContainerAndScroll
+{
+    containerView=[[UIView alloc] initWithFrame:self.bounds];
+    [self addSubview:containerView];
+    containerView.clipsToBounds=false;
+    
+    
+    scrollView=[[UIScrollView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
+    [containerView addSubview:scrollView];
+    scrollView.center=self.center;
+    scrollView.showsHorizontalScrollIndicator=false;
+    scrollView.showsVerticalScrollIndicator=false;
+    scrollView.clipsToBounds=false;
+    scrollView.layer.borderWidth=1;
+    scrollView.layer.borderColor=[UIColor whiteColor].CGColor;
+    scrollView.delegate=self;
+    scrollView.minimumZoomScale=1.0f;
+    scrollView.maximumZoomScale=2.0f;
+    
+    commonView=[[UIView alloc] initWithFrame:CGRectZero];
+    [scrollView addSubview:commonView];
+    
+
+}
+-(void)setUpButtons
+{
     title=[[UILabel alloc] initWithFrame:CGRectMake(0, 20, self.bounds.size.width, 50)];
     [self addSubview:title];
     title.textAlignment=NSTextAlignmentCenter;
@@ -215,7 +243,7 @@
         [self addSubview:trimSlider];
         [trimSlider setUp:filePathStr];
         [trimSlider setTarget:self andOnTrimmingDidChangeFunc:@selector(trimmingChange:)];
-
+        
         
         //        CGSize mediaSize=[self getTheSizeFromVideoPath:filePathStr];
         //
@@ -230,59 +258,201 @@
     title.layer.shadowRadius=2;
     title.layer.shadowOffset=CGSizeMake(0, 0);
     
-    
-    doneBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-80, 20, 70, 50)];
+    doneBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-60, 30, 50, 50)];
     [self addSubview:doneBtn];
-    [doneBtn setTitle:@"Done" forState:UIControlStateNormal];
+    [doneBtn setBackgroundImage:[UIImage imageNamed:@"3_correctBtn.png"] forState:UIControlStateNormal];
+
     doneBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
     [doneBtn addTarget:self action:@selector(cropFinished:) forControlEvents:UIControlEventTouchUpInside];
- 
-    doneBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
-    doneBtn.titleLabel.layer.shadowOpacity=0.5;
-    doneBtn.titleLabel.layer.shadowRadius=2;
-    doneBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
     
-    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 20, 70, 50)];
+    
+    cancelBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 30, 40, 40)];
     [self addSubview:cancelBtn];
-    [cancelBtn setTitle:@"Cancel" forState:UIControlStateNormal];
+    [cancelBtn setBackgroundImage:[UIImage imageNamed:@"BackPlainWhite.png"] forState:UIControlStateNormal];
+
     cancelBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
     [cancelBtn addTarget:self action:@selector(cancelBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     
+   
+    rotateBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.bounds.size.width-60, 90, 50, 50)];
+    [self addSubview:rotateBtn];
+    [rotateBtn setBackgroundImage:[UIImage imageNamed:@"RotateMedia.png"] forState:UIControlStateNormal];
+    rotateBtn.titleLabel.font=[UIFont fontWithName:k_fontBold size:16];
+    [rotateBtn addTarget:self action:@selector(rotateBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+    doneBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
+    doneBtn.titleLabel.layer.shadowOpacity=0.8;
+    doneBtn.titleLabel.layer.shadowRadius=5;
+    doneBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
+    
     cancelBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
-    cancelBtn.titleLabel.layer.shadowOpacity=0.5;
-    cancelBtn.titleLabel.layer.shadowRadius=2;
+    cancelBtn.titleLabel.layer.shadowOpacity=0.8;
+    cancelBtn.titleLabel.layer.shadowRadius=5;
     cancelBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
     
+    
+    rotateBtn.titleLabel.layer.shadowColor=[UIColor blackColor].CGColor;
+    rotateBtn.titleLabel.layer.shadowOpacity=0.8;
+    rotateBtn.titleLabel.layer.shadowRadius=5;
+    rotateBtn.titleLabel.layer.shadowOffset=CGSizeMake(0, 0);
+    
 }
--(void)cancelBtnClicked:(id)sender
+-(void)rotateBtnClicked:(id)sender
 {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        
-        
-        if(isVideo)
+    if(isVideo==false)
+    {
+        CGSize imageViewSize;
+        if(defaultOrientation==0)
         {
-            isPlayerPaused=true;
-            [playerViewControl.player pause];
-            playerViewControl.player=nil;
-            playerViewControl=nil;
-            
+
+
+            [UIView animateWithDuration:0.2 animations:^{
+                imageView.transform=CGAffineTransformMakeRotation(M_PI/2);
+                rotateBtn.transform=CGAffineTransformMakeScale(-1, 1);
+//                imageView.transform = CGAffineTransformRotate(imageView.transform, M_PI/2);
+            }];
+            imageViewSize=CGSizeMake(sourceImage.size.height, sourceImage.size.width);
+            defaultOrientation=1;
         }
         else
         {
+            imageView.layer.anchorPoint=CGPointMake(0.5, 0.5);
+
+            [UIView animateWithDuration:0.2 animations:^{
+                imageView.transform=CGAffineTransformMakeRotation(0);
+                rotateBtn.transform=CGAffineTransformMakeScale(1, 1);
+
+            }];
+            imageViewSize=CGSizeMake(sourceImage.size.width, sourceImage.size.height);
+            defaultOrientation=0;
+
+        }
+        
+        
+        
+        
+        if(imageViewSize.width>=imageViewSize.height)
+        {
+            ratio=scrollView.frame.size.height/imageViewSize.height;
+            float width=ratio*imageViewSize.width;
+            imageViewSize=CGSizeMake(width, scrollView.frame.size.height);
+        }
+        else
+        {
+            ratio=scrollView.frame.size.width/imageViewSize.width;
+            float height=ratio*imageViewSize.height;
+            imageViewSize=CGSizeMake(scrollView.frame.size.width, height);
+            
+            if(imageViewSize.height<scrollView.frame.size.height) //bruteforce
+            {
+                float newratio=1.0f;
+                for(int i=0;i<20;i++)
+                {
+                    float ratioTemp=1.0f+i*0.05;
+                    if(height*ratioTemp>scrollView.frame.size.height)
+                    {
+                        newratio=ratioTemp;
+                        break;
+                    }
+                    
+                }
+                
+                NSLog(@"%@",@"YOYO - BEST FIT PORTRAIT");
+                ratio=ratio*newratio;
+                int width=scrollView.frame.size.width*newratio;
+                height=height*newratio;
+                imageViewSize=CGSizeMake(width, height);
+            }
             
             
         }
         
-        [target performSelector:cancelBtnClicked withObject:nil afterDelay:0.001];
-       [self performSelector:@selector(removeThisView:) withObject:nil afterDelay:0.001];
+        scrollView.contentSize=imageViewSize;
+        imageView.frame=CGRectMake(0, 0,imageViewSize.width , imageViewSize.height);
+        commonView.frame=CGRectMake(0, 0,imageViewSize.width , imageViewSize.height);
+       scrollView.zoomScale=1;
+        scrollView.contentOffset=CGPointZero;
+    }
+    else
+    {
         
-    });
-    
+        CGSize mediaSize=[self getTheSizeFromVideoPath:filePathStr];
+        if(defaultOrientation==0)
+        {
+            [UIView animateWithDuration:0.2 animations:^{
+                playerViewControl.view.transform = CGAffineTransformRotate(playerViewControl.view.transform, M_PI/2);
+                rotateBtn.transform=CGAffineTransformMakeScale(-1, 1);
 
-    
+            }];
+            mediaSize=CGSizeMake(mediaSize.height, mediaSize.width);
+            defaultOrientation=1;
+        }
+        else
+        {
+            playerViewControl.view.layer.anchorPoint=CGPointMake(0.5,0.5);
+            [UIView animateWithDuration:0.2 animations:^{
+                playerViewControl.view.transform=CGAffineTransformMakeRotation(0);
+                rotateBtn.transform=CGAffineTransformMakeScale(1, 1);
+ 
+            }];
+            mediaSize=CGSizeMake(mediaSize.width, mediaSize.height);
+            defaultOrientation=0;
+            
+        }
+        
+       
+        
+        if(mediaSize.width>=mediaSize.height)
+        {
+            ratio=scrollView.frame.size.height/mediaSize.height;
+            float width=ratio*mediaSize.width;
+            mediaSize=CGSizeMake(width, scrollView.frame.size.height);
+        }
+        else
+        {
+            ratio=scrollView.frame.size.width/mediaSize.width;
+            float height=ratio*mediaSize.height;
+            mediaSize=CGSizeMake(scrollView.frame.size.width, height);
+            
+            if(mediaSize.height<scrollView.frame.size.height)
+            {
+                float newratio=1.0f;
+                for(int i=0;i<20;i++)
+                {
+                    float ratioTemp=1.0f+i*0.05;
+                    if(height*ratioTemp>scrollView.frame.size.height)
+                    {
+                        newratio=ratioTemp;
+                        break;
+                    }
+                    
+                }
+                
+                NSLog(@"%@",@"YOYO - BEST FIT PORTRAIT");
+                ratio=ratio*newratio;
+                int width=scrollView.frame.size.width*newratio;
+                height=height*newratio;
+                mediaSize=CGSizeMake(width, height);
+            }
+            
+        }
+        
+        
+        
+        
+        scrollView.contentSize=mediaSize;
+        
+        commonView.frame=CGRectMake(0, 0,mediaSize.width , mediaSize.height);
+        playerViewControl.view.frame=CGRectMake(0, 0, mediaSize.width, mediaSize.height);
+
+        scrollView.zoomScale=1;
+        scrollView.contentOffset=CGPointZero;
+
+    }
 }
 
--(void)saveNewVideo
+-(void)FixOrientation
 {
     AVURLAsset* firstAsset = [[AVURLAsset alloc]initWithURL:[NSURL fileURLWithPath:filePathStr] options:nil];
     
@@ -405,6 +575,7 @@
                  if(exporter.status == AVAssetExportSessionStatusCompleted)
                  {
                      
+
                      [self saveNewVideoManage:myPathDocs];
                      
                      
@@ -421,7 +592,6 @@
     
     
 }
-
 
 -(void)saveNewVideoManage:(NSString *)path
 {
@@ -540,7 +710,14 @@
             
             if(exporter.status == AVAssetExportSessionStatusCompleted)
             {
+                if(defaultOrientation==0)
+                {
                 [self removeAndClose:myPathDocs];
+                }
+                else
+                {
+                    [self RotateVideo:myPathDocs];
+                }
 
                 
                // [self saveNewVideoManage:myPathDocs];
@@ -554,7 +731,6 @@
                 
             }
 
-            //            [self convertIntoUploadedFormat:myPathDocs];
             
             
         });
@@ -562,6 +738,112 @@
     
     
 }
+-(void)RotateVideo:(NSString *)path
+{
+    AVMutableComposition *mixComposition = [[AVMutableComposition alloc] init];
+    AVMutableCompositionTrack *track = [mixComposition addMutableTrackWithMediaType:AVMediaTypeVideo preferredTrackID:kCMPersistentTrackID_Invalid];
+    
+    
+    AVAsset *asset = [AVAsset assetWithURL:[NSURL fileURLWithPath:path]];
+    
+    [track insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration) ofTrack:[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0] atTime:CMTimeMake(0, 1) error:nil];
+    
+    if([asset tracksWithMediaType:AVMediaTypeAudio].count>0)
+    {
+        
+        AVMutableCompositionTrack *track1 = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
+        
+        
+        [track1 insertTimeRange:CMTimeRangeMake(kCMTimeZero, asset.duration) ofTrack:[[asset tracksWithMediaType:AVMediaTypeAudio] objectAtIndex:0] atTime:CMTimeMake(0, 1) error:nil];
+    }
+    
+    
+    NSString *documentsDirectory=[self applicationDocumentsDirectoryPath];
+    
+    NSString *myPathDocs =  [documentsDirectory stringByAppendingPathComponent:@"/hello2.mp4"];
+    [[NSFileManager defaultManager] removeItemAtPath:myPathDocs error:nil];
+    
+    NSURL *url = [NSURL fileURLWithPath:myPathDocs];
+    
+    AVMutableVideoCompositionInstruction *instruction = [AVMutableVideoCompositionInstruction videoCompositionInstruction];
+    instruction.timeRange = CMTimeRangeMake(kCMTimeZero, asset.duration);
+    
+    AVMutableVideoCompositionLayerInstruction *layerInstruction = [AVMutableVideoCompositionLayerInstruction videoCompositionLayerInstructionWithAssetTrack:track];
+    
+
+    
+    
+    
+    
+    
+    
+    CGSize naturalSize=[[asset tracksWithMediaType:AVMediaTypeVideo] objectAtIndex:0].naturalSize;
+    
+    NSLog(@"Natural Video Rect = %@",NSStringFromCGSize(naturalSize));
+    
+    
+    
+   CGAffineTransform rotationTransform = CGAffineTransformMakeRotation(M_PI/2);
+    CGAffineTransform rotateTranslate = CGAffineTransformTranslate(rotationTransform,0,-naturalSize.height);
+    [layerInstruction setTransform:rotateTranslate atTime:kCMTimeZero];
+    
+//
+//
+    
+    instruction.layerInstructions = [NSArray arrayWithObjects:layerInstruction,nil];
+    AVMutableVideoComposition *mainCompositionInst = [AVMutableVideoComposition videoComposition];
+
+    
+    mainCompositionInst.renderSize = CGSizeMake(naturalSize.height, naturalSize.width);
+    mainCompositionInst.instructions = [NSArray arrayWithObject:instruction];
+    mainCompositionInst.frameDuration = CMTimeMake(1, 30);
+    
+    AVAssetExportSession *exporter;
+    
+    exporter = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
+    
+    exporter.videoComposition = mainCompositionInst;
+    exporter.outputURL=url;
+    exporter.outputFileType = AVFileTypeMPEG4;
+    exporter.shouldOptimizeForNetworkUse = YES;
+    
+    
+    
+    
+    
+    
+    [exporter exportAsynchronouslyWithCompletionHandler:^{
+        dispatch_async(dispatch_get_main_queue(), ^{
+            
+            
+            if(exporter.status == AVAssetExportSessionStatusCompleted)
+            {
+
+                    [self removeAndClose:myPathDocs];
+                
+                
+                
+                
+                // [self saveNewVideoManage:myPathDocs];
+                
+                
+                NSLog(@"DONE - %@",myPathDocs);
+            }
+            else
+            {
+                NSLog(@"DONE - %@",myPathDocs);
+                
+            }
+            
+            
+            
+        });
+    }];
+
+    
+    
+}
+
 -(void)trimmingChange:(NSArray *)array
 {
     
@@ -782,6 +1064,33 @@
 
 
 #pragma mark - Events
+-(void)cancelBtnClicked:(id)sender
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        
+        
+        if(isVideo)
+        {
+            isPlayerPaused=true;
+            [playerViewControl.player pause];
+            playerViewControl.player=nil;
+            playerViewControl=nil;
+            
+        }
+        else
+        {
+            
+            
+        }
+        
+        [target performSelector:cancelBtnClicked withObject:nil afterDelay:0.001];
+        [self performSelector:@selector(removeThisView:) withObject:nil afterDelay:0.001];
+        
+    });
+    
+    
+    
+}
 
 -(void)removeAndClose:(NSString *)path
 {
@@ -838,7 +1147,7 @@
         blurEffectView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         [self addSubview:blurEffectView];
 
-        [self saveNewVideo];
+        [self FixOrientation];
     }
     else
     {
@@ -857,18 +1166,24 @@
 #pragma mark - Helper
 -(UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
 {
-    if(isVideo)
-    {
-        return playerViewControl.view;
-    }
-    else
-    {
-        return imageView;
-    }
+    return commonView;
+//    if(isVideo)
+//    {
+//        return playerViewControl.view;
+//    }
+//    else
+//    {
+//        return imageView;
+//    }
 }
 - (UIImage *)crop:(CGRect)rect withImage:(UIImage *)image
 {
-    
+//    UIImage *image=image2;
+//    if(defaultOrientation==1)
+//    {
+//        image=[self rotateDegree:image2];
+//    }
+
     if (image.scale > 1.0f) {
         rect = CGRectMake(rect.origin.x * image.scale,
                           rect.origin.y * image.scale,
@@ -879,8 +1194,45 @@
     CGImageRef imageRef = CGImageCreateWithImageInRect(image.CGImage, rect);
     UIImage *result = [UIImage imageWithCGImage:imageRef scale:image.scale orientation:image.imageOrientation];
     CGImageRelease(imageRef);
+    
+    if(defaultOrientation==1)
+            {
+                result=[self rotateDegree:result];
+            }
+    
     return result;
 }
+
+- (UIImage*)rotateDegree:(UIImage*)oldImage
+{
+    
+    float degrees=90;
+    // calculate the size of the rotated view's containing box for our drawing space
+    UIView *rotatedViewBox = [[UIView alloc] initWithFrame:CGRectMake(0,0,oldImage.size.width, oldImage.size.height)];
+    CGAffineTransform t = CGAffineTransformMakeRotation(degrees * M_PI / 180);
+    rotatedViewBox.transform = t;
+    CGSize rotatedSize = rotatedViewBox.frame.size;
+    // Create the bitmap context
+    UIGraphicsBeginImageContext(rotatedSize);
+    CGContextRef bitmap = UIGraphicsGetCurrentContext();
+    
+    // Move the origin to the middle of the image so we will rotate and scale around the center.
+    CGContextTranslateCTM(bitmap, rotatedSize.width/2, rotatedSize.height/2);
+    
+    //   // Rotate the image context
+    CGContextRotateCTM(bitmap, (degrees * M_PI / 180));
+    
+    // Now, draw the rotated/scaled image into the context
+    CGContextScaleCTM(bitmap, 1.0, -1.0);
+    CGContextDrawImage(bitmap, CGRectMake(-oldImage.size.width / 2, -oldImage.size.height / 2, oldImage.size.width, oldImage.size.height), [oldImage CGImage]);
+    
+    UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return newImage;
+
+
+}
+
 
 
 -(void)setTarget:(id)delegate andDoneBtn:(SEL)func1 andCancelBtn:(SEL)func2
@@ -985,108 +1337,7 @@
     return documentsPath;
 }
 
--(void)showMessage:(NSString*)message withTitle:(NSString *)titleMessage
-{
-    NSLog(@"BOOM \n\n\n\n %@ - %@\n\n\n",message,titleMessage);
-    
-    
-    UIAlertController * alert=   [UIAlertController
-                                  alertControllerWithTitle:titleMessage
-                                  message:message
-                                  preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action){
-        
-        //do something when click button
-    }];
-    [alert addAction:okAction];
-    // [[UIApplication sharedApplication].keyWindow.rootViewController.presentedViewController presentViewController:alert animated:YES completion:^{}];
-    
-    UIViewController *vc = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    [vc presentViewController:alert animated:YES completion:nil];
-}
 
--(void)convertIntoUploadedFormat:(NSString *)convertFile
-{
-    
-    
-    
-    //Configuration Path
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *documentsDirectory = [paths objectAtIndex:0]; // Get documents folder
-    NSString *combinedPath = [documentsDirectory stringByAppendingPathComponent:@"/final.mp4"];
-    NSLog(@"OUTPUT FILE = %@",combinedPath);
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:combinedPath])
-    {
-        [[NSFileManager defaultManager] removeItemAtPath:combinedPath error:nil];
-    }
-    NSURL *finalURL = [[NSURL alloc] initFileURLWithPath: combinedPath];
-    
-    
-    
-    
-    NSString* filePath2=convertFile;
-    
-    NSURL *url1=[NSURL fileURLWithPath:filePath2];
-    
-    
-    AVURLAsset* anAsset = [[AVURLAsset alloc]initWithURL:url1 options:nil];
-    AVAssetTrack *track = [[anAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
-    CGSize dimensions = CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform);
-    
-    
-    SDAVAssetExportSession *encoder = [SDAVAssetExportSession.alloc initWithAsset:anAsset];
-    encoder.outputFileType = AVFileTypeMPEG4;
-    encoder.outputURL = finalURL;
-    encoder.videoSettings = @
-    {
-    AVVideoCodecKey: AVVideoCodecH264,
-    AVVideoWidthKey: [NSNumber numberWithFloat:dimensions.width],
-    AVVideoHeightKey: [NSNumber numberWithFloat:dimensions.height],
-    AVVideoCompressionPropertiesKey: @
-        {
-        AVVideoAverageBitRateKey: @6000000,
-        AVVideoProfileLevelKey: AVVideoProfileLevelH264High40,
-        },
-    };
-    encoder.audioSettings = @
-    {
-    AVFormatIDKey: @(kAudioFormatMPEG4AAC),
-    AVNumberOfChannelsKey: @2,
-    AVSampleRateKey: @44100,
-    AVEncoderBitRateKey: @128000,
-    };
-    
-    [encoder exportAsynchronouslyWithCompletionHandler:^
-     {
-         dispatch_async(dispatch_get_main_queue(), ^{
-             
-             
-             [self removeAndClose:convertFile];
-             
-             
-         });
-         
-         
-         
-         if (encoder.status == AVAssetExportSessionStatusCompleted)
-         {
-             NSLog(@"Video export succeeded");
-         }
-         else if (encoder.status == AVAssetExportSessionStatusCancelled)
-         {
-             NSLog(@"Video export cancelled");
-         }
-         else
-         {
-             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
-         }
-     }];
-    
-    
-    
-    
-}
+
 
 @end

@@ -21,7 +21,6 @@
     
     int lastSearchType;
     
-    UIRefreshControl *refreshControl;
     APIManager *manager;
 
     UITextField *searchFieldTXT;
@@ -45,6 +44,7 @@
     SEL hideBottomBarFunc;
     SEL showBottomBarFunc;
     
+    UIButton *clearSearchBtn;
     EmptyView *emptyView;
     
 }

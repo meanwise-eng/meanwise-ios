@@ -13,6 +13,7 @@
 #import "UserSession.h"
 #import "APIObjectsParser.h"
 #import "APIObjects_ProfileObj.h"
+#import "UIColor+Hexadecimal.h"
 
 
 @implementation SearchComponent
@@ -50,13 +51,7 @@
     galleryView.bounces=YES;
     [galleryView registerClass:[ProfileCell class] forCellWithReuseIdentifier:@"cellIdentifier"];
     
-    refreshControl = [[UIRefreshControl alloc] init];
-    refreshControl.tintColor = [UIColor whiteColor];
-    [refreshControl addTarget:self action:@selector(refershControlAction) forControlEvents:UIControlEventValueChanged];
-    [galleryView addSubview:refreshControl];
-    galleryView.alwaysBounceVertical = true;
-    
-
+  
     
     [self addSubview:galleryView];
 
@@ -92,7 +87,15 @@
     searchTypeLBL.clipsToBounds=YES;
     searchTypeLBL.textAlignment=NSTextAlignmentCenter;
 
-  
+    clearSearchBtn=[[UIButton alloc] initWithFrame:CGRectMake(searchBaseView.frame.size.width-40, 0, 40, 40)];
+    [searchBaseView addSubview:clearSearchBtn];
+    [clearSearchBtn setBackgroundImage:[UIImage imageNamed:@"close.png"] forState:UIControlStateNormal];
+    [clearSearchBtn addTarget:self action:@selector(clearSearchBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+   // clearSearchBtn.center=CGPointMake(self.frame.size.width-40,self.frame.size.height-50);
+    
+    clearSearchBtn.hidden=true;
+    clearSearchBtn.enabled=false;
+
     
 
     
@@ -121,7 +124,7 @@
 //    [backBtn addTarget:self action:@selector(backBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
 //    self.clipsToBounds=YES;
     
-    
+   
     emptyView=[[EmptyView alloc] initWithFrame:galleryView.frame];
     [self addSubview:emptyView];
     emptyView.hidden=true;
@@ -130,10 +133,15 @@
     
     [emptyView.reloadBtn setTitle:@"SHOW FEATURED USERS" forState:UIControlStateNormal];
 
-
+  
     
     [self refreshAction];
 
+}
+-(void)clearSearchBtnClicked:(id)sender
+{
+    clearSearchBtn.hidden=true;
+    [self refreshAction];
 }
 
 #pragma mark - Methods
@@ -145,7 +153,14 @@
     
     int width=sizeF.width+20;
     
-    searchTypeLBL.frame=CGRectMake(searchBaseView.frame.size.width-5-width, 10, width, 20);
+    if(lastSearchType!=-1)
+    {
+    searchTypeLBL.frame=CGRectMake(searchBaseView.frame.size.width-5-width-40, 10, width, 20);
+    }
+    else
+    {
+        searchTypeLBL.frame=CGRectMake(searchBaseView.frame.size.width-5-width, 10, width, 20);
+    }
 }
 -(void)refershControlAction
 {
@@ -352,42 +367,42 @@
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
     
-    CGFloat pageWidth = galleryView.frame.size.width*0.6;
-    float currentPage = galleryView.contentOffset.x / pageWidth;
-    
-    int pageNumber;
-    
-    if (0.0f != fmodf(currentPage, 1.0f))
-    {
-        pageNumber = currentPage + 1;
-    }
-    else
-    {
-        pageNumber= currentPage;
-    }
-    
-    
-    
-    //  NSLog(@"Page Number : %d", pageNumber);
-    
-    float diff=galleryView.contentOffset.x-pageNumber*pageWidth;
-    float incRatio=1.0f+diff/pageWidth;
-    
-   // NSLog(@"Page Number :%d, %f",pageNumber, incRatio);
-    
-    UIColor *color1=[Constant colorGlobal:((pageNumber)%14)];
-    UIColor *color0=[Constant colorGlobal:((pageNumber-1)%14)];
-    
-    
-    CGFloat red1 = 0.0, green1 = 0.0, blue1 = 0.0, alpha1 =0.0;
-    CGFloat red0 = 0.0, green0 = 0.0, blue0 = 0.0, alpha0 =0.0;
-    
-    [color1 getRed:&red1 green:&green1 blue:&blue1 alpha:&alpha1];
-    [color0 getRed:&red0 green:&green0 blue:&blue0 alpha:&alpha0];
-    
-    UIColor *colorF=[UIColor colorWithRed:red0+red1*incRatio green:green0+green1*incRatio blue:blue0+incRatio*blue1 alpha:alpha0+incRatio*alpha1];
-    
-    self.backgroundColor=colorF;
+//    CGFloat pageWidth = galleryView.frame.size.width*0.6;
+//    float currentPage = galleryView.contentOffset.x / pageWidth;
+//    
+//    int pageNumber;
+//    
+//    if (0.0f != fmodf(currentPage, 1.0f))
+//    {
+//        pageNumber = currentPage + 1;
+//    }
+//    else
+//    {
+//        pageNumber= currentPage;
+//    }
+//    
+//    
+//    
+//    //  NSLog(@"Page Number : %d", pageNumber);
+//    
+//    float diff=galleryView.contentOffset.x-pageNumber*pageWidth;
+//    float incRatio=1.0f+diff/pageWidth;
+//    
+//   // NSLog(@"Page Number :%d, %f",pageNumber, incRatio);
+//    
+//    UIColor *color1=[Constant colorGlobal:((pageNumber)%14)];
+//    UIColor *color0=[Constant colorGlobal:((pageNumber-1)%14)];
+//    
+//    
+//    CGFloat red1 = 0.0, green1 = 0.0, blue1 = 0.0, alpha1 =0.0;
+//    CGFloat red0 = 0.0, green0 = 0.0, blue0 = 0.0, alpha0 =0.0;
+//    
+//    [color1 getRed:&red1 green:&green1 blue:&blue1 alpha:&alpha1];
+//    [color0 getRed:&red0 green:&green0 blue:&blue0 alpha:&alpha0];
+//    
+//    UIColor *colorF=[UIColor colorWithRed:red0+red1*incRatio green:green0+green1*incRatio blue:blue0+incRatio*blue1 alpha:alpha0+incRatio*alpha1];
+//    
+//    self.backgroundColor=colorF;
     
     if(scrollView==galleryView)
     {
@@ -406,94 +421,73 @@
 -(void)scrollingEnded
 {
     
+    CGPoint point=galleryView.center;
+    
     NSIndexPath *centerCellIndexPath =
     [galleryView indexPathForItemAtPoint:
-     [self convertPoint:[galleryView center] toView:galleryView]];
+     [self convertPoint:point toView:galleryView]];
 
+    
+    if(centerCellIndexPath==nil)
+    {
+        point=CGPointMake(galleryView.center.x+10, galleryView.center.y);
+        centerCellIndexPath=[galleryView indexPathForItemAtPoint:
+         [self convertPoint:point toView:galleryView]];
+
+
+    }
+    
+    
     [galleryView scrollToItemAtIndexPath:centerCellIndexPath atScrollPosition:UICollectionViewScrollPositionCenteredHorizontally animated:true];
 
     int pageNumber=(int)centerCellIndexPath.row;
 
-    
-//    CGFloat pageWidth = galleryView.frame.size.width*0.6;
-//    float currentPage = (galleryView.contentOffset.x) / pageWidth;
-//    
-//    
-//    int pageNumber;
-//    
-//    if (0.0f != fmodf(currentPage, 1.0f))
-//    {
-//        pageNumber = currentPage + 1;
-//    }
-//    else
-//    {
-//        pageNumber= currentPage;
-//    }
-//    
-//  //  NSLog(@"Page Number : %d", pageNumber);
-//    
-//    if(resultData.count<=pageNumber)
-//    {
-//        pageNumber=pageNumber-1;
-//    }
-//    NSIndexPath *indexPath=[NSIndexPath indexPathForItem:pageNumber inSection:0];
-//    
-    
-    
-   // CGPoint oldContentOffset=galleryView.contentOffset;
-
-    
-//    CGPoint newContentOffset=galleryView.contentOffset;
-//    galleryView.contentOffset=oldContentOffset;
-//
-//    
-//    
-//    
-//    [UIView animateKeyframesWithDuration:0.2 delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
-//        galleryView.contentOffset=CGPointMake(newContentOffset.x-10, newContentOffset.y);
-//
-//
-//        
-//    } completion:^(BOOL finished) {
-//        
-//      
-//        
-//    }];
-//
-//    
-
-    
-    [UIView animateWithDuration:0.2 animations:^{
-        
-        self.backgroundColor=[Constant colorGlobal:(pageNumber%14)];
-        
-    }];
-    
-    
+ 
     APIObjects_ProfileObj *obj=[[DataSession sharedInstance].searchUserResults objectAtIndex:centerCellIndexPath.row];
+
     
-    if(obj.bio.class!=[NSNull class])
-    {
-        if(![obj.bio isEqualToString:@""])
+    [UIView animateWithDuration:0.3 animations:^{
+        
+        self.backgroundColor=[UIColor whiteColor];
+
+    } completion:^(BOOL finished) {
+        
+        
+        if(obj.bio.class!=[NSNull class])
         {
-        statusLabel.text=obj.bio;
+            if(![obj.bio isEqualToString:@""])
+            {
+                statusLabel.text=obj.bio;
+            }
+            else
+            {
+                statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
+                
+            }
         }
         else
         {
             statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
-
         }
-    }
-    else
-    {
-        statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
-    }
+        [UIView animateWithDuration:0.3 animations:^{
+            
+            self.backgroundColor=[UIColor colorWithHexString:obj.profile_background_color];
+            
+        }];
+    }];
+    
+    
+   
+    
+    
+    
 
 }
 
 #pragma mark - API calls
 -(void)refreshAction
 {
+    suggestionBox.hidden=true;
 
     lastSearchType=-1;
     [self updateSearchTitle:@"Featured Users"];
@@ -509,6 +503,7 @@
     
     [FTIndicator showProgressWithmessage:@"Loading.."];
     galleryView.userInteractionEnabled=false;
+    searchFieldTXT.userInteractionEnabled=false;
 
     
 }
@@ -516,9 +511,10 @@
 -(void)userFriendsReceived:(APIResponseObj *)responseObj
 {
     galleryView.userInteractionEnabled=true;
-
-    [refreshControl endRefreshing];
-
+searchFieldTXT.userInteractionEnabled=true;
+    
+    clearSearchBtn.enabled=true;
+    
     [FTIndicator dismissProgress];
     
   //  NSLog(@"%@",responseObj.response);
@@ -557,6 +553,8 @@
                 statusLabel.text=[NSString stringWithFormat:@"I'm %@",obj.first_name];
             }
             
+            self.backgroundColor=[UIColor colorWithHexString:obj.profile_background_color];
+
         }
         else
         {
@@ -575,12 +573,16 @@
 }
 -(void)searchAPI:(NSDictionary *)dict
 {
+    clearSearchBtn.hidden=false;
+    clearSearchBtn.enabled=false;
+
     manager=[[APIManager alloc] init];
     [manager sendRequestForUserSearch:dict delegate:self andSelector:@selector(userFriendsReceived:)];
     
     [FTIndicator showProgressWithmessage:@"Loading.."];
     
     galleryView.userInteractionEnabled=false;
+    searchFieldTXT.userInteractionEnabled=false;
 
     
 }

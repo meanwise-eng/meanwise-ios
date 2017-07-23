@@ -40,7 +40,7 @@
     
 
     
-    connectionCountStr=[NSString stringWithFormat:@"%d",(int)dataObj.userFriends.count];
+    connectionCountStr=[NSString stringWithFormat:@"%d",[dataObj.friend_count intValue]];
     storyTitleStr=dataObj.bio;
     storyDescStr=dataObj.profile_story_description;
     storySkillsArray=dataObj.skill_List;
@@ -85,7 +85,7 @@
     tagsArray=[NSString stringWithFormat:@"%@ %@",storyInterestsStr,storySkillsStr];
     
     
-    frienshipStatusStr=dataObj.friendShipStatus;
+    frienshipStatusStr=dataObj.friend_request_status;
     
     
     
@@ -240,7 +240,7 @@
         
 
     }
-    else if([[dataObj.friendShipStatus lowercaseString] isEqualToString:@""])
+    else if([[dataObj.friend_request_status lowercaseString] isEqualToString:@""])
     {
         [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen Stranger"];
 

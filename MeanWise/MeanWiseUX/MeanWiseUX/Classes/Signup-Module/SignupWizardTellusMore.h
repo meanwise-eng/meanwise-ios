@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "Constant.h"
 #import "DataSession.h"
+#import "TTTAttributedLabel.h"
 
 @interface popUpCalendar : UIView
 {
@@ -35,7 +36,7 @@
     UIButton *forgetPassBtn;
     UIButton *backBtn;
     
-    UILabel *passHeadLBL;
+    TTTAttributedLabel *passHeadLBL;
     UIView *passBaseView;
     UIView *emailBaseView;
     UILabel *emailHeadLBL;

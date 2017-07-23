@@ -53,6 +53,10 @@
 {
     isPlayerPaused=true;
 }
+-(void)setSoundSettings:(BOOL)flag;
+{
+    playerViewControl.player.muted=flag;
+}
 -(void)resumeBtnClicked:(id)sender
 {
     isPlayerPaused=false;

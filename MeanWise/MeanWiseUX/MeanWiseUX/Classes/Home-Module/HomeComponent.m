@@ -92,7 +92,7 @@
     
     //[self messageBtnClicked:nil];
    // [self tableView:feedList didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]];
-    pManager=[[API_PAGESManager alloc] initWithRequestCount:30 isVertical:YES];
+    pManager=[[API_PAGESManager alloc] initWithRequestCount:15 isVertical:YES];
 
     [self manuallyRefresh];
     
@@ -102,7 +102,8 @@
                                                  name:@"REFRESH_HOME"
                                                object:nil];
 
-   
+    
+    
     
 
 }
@@ -304,7 +305,8 @@
     }
     
   
-    if([pManager ifNewCallRequired:scrollView withCellHeight:0] && [DataSession sharedInstance].homeFeedResults.count!=0)
+    pManager.AP_isPageBasedOnRecords=YES;
+    if([pManager ifNewCallRequired:scrollView withCellHeight:self.frame.size.height] && [DataSession sharedInstance].homeFeedResults.count!=0)
     {
         [self callNewData];
     }

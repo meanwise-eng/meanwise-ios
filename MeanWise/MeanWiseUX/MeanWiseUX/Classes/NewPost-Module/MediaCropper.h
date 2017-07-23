@@ -16,11 +16,20 @@
 
 @interface MediaCropper : UIView <UIScrollViewDelegate>
 {
-    UIView *containerView;
-    UIScrollView *scrollView;
-    UIImageView *imageView;
     
+    int defaultOrientation;
+    UIView *containerView;
+    
+    UIScrollView *scrollView;
+    UIView *commonView;
+    
+    UIImageView *imageView;
     AVPlayerViewController *playerViewControl;
+
+    
+    
+    UIImage *sourceImage;
+    
     BOOL isPlayerPaused;
     TrimSlider *trimSlider;
     CMTime playerStartTime;
@@ -42,6 +51,7 @@
     UILabel *title;
     UIButton *doneBtn;
     UIButton *cancelBtn;
+    UIButton *rotateBtn;
     
     UIView *view1,*view2,*view3,*view4;
     UIView *gridView1,*gridView2,*gridView3,*gridView4,*gridView5;

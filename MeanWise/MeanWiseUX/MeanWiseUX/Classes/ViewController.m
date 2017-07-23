@@ -25,6 +25,7 @@
 #import "SignUpWizardSkillsComponent.h"
 
 #import "GUIScaleManager.h"
+#import "EditLocationComponent.h"
 
 
 
@@ -105,30 +106,30 @@
    */
     
     
-//    [UserSession setUserSessionIfExist];
-//    
-//    EditPCComponent *Compo=[[EditPCComponent alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
-//    
-//    [Compo setUp];
-//    Compo.blackOverLayView.image=[Constant takeScreenshot];
-//    Compo.blackOverLayView.alpha=1;
-//    //  [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
-//    
-//    [self.view addSubview:Compo];
-//    
-//    [UIView animateWithDuration:0.001 animations:^{
-//        Compo.frame=self.view.bounds;
-//        Compo.backgroundColor=[UIColor whiteColor];
-//    }];
-//    
+   /* [UserSession setUserSessionIfExist];
+    
+    EditLocationComponent *Compo=[[EditLocationComponent alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
+    
+    [Compo setUp];
+    Compo.blackOverLayView.image=[Constant takeScreenshot];
+    Compo.blackOverLayView.alpha=1;
+    //  [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+    
+    [self.view addSubview:Compo];
+    
+    [UIView animateWithDuration:0.001 animations:^{
+        Compo.frame=self.view.bounds;
+        Compo.backgroundColor=[UIColor whiteColor];
+    }];*/
+    
     
 
-//    [UserSession setUserSessionIfExist];
-//    NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
-//    [self.view addSubview:cont];
-//    [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
+  /*  [UserSession setUserSessionIfExist];
+    NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:cont];
+    [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
+*/
 //
-//  
     
     //TestCases
    /*[UserSession setUserSessionIfExist];
@@ -260,8 +261,82 @@
 
 -(void)renderVideoAndPost:(NSDictionary *)dict witPath:(NSString *)path overlayImage:(UIImage *)image
 {
+    
+    AVMutableVideoComposition *currentCompo=[[dict valueForKey:@"metaData"] valueForKey:@"COMPOSITION"];
+    
+    if(currentCompo==nil)
+    {
+        [self exportVideoWithOverLay:dict witPath:path overlayImage:image];
+
+    }
+    else
+    {
+    AVURLAsset* videoAsset = [[AVURLAsset alloc]initWithURL:[NSURL fileURLWithPath:path] options:nil];
+    AVAssetTrack *track = [[videoAsset tracksWithMediaType:AVMediaTypeVideo] firstObject];
+    CGSize dimensions = CGSizeApplyAffineTransform(track.naturalSize, track.preferredTransform);
+    
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    NSString *destinationPath =  [documentsDirectory stringByAppendingPathComponent:
+                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", arc4random() % 1000]];
+    [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
+    
+    
+    
+    SDAVAssetExportSession *encoder = [SDAVAssetExportSession.alloc initWithAsset:[AVAsset assetWithURL:[NSURL fileURLWithPath:path]]];
+    encoder.outputFileType = AVFileTypeQuickTimeMovie;
+    encoder.outputURL = [NSURL fileURLWithPath:destinationPath];
+    encoder.videoComposition=currentCompo;
+    
+    encoder.videoSettings = @
+    {
+    AVVideoCodecKey: AVVideoCodecH264,
+    AVVideoWidthKey: [NSNumber numberWithFloat:dimensions.width],
+    AVVideoHeightKey: [NSNumber numberWithFloat:dimensions.height],
+    AVVideoCompressionPropertiesKey: @
+        {
+        AVVideoAverageBitRateKey: @1100000,
+        AVVideoProfileLevelKey: AVVideoProfileLevelH264High40,
+        },
+    };
+    encoder.audioSettings = @
+    {
+    AVFormatIDKey: @(kAudioFormatMPEG4AAC),
+    AVNumberOfChannelsKey: @2,
+    AVSampleRateKey: @(44100/2),
+    AVEncoderBitRateKey: @(128000/2),
+    };
+    
+    
+    
+    [encoder exportAsynchronouslyWithCompletionHandler:^
+     {
+         if (encoder.status == AVAssetExportSessionStatusCompleted)
+         {
+             
+
+             
+             
+                          NSLog(@"Export OK %@",destinationPath);
+//                          if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(destinationPath)) {
+//                              UISaveVideoAtPathToSavedPhotosAlbum(destinationPath, nil,nil, nil);
+//                          }
+             [self exportVideoWithOverLay:dict witPath:destinationPath overlayImage:image];
+
+             //
+             NSLog(@"Video export succeeded 1");
+         }
+         else if (encoder.status == AVAssetExportSessionStatusCancelled)
+         {
+             NSLog(@"Video cancel error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+         }
+         else
+         {
+             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+         }
+     }];
+    }
  
-    [self exportVideoWithOverLay:dict witPath:path overlayImage:image];
     
 }
 
@@ -311,6 +386,7 @@
     videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
     [parentLayer addSublayer:videoLayer];
     
+  
     
     CALayer *titleLayer = [CALayer layer];
     titleLayer.contents = (id)overLayImage.CGImage;
@@ -406,7 +482,10 @@
 -(void)exportVideoWithOverLay:(NSDictionary *)dict witPath:(NSString *)actualMediaPath overlayImage:(UIImage *)overLayImage
 {
     
-    
+    NSDictionary *metaData=[dict valueForKey:@"metaData"];
+    int kAudioOption=[[metaData valueForKey:@"audioOption"] intValue];
+    UIImage *imageFirst=[metaData valueForKey:@"OVERLAY"];
+
     
     CGSize requiredVideoSize=RX_mainScreenBounds.size;
     
@@ -427,7 +506,7 @@
     [compositionVideoTrack insertTimeRange:CMTimeRangeMake(kCMTimeZero, videoAsset.duration) ofTrack:clipVideoTrack atTime:kCMTimeZero error:nil];
 
     
-    if([videoAsset tracksWithMediaType:AVMediaTypeAudio].count>0)
+    if([videoAsset tracksWithMediaType:AVMediaTypeAudio].count>0 && kAudioOption!=0)
     {
         AVMutableCompositionTrack *compositionAudioTrack = [mixComposition addMutableTrackWithMediaType:AVMediaTypeAudio preferredTrackID:kCMPersistentTrackID_Invalid];
         
@@ -456,6 +535,12 @@
     videoLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
     [parentLayer addSublayer:videoLayer];
     
+    
+    CALayer *firstLayer = [CALayer layer];
+    firstLayer.contents = (id)imageFirst.CGImage;
+    //titleLayer.frame = CGRectMake(15, 15, 600/8, 600/8);
+    firstLayer.frame = CGRectMake(0, 0, videoSize.width, videoSize.height);
+    [parentLayer addSublayer:firstLayer];
     
     CALayer *titleLayer = [CALayer layer];
     titleLayer.contents = (id)overLayImage.CGImage;

@@ -33,7 +33,7 @@
 @property (nonatomic, strong) NSNumber* num_likes;
 @property (nonatomic, strong) NSString* timeString;
 
-@property (nonatomic,strong) NSNumber *IsUserLiked;
+@property (nonatomic,strong) NSNumber *is_liked;
 @property (nonatomic, strong) NSNumber* mediaType;
 
 

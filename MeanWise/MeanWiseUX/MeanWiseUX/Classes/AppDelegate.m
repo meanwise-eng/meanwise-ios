@@ -11,6 +11,8 @@
 #import "ViewController.h"
 #import "ResolutionVersion.h"
 #import "AnalyticsMXManager.h"
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+
 
 @interface AppDelegate ()
 
@@ -42,11 +44,14 @@
     [AnalyticsMXManager PushAnalyticsStartup];
     
     
-    BOOL iphone5=RX_isiPhone5Res;
-
-    BOOL iphoen52=[ResolutionVersion IfResIPhone5];
+//    BOOL iphone5=RX_isiPhone5Res;
+//
+//    BOOL iphoen52=[ResolutionVersion IfResIPhone5];
    // [self clearcache];
     
+    [[FBSDKApplicationDelegate sharedInstance] application:application
+                             didFinishLaunchingWithOptions:launchOptions];
+
     
     
     
@@ -169,11 +174,20 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
 
 
 
+
 -(BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
 {
     
-    [self parseDeepLinking:url Options:options];
+    BOOL handled = [[FBSDKApplicationDelegate sharedInstance] application:app
+                                                                  openURL:url
+                                                        sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey]
+                                                               annotation:options[UIApplicationOpenURLOptionsAnnotationKey]
+                    ];
     
+    if(handled==false)
+    {
+    [self parseDeepLinking:url Options:options];
+    }
     return true;
 }
 -(void)parseDeepLinking:(NSURL *)url Options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
@@ -404,9 +418,7 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
 
 
 
-   [[NSNotificationCenter defaultCenter]
-     postNotificationName:@"REFRESH_HOME"
-     object:self];
+  
     
     
     
@@ -421,7 +433,8 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     [vuti requestForCall];
-    
+    [FBSDKAppEvents activateApp];
+
        // [[Crashlytics sharedInstance] crash];
 
 

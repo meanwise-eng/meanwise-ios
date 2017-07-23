@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import "MWNavBar.h"
 
-@interface EditLocationComponent : UIView
+@interface EditLocationComponent : UIView <UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate>
 {
     
     
@@ -26,6 +26,16 @@
     
     UILabel *instructionField;
     UIButton *saveBtn;
+    
+    
+    UIView *resultContainerView;
+    UITableView *resultListView;
+    UIImageView *poweredByLogo;
+    float logoHeight;
+    NSString *searchString;
+    UIActivityIndicatorView *activityIndicator;
+
+    
     
 }
 @property (nonatomic, strong) UIImageView *blackOverLayView;

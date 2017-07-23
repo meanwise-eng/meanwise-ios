@@ -509,12 +509,14 @@
         
         UIImage *image=[mediaAttachComponent getOverLayVideoImage];
         
+        NSDictionary *metaData=[mediaAttachComponent getMetaDataOptions];
         
         NSDictionary *dict=@{
                              @"text":statusString,
                              @"interest":[NSString stringWithFormat:@"%d",channelId],
                              @"topic_names":topicValue,
-                             @"tags":hashTagValue
+                             @"tags":hashTagValue,
+                             @"metaData":metaData
                              };
         [t renderVideoAndPost:dict witPath:mediaPath overlayImage:image];
         

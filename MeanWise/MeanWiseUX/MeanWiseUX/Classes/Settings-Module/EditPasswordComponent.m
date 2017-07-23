@@ -194,7 +194,7 @@
 //
 //    
     NSString *stricterFilterString = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}";
-    stricterFilterString=@"^(?=.*\\d).{8,12}$";
+    stricterFilterString=@"^(?=.*\\d).{8,15}$";
     NSPredicate *passwordTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", stricterFilterString];
     return [passwordTest evaluateWithObject:passwordString];
 }

@@ -133,6 +133,8 @@
 
 -(void)backBtnClicked:(id)sender
 {
+    [FTIndicator dismissProgress];
+
     [emailField resignFirstResponder];
 
     [delegate performSelector:Func_backBtnClicked withObject:nil afterDelay:0.01];
@@ -142,21 +144,25 @@
 -(void)forgetPassBtnClicked:(id)sender
 {
     
+    
     APIManager *manager=[[APIManager alloc] init];
     
     NSDictionary *dict=@{@"email":emailField.text};
     
     [manager sendRequestForForgetPasswordWithDelegate:self withData:dict andSelector:@selector(ForgetPasswordReceived:)];
     
+    [FTIndicator showProgressWithmessage:@"Requesting.."];
     
 }
 -(void)ForgetPasswordReceived:(APIResponseObj *)obj
 {
     [emailField resignFirstResponder];
 
+    [FTIndicator dismissProgress];
+    
     if(obj.statusCode==200)
     {
-        [Constant okAlert:@"Done!" withSubTitle:@"A new password has been sent to your e-mail address." onView:self andStatus:1];
+        [Constant okAlert:@"Success!" withSubTitle:@"A new password has been sent to your e-mail address." onView:self andStatus:1];
 
         [delegate performSelector:Func_backBtnClicked withObject:nil afterDelay:0.01];
 
@@ -167,7 +173,6 @@
 
         [Constant okAlert:@"Fail!" withSubTitle:@"The email address that you've entered doesn't match any account." onView:self andStatus:1];
         
-      //  [FTIndicator showSuccessWithMessage:@"Please check your email address."];
 
     }
 }

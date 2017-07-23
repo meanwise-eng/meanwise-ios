@@ -39,8 +39,11 @@
 @property (nonatomic, strong) NSString* profile_story_title;
 @property (nonatomic, strong) NSString* profile_story_description;
 
-@property (nonatomic,strong) NSArray *userFriends;
-@property (nonatomic,strong) NSString *friendShipStatus;
+//@property (nonatomic,strong) NSArray *userFriends;
+//@property (nonatomic,strong) NSString *friendShipStatus;
+
+@property (nonatomic,strong) NSNumber *friend_count;
+@property (nonatomic,strong) NSString *friend_request_status;
 
 
 @property (nonatomic,strong) NSArray *skillsX;

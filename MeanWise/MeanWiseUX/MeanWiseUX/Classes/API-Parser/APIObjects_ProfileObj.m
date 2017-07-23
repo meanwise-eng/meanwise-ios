@@ -133,16 +133,32 @@
     self.interests=[dict valueForKey:@"interests"];
     self.skillsX=[dict valueForKey:@"skills"];
     
-    self.userFriends=[dict valueForKey:@"user_friends"];
-    
-    self.friendShipStatus=@"";
     
     
-    NSString *watchingUserId=[NSString stringWithFormat:@"%@",[dict valueForKey:@"user_id"]];
+    
 
   
+    self.friend_count=[NSNumber numberWithInt:[[dict valueForKey:@"friend_count"] intValue]];
+    
+    if([[dict valueForKey:@"friend_request_status"] isKindOfClass:[NSNull class]])
+    {
+        self.friend_request_status=@"";
+    }
+    else
+    {
+        self.friend_request_status=[dict valueForKey:@"friend_request_status"];
+    }
+    
+    //Accepted,Pending
     
     
+    
+    /*
+     self.friendShipStatus=@"";
+     NSString *watchingUserId=[NSString stringWithFormat:@"%@",[dict valueForKey:@"user_id"]];
+
+    self.userFriends=[dict valueForKey:@"user_friends"];
+
     for (NSDictionary *dictTemp in self.userFriends)
     {
         
@@ -174,6 +190,7 @@
         
         
     }
+     */
 
     
 }
@@ -209,7 +226,8 @@
     [encoder encodeObject:self.profile_background_color forKey:@"profile_background_color"];
     [encoder encodeObject:self.profession_text forKey:@"profession_text"];
     [encoder encodeObject:self.user_type forKey:@"user_type"];
-    [encoder encodeObject:self.userFriends forKey:@"userFriends"];
+    [encoder encodeObject:self.friend_count forKey:@"friend_count"];
+    [encoder encodeObject:self.friend_request_status forKey:@"friend_request_status"];
 
     
 
@@ -250,7 +268,8 @@
         self.profile_background_color = [decoder decodeObjectForKey:@"profile_background_color"];
         self.profession_text = [decoder decodeObjectForKey:@"profession_text"];
         self.user_type = [decoder decodeObjectForKey:@"user_type"];
-        self.userFriends = [decoder decodeObjectForKey:@"userFriends"];
+        self.friend_count = [decoder decodeObjectForKey:@"friend_count"];
+        self.friend_request_status = [decoder decodeObjectForKey:@"friend_request_status"];
 
 
         

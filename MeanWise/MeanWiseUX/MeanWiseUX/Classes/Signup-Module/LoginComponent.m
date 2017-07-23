@@ -98,14 +98,14 @@
     infoLabel.textColor=[UIColor whiteColor];
 
    
-    infoLabel.linkAttributes=@{NSForegroundColorAttributeName:[UIColor whiteColor]};
+    infoLabel.linkAttributes=@{NSForegroundColorAttributeName:[UIColor whiteColor],NSUnderlineStyleAttributeName:[NSNumber numberWithInt:1]};
     
     
     infoLabel.lineBreakMode=NSLineBreakByWordWrapping;
     infoLabel.numberOfLines = 0;
     infoLabel.enabledTextCheckingTypes = NSTextCheckingTypeLink;
     
-    infoLabel.text = @"By Signing up, I agree to Meanwise's Terms of Service and Privacy Policy.)"; // Repository URL will be automatically detected and linked
+    infoLabel.text = @"By Signing up, I agree to Meanwise's Terms of Service and Privacy Policy."; // Repository URL will be automatically detected and linked
     
     {
     NSRange range = [infoLabel.text rangeOfString:@"Terms of Service"];

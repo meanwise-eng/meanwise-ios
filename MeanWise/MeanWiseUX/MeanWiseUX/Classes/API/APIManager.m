@@ -23,9 +23,14 @@
 //Dev Server
   //  return  @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8000/api/v4/";
     
+//Dev Server 1.1
+  // return @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8001/api/v4/";
 //Live
-   return @"https://api.meanwise.com/api/v4/";
+ //  return @"https://api.meanwise.com/api/v4/";
     
+//    Live 1.1
+      return @"https://api.meanwise.com/api/v1.1/";
+
 }
 
 
@@ -989,8 +994,8 @@
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"GET"];
     
-  //  NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",@"e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6"];
-   // [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+//    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",@"e581fe1f83d40a6de5761d6ce8bbff0e0a0680c6"];
+//    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
 
     
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -1706,6 +1711,10 @@
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"GET"];
     
+    NSString *token=[UserSession getAccessToken];
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+
     
    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
@@ -1954,6 +1963,13 @@
                                                           timeoutInterval:60.0];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest setHTTPMethod:@"GET"];
+    
+    NSString *token=[UserSession getAccessToken];
+
+    NSString *tokenParameter=[NSString stringWithFormat:@"Token %@",token];
+    
+    [urlRequest setValue:tokenParameter forHTTPHeaderField:@"Authorization"];
+
     
     NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:nil delegateQueue:nil];
@@ -3550,7 +3566,7 @@
     
     NSUUID *identifierForVendor = [[UIDevice currentDevice] identifierForVendor];
     NSString* uuid = [identifierForVendor UUIDString];
-    
+//    NSLog(@"uuid - %@",[identifierForVendor UUIDString]);
     NSError *error;
     NSDictionary *dict;
     

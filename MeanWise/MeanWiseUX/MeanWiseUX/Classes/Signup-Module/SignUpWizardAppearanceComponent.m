@@ -76,15 +76,33 @@
     nextBtn.center=CGPointMake(self.frame.size.width/2, self.frame.size.height-30);
     nextBtn.hidden=true;
     
-    usernameHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
+    usernameHeadLBL=[[TTTAttributedLabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 20)];
     [self addSubview:usernameHeadLBL];
-    usernameHeadLBL.text=@"USERNAME (MIN 6 CHARACTERS)";
+    usernameHeadLBL.text=@"USERNAME (Min 6 characters, without spaces)";
     usernameHeadLBL.textColor=[UIColor whiteColor];
     usernameHeadLBL.textAlignment=NSTextAlignmentLeft;
     usernameHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
     usernameHeadLBL.center=CGPointMake(self.frame.size.width/2, 230);
     
-
+    NSString *text = @"USERNAME  (Min 6 characters, without spaces)";
+    [usernameHeadLBL setText:text afterInheritingLabelAttributesAndConfiguringWithBlock:^ NSMutableAttributedString *(NSMutableAttributedString *mutableAttributedString)
+     {
+         NSRange boldRange = [[mutableAttributedString string] rangeOfString:@"(Min 6 characters, without spaces)" options:NSCaseInsensitiveSearch];
+         
+         [mutableAttributedString addAttribute:(NSString *)kCTForegroundColorAttributeName value:[UIColor colorWithWhite:1.0f alpha:0.8f] range:boldRange];
+         
+         UIFont *boldSystemFont = [UIFont fontWithName:k_fontBold size:12];
+         CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)boldSystemFont.fontName, boldSystemFont.pointSize, NULL);
+         if (font) {
+             [mutableAttributedString addAttribute:(NSString *)kCTFontAttributeName value:(__bridge id)font range:boldRange];
+             
+             
+             CFRelease(font);
+         }
+         
+         return mutableAttributedString;
+     }];
+    
 
     
     

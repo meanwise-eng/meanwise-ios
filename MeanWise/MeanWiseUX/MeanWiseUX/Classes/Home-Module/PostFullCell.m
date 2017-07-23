@@ -408,7 +408,7 @@
 -(void)setDataObj:(APIObjects_FeedObj *)dict;
 {
     dataObj=dict;
-    liked=dict.IsUserLiked.intValue;
+    liked=dict.is_liked.intValue;
     
     
     

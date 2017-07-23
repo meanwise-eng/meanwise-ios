@@ -12,6 +12,9 @@
 #import "LineProgressBar.h"
 #import "UICameraBtn.h"
 #import <AVFoundation/AVFoundation.h>
+#import "HCDropDown.h"
+#import "TimerCountDownControl.h"
+#import "HandsFreeBtn.h"
 
 @interface PhotosBtnController : UIView
 {
@@ -50,7 +53,11 @@
     
     
     UICollectionView *photoGallery;
-    NSMutableArray *arrayImagesAll;
+    NSMutableArray *allImagesList;
+    NSMutableArray *favoritesImages;
+    UISegmentedControl *segmentControl;
+    int currentSegmentIndex;
+    
     NSArray *arrayData;
 
     
@@ -58,12 +65,17 @@
     LLCameraPosition cameraPosition;
     LLSimpleCamera *cameraCaptureView;
     UICameraBtn *cameraBtnMax;
+    HandsFreeBtn *handsFreeBtn;
+    
     UIButton *switchCamBtn;
     UIButton *flashLightBtn;
+    UIButton *timerBtn;
 
     float columunWidth;
     NSUInteger numColumns;
-
+    
+    HCDropDown *timePicker;
+    TimerCountDownControl *timerControl;
     
 }
 -(void)setUp:(int)section;

@@ -98,15 +98,34 @@
 
     
     
-    passHeadLBL=[[UILabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 15)];
+    passHeadLBL=[[TTTAttributedLabel alloc] initWithFrame:CGRectMake(20, 0, self.frame.size.width-40, 35)];
     [self addSubview:passHeadLBL];
-    passHeadLBL.text=@"PASSWORD  (MIN 8 CHARACTERS)";
+    passHeadLBL.text=@"PASSWORD  (Min 8 characters, with atleast 1 digit)";
     passHeadLBL.textColor=[UIColor whiteColor];
     passHeadLBL.textAlignment=NSTextAlignmentLeft;
     passHeadLBL.font=[UIFont fontWithName:k_fontBold size:15];
     passHeadLBL.center=CGPointMake(self.frame.size.width/2, 350);
+    passHeadLBL.numberOfLines=2;
     
-    
+    NSString *text = @"PASSWORD \n(Min 8 characters, with atleast 1 digit)";
+    [passHeadLBL setText:text afterInheritingLabelAttributesAndConfiguringWithBlock:^ NSMutableAttributedString *(NSMutableAttributedString *mutableAttributedString)
+    {
+        NSRange boldRange = [[mutableAttributedString string] rangeOfString:@"(Min 8 characters, with atleast 1 digit)" options:NSCaseInsensitiveSearch];
+        
+        [mutableAttributedString addAttribute:(NSString *)kCTForegroundColorAttributeName value:[UIColor colorWithWhite:1.0f alpha:0.8f] range:boldRange];
+
+        UIFont *boldSystemFont = [UIFont fontWithName:k_fontBold size:12];
+        CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)boldSystemFont.fontName, boldSystemFont.pointSize, NULL);
+        if (font) {
+            [mutableAttributedString addAttribute:(NSString *)kCTFontAttributeName value:(__bridge id)font range:boldRange];
+
+
+            CFRelease(font);
+        }
+        
+        return mutableAttributedString;
+    }];
+  
     
     
     passField=[Constant textField_Style1_WithRect:CGRectMake(20, 0, self.frame.size.width-40, 50)];
@@ -220,6 +239,10 @@ forControlEvents:UIControlEventEditingChanged];
     {
         passValidationSign.hidden=true;
     }
+    else if(![self isValidPassword:passField.text])
+    {
+        passValidationSign.hidden=true;
+    }
     else
     {
         valid2=1;
@@ -299,7 +322,7 @@ forControlEvents:UIControlEventEditingChanged];
     //
     //
     NSString *stricterFilterString = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[$@$!%*?&])[A-Za-z\\d$@$!%*?&]{8,}";
-    stricterFilterString=@"^(?=.*\\d).{8,12}$";
+    stricterFilterString=@"^(?=.*\\d).{8,15}$";
     NSPredicate *passwordTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", stricterFilterString];
     return [passwordTest evaluateWithObject:passwordString];
 }

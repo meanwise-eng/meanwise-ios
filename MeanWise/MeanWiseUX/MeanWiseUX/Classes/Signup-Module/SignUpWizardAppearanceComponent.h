@@ -12,12 +12,13 @@
 #import "ImageCropView.h"
 #import "DataSession.h"
 #import "SignUpTransitionScreen.h"
+#import "TTTAttributedLabel.h"
 
 @interface SignUpWizardAppearanceComponent : UIView <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 {
     
     SignUpTransitionScreen *screen;
-    UILabel *usernameHeadLBL;
+    TTTAttributedLabel *usernameHeadLBL;
     UIView *usernameBaseView;
     UITextField *usernameField;
     UILabel *usernameValidationLBL;

@@ -11,10 +11,10 @@
 #import "LocationStickerView.h"
 #import "OverlayStickerView.h"
 #import "OverlaySettingsPanel.h"
-#import "UIFilterImageView.h"
+//#import "UIFilterImageView.h"
+#import "HCFilterImageView.h"
 #import "VidLoopPlayer.h"
-#import "UIFilterOverLayView.h"
-
+#import "HCFilterVideoView.h"
 
 @interface PreviewMaxScreen : UIView
 {
@@ -33,9 +33,8 @@
     
     
     
-    UIFilterImageView *mediaImageView;
-    UIFilterOverLayView *videoOverLayView;
-    VidLoopPlayer *loopPlayer;
+    HCFilterImageView *mediaImageView;
+    HCFilterVideoView *loopPlayer;
     
     
     CGRect fullRect;
@@ -48,13 +47,14 @@
     UIButton *mediaDownloadBtn;
     UIButton *locationFilterPhaseBtn;
     UIButton *textFilterPhaseBtn;
-    
     UIButton *trashIcon;
-    
+    UIButton *filterBtn;
+    UIButton *soundToggleBtn;
+    BOOL isFilterModeOn;
+
     NSString *actualMediaPath;
     
     OverlaySettingsPanel *overLayStickerKeyboardBar;
-    
     
     
     LocationStickerView *MX_locationStickerObj;
@@ -62,8 +62,10 @@
     
     NSMutableArray *MX_overlayStickers;
     
-    
+ 
+    int audioOption;
 }
+-(NSDictionary *)getMetaDataOptions;
 -(void)setAttachmentRemoveCallBack:(SEL)func3;
 -(void)setTarget:(id)delegate showFullScreenCallBack:(SEL)func1 andShowThumbCallBack:(SEL)func2;
 -(void)seUpBasics:(CGRect)smallScreenRect;

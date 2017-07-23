@@ -149,7 +149,7 @@
     liked=0;
     dataObj=dict;
     dataObj=dict;
-    liked=dict.IsUserLiked.intValue;
+    liked=dict.is_liked.intValue;
     
     [self.profileIMGVIEW setUp:dict.user_profile_photo_small];
     
