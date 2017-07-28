@@ -13,6 +13,7 @@
 #import "APIObjectsParser.h"
 #import "DataSession.h"
 #import "HMPlayerManager.h"
+#import "ViewController.h"
 
 @implementation ExploreComponent
 
@@ -64,40 +65,36 @@
 
     
     
-    exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(20, 30, self.frame.size.width-40, 40)];
+    exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(36/2, 60/2, self.frame.size.width-34/2, 40)];
     [self addSubview:exploreTermBaseView];
-    exploreTermBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
+//    exploreTermBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
     exploreTermBaseView.layer.cornerRadius=2;
     exploreTermBaseView.clipsToBounds=YES;
     
 
+    settingsBtn=[[UIButton alloc] initWithFrame:CGRectMake(666/2, 73/2, 50/2, 50/2)];
+    [self addSubview:settingsBtn];
+    [settingsBtn setBackgroundImage:[UIImage imageNamed:@"Base_SettingsIcon.png"] forState:UIControlStateNormal];
+    [settingsBtn addTarget:self action:@selector(settingsBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
 
-    UIImageView *searchIcon=[[UIImageView alloc] initWithFrame:CGRectMake(10, 10, 20, 20)];
-    searchIcon.image=[UIImage imageNamed:@"ChannelSearchIcon.png"];
-    [exploreTermBaseView addSubview:searchIcon];
-    searchIcon.contentMode=UIViewContentModeScaleAspectFill;
     
-    exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(50, 0, exploreTermBaseView.frame.size.width-50, 40)];
+    exploreTerm=[[UITextField alloc] initWithFrame:CGRectMake(0, 0, exploreTermBaseView.frame.size.width, 40)];
     [exploreTermBaseView addSubview:exploreTerm];
     exploreTerm.tintColor=[UIColor whiteColor];
+    exploreTerm.font=[UIFont fontWithName:k_fontRegular size:18];
     exploreTerm.clearButtonMode=UITextFieldViewModeAlways;
     exploreTerm.textColor=[UIColor whiteColor];
     exploreTerm.keyboardAppearance=UIKeyboardAppearanceDark;
-    
+    exploreTerm.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"Type here to search this channel" attributes:@{NSForegroundColorAttributeName: [UIColor grayColor],NSFontAttributeName:[UIFont fontWithName:k_fontRegular size:18]}];
+
     
     
     UICollectionViewFlowLayout* layout1 = [[UICollectionViewFlowLayout alloc] init];
-    layout1.minimumInteritemSpacing = 20;
-    layout1.minimumLineSpacing = 10;
+    layout1.minimumInteritemSpacing = 5;
+    layout1.minimumLineSpacing = 5;
     layout1.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    layout1.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
-
-    UICollectionViewFlowLayout* layout2 = [[UICollectionViewFlowLayout alloc] init];
-    layout2.minimumInteritemSpacing = 20;
-    layout2.minimumLineSpacing = 20;
-    layout2.scrollDirection = UICollectionViewScrollDirectionHorizontal;
-    layout2.sectionInset = UIEdgeInsetsMake(0, 20, 0, 20);
-
+    layout1.sectionInset = UIEdgeInsetsMake(0, 18, 0, 18);
+   
     CGRect collectionViewFrame = CGRectMake(0, 70, self.frame.size.width, 100);
     ChannelList = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout1];
     ChannelList.delegate = self;
@@ -109,6 +106,11 @@
     [self addSubview:ChannelList];
     
     
+    UICollectionViewFlowLayout* layout2 = [[UICollectionViewFlowLayout alloc] init];
+    layout2.minimumInteritemSpacing = 20;
+    layout2.minimumLineSpacing = 20;
+    layout2.scrollDirection = UICollectionViewScrollDirectionHorizontal;
+    layout2.sectionInset = UIEdgeInsetsMake(0, 18, 0, 18);
 
     collectionViewFrame = CGRectMake(0, 210, self.frame.size.width, 380);
     feedList = [[UICollectionView alloc] initWithFrame:collectionViewFrame collectionViewLayout:layout2];
@@ -195,6 +197,32 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
+}
+-(void)settingsBtnClicked:(id)sender
+{
+    myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+    [myAccountCompo setUp];
+    myAccountCompo.blackOverLayView.image=[Constant takeScreenshot];
+    myAccountCompo.blackOverLayView.alpha=1;
+    
+    [myAccountCompo setTarget:self andBackFunc:@selector(backFromMessage)];
+    
+    [self addSubview:myAccountCompo];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        myAccountCompo.frame=self.bounds;
+        myAccountCompo.backgroundColor=[UIColor whiteColor];
+    }];
+
+    [self endEditing:false];
+    [self hideBottomBar];
+
+}
+-(void)backFromMessage
+{
+    
+    myAccountCompo=nil;
+    [self showBottomBar];
 }
 
 -(void)refreshTopicChannels
@@ -559,11 +587,13 @@ exploreTerm.hidden=false;
     if(collectionView==ChannelList)
     {
         
-        return CGSizeMake(90, 70);
+        return CGSizeMake(170/2, 170/2);
     }
     else
     {
-        return CGSizeMake(250, 370);
+        return CGSizeMake(490/2, 720/2);
+
+//        return CGSizeMake(250, 370);
     }
 }
 
@@ -695,6 +725,12 @@ exploreTerm.hidden=false;
         
         [detailPostView setForPostDetail];
         
+        
+        UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+        ViewController *t=(ViewController *)vc.topViewController;
+        [t setStatusBarHide:YES];
+
+        
     }
     else
     {
@@ -767,6 +803,9 @@ exploreTerm.hidden=false;
 
 -(void)downClicked:(NSIndexPath *)indexPath
 {
+    UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+    ViewController *t=(ViewController *)vc.topViewController;
+    [t setStatusBarHide:false];
     
     detailPostView=nil;
     [self updateTheCommentCountsForVisibleRows];

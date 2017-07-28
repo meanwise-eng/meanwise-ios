@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "MeanWiseUX/Classes/ViewController.m"
-            timestampString = "522440002.03935"
+            timestampString = "522773640.839312"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "348"
-            endingLineNumber = "348"
+            startingLineNumber = "356"
+            endingLineNumber = "356"
             landmarkName = "-exportVideoWithOverLay1:witPath:overlayImage:"
             landmarkType = "7">
          </BreakpointContent>
@@ -48,22 +48,6 @@
             startingLineNumber = "886"
             endingLineNumber = "886"
             landmarkName = "-exportCompositionToVideo:withMetadata:"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "MeanWiseUX/Classes/Home-Module/UserSession.m"
-            timestampString = "522462560.156328"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "204"
-            endingLineNumber = "204"
-            landmarkName = "+setUserSessionIfExist"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

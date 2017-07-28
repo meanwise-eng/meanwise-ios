@@ -102,12 +102,14 @@
 
 -(void)backBtnClicked:(id)sender
 {
+    CGRect rect=CGRectMake(0, self.frame.size.height, self.frame.size.width, self.frame.size.height);
+
     [delegate performSelector:backBtnClickedFunc withObject:nil afterDelay:0.01];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     [UIView animateWithDuration:0.8 delay:0 usingSpringWithDamping:1 initialSpringVelocity:0.2 options:UIViewAnimationOptionCurveEaseIn animations:^{
         
-        self.frame=CGRectMake(0, -self.frame.size.height, self.frame.size.width, self.frame.size.height);
+        self.frame=rect;
         
         
     } completion:^(BOOL finished) {

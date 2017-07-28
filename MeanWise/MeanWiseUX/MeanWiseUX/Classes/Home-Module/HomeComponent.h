@@ -61,7 +61,7 @@
 }
 -(void)setUp;
 -(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2;
-
+-(void)playVideoIfAvaialble;
 
 @end
 

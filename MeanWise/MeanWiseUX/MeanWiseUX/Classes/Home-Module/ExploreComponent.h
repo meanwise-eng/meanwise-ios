@@ -14,9 +14,16 @@
 #import "UIImageHM.h"
 #import "ExploreSearchComponent.h"
 #import "APIManager.h"
+#import "MyAccountComponent.h"
 
 @interface ExploreComponent : UIView <UICollectionViewDataSource,UICollectionViewDelegate,UITextViewDelegate>
 {
+    MyAccountComponent *myAccountCompo;
+    
+    UITextField *exploreTerm;
+    UIView *exploreTermBaseView;
+
+    UIButton *settingsBtn;
     
     int typeOfSearch;
     NSString *currentSearchTerm;
@@ -38,8 +45,6 @@
     
     ExploreTopicView *topicView;
     
-    UITextField *exploreTerm;
-    UIView *exploreTermBaseView;
     
     UICollectionView *ChannelList;
     UICollectionView *feedList;

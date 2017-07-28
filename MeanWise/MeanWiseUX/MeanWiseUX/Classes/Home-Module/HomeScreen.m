@@ -203,6 +203,7 @@
     
     
 }
+
 #pragma mark - By Scroll Screen Detect
 
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
@@ -278,7 +279,6 @@
     {
         [HMPlayerManager sharedInstance].Home_isPaused=true;
         
-        [Constant setStatusBarColorWhite:false];
 
         [AnalyticsMXManager PushAnalyticsEvent:@"New Post Screen"];
 
@@ -302,8 +302,6 @@
         
         
     }
-
-    
 
 }
 -(void)inviteCodeCancel:(id)sender

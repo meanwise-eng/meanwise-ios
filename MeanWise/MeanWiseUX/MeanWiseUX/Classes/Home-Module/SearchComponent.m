@@ -618,6 +618,7 @@ searchFieldTXT.userInteractionEnabled=true;
 }
 -(void)downClicked:(NSIndexPath *)indexPath
 {
+    
     [self showBottomBar];
     
     galleryView.scrollEnabled=true;

@@ -63,7 +63,7 @@
         self.overLayView.alpha=0.5;
         [self addSubview:self.overLayView];
         
-    
+
         
         
        
@@ -110,7 +110,6 @@
             self.profileIMGVIEW.alpha=0.6;
 
             self.overLayView.alpha=0.5;
-
         } completion:^(BOOL finished) {
             
         }];

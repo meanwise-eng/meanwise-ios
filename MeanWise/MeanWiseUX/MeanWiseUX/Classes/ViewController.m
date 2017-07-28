@@ -7,7 +7,8 @@
 //
 
 #import "ViewController.h"
-#import "HomeScreen.h"
+//#import "HomeScreen.h"
+#import "BaseControl.h"
 #import "APITesterView.h"
 #import "ConnectionBar.h"
 #import "UserSession.h"
@@ -25,6 +26,7 @@
 #import "SignUpWizardSkillsComponent.h"
 
 #import "GUIScaleManager.h"
+#import "BaseControl.h"
 #import "EditLocationComponent.h"
 
 
@@ -76,9 +78,15 @@
     
     //Final
     
-  
     
-    [self AppStart];
+   [self AppStart];
+    
+    
+//    [UserSession setUserSessionIfExist];
+//    BaseControl *control=[[BaseControl alloc] initWithFrame:self.view.bounds];
+//    [mainKeyView addSubview:control];
+//    [control setUp];
+
     
 //    [UserSession setUserSessionIfExist];
 //    MyAccountComponent *myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.view.frame.size.width, 0, self.view.bounds.size.width, self.view.bounds.size.height)];
@@ -804,7 +812,7 @@
     else
     {
 
-           HomeScreen *cm=[[HomeScreen alloc] initWithFrame:mainKeyView.bounds];
+           BaseControl *cm=[[BaseControl alloc] initWithFrame:mainKeyView.bounds];
          [cm setUp];
          [mainKeyView addSubview:cm];
 
@@ -908,10 +916,10 @@
 -(void)loggedInSuccessfully:(id)sender
 {
 
-    [Constant setStatusBarColorWhite:false];
+    [Constant setStatusBarColorWhite:true];
 
 
-    HomeScreen *cm=[[HomeScreen alloc] initWithFrame:mainKeyView.bounds];
+    BaseControl *cm=[[BaseControl alloc] initWithFrame:mainKeyView.bounds];
     [cm setUp];
     [mainKeyView addSubview:cm];
 

@@ -82,8 +82,14 @@
     
     
     [self setNotificationNumber:0];
-    [self setUpWatchForNotifications];
+   // [self setUpWatchForNotifications];
 
+    [self hideForHomeScreen];
+}
+-(void)hideForHomeScreen
+{
+    self.leftBtn.hidden=true;
+    self.rightBtn.hidden=true;
 }
 #pragma mark - Notification Watch
 

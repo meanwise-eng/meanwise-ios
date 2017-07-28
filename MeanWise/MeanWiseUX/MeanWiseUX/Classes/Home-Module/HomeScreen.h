@@ -33,6 +33,7 @@
     int visibleComp;
     TutorialComponent *tutorialCmp;
     InviteCodeComponent *inviteCodeComp;
+    
 }
 -(void)setUp;
 

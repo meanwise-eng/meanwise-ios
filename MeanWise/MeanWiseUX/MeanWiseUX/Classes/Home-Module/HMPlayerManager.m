@@ -21,19 +21,19 @@
         sharedInstance.Home_screenIdentifier=@"";
         sharedInstance.Home_urlIdentifier=@"";
         sharedInstance.Home_isPaused=FALSE;
-        sharedInstance.Home_isVisibleBounds=TRUE;
+        sharedInstance.Home_isVisibleBounds=false;
         sharedInstance.Home_RefreshIdentifier=[NSNumber numberWithLong:1];
 
         sharedInstance.Explore_isPaused=false;
-        sharedInstance.Explore_isVisibleBounds=false;
+        sharedInstance.Explore_isVisibleBounds=true;
         sharedInstance.Explore_screenIdentifier=@"";
         sharedInstance.Explore_urlIdentifier=@"";
         sharedInstance.Explore_isKilling=false;
         
-        sharedInstance.Profile_isPaused=false;
-        sharedInstance.Profile_isVisibleBounds=TRUE;
         sharedInstance.Profile_screenIdentifier=@"";
         sharedInstance.Profile_urlIdentifier=@"";
+        sharedInstance.Profile_isPaused=false;
+        sharedInstance.Profile_isVisibleBounds=TRUE;
         sharedInstance.Profile_isKilling=false;
         sharedInstance.Profile_RefreshIdentifier=[NSNumber numberWithLong:1];
         

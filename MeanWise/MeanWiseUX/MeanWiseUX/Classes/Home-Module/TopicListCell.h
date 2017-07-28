@@ -19,4 +19,5 @@
 @property (nonatomic, strong) UILabel *nameLBL;
 @property (nonatomic, strong) UIColor *topicColor;
 
+
 @end

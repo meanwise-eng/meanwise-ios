@@ -32,9 +32,20 @@
         self.nameLBL.font=[UIFont fontWithName:k_fontRegular size:16];
         self.nameLBL.autoresizingMask=UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight;
         
+//        self.nameLBL.textColor=[UIColor colorWithWhite:1.0f alpha:0.5f];
+//        self.bgView.backgroundColor=[self.topicColor colorWithAlphaComponent:0.5f];
+
     }
     return self;
 }
+-(void)setTopicColor:(UIColor *)topicColor
+{
+    self.nameLBL.textColor=[UIColor colorWithWhite:1.0f alpha:0.5f];
+    self.bgView.backgroundColor=[topicColor colorWithAlphaComponent:0.5f];
+
+    _topicColor=topicColor;
+}
+
 -(void)setSelected:(BOOL)selected
 {
     [super setSelected:selected];
@@ -44,13 +55,15 @@
         
         if(selected==false)
         {
-            self.nameLBL.textColor=[UIColor whiteColor];
-            self.bgView.backgroundColor=self.topicColor;
+            self.nameLBL.textColor=[UIColor colorWithWhite:1.0f alpha:0.5f];
+            self.bgView.backgroundColor=[self.topicColor colorWithAlphaComponent:0.5f];
+
+           
         }
         if(selected==true)
         {
-            self.nameLBL.textColor=self.topicColor;
-            self.bgView.backgroundColor=[UIColor whiteColor];
+            self.nameLBL.textColor=[UIColor whiteColor];
+            self.bgView.backgroundColor=self.topicColor;
         }
 
         

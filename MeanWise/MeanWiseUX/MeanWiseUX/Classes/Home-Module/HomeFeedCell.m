@@ -37,7 +37,8 @@
          self.shadowImage.alpha=0.8;
          
         
-        
+      
+
         
         
         self.statusLBL=[[UILabel alloc] initWithFrame:CGRectZero];
@@ -65,7 +66,7 @@
         self.timeLBL.text=@"2 hrs";
         self.timeLBL.textColor=[UIColor whiteColor];
         self.timeLBL.textAlignment=NSTextAlignmentRight;
-        self.timeLBL.font=[UIFont fontWithName:k_fontBold size:14];
+        self.timeLBL.font=[UIFont fontWithName:k_fontSemiBold size:14];
         
         self.profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectZero];
         [self addSubview:self.profileIMGVIEW];
@@ -73,12 +74,14 @@
         self.profileIMGVIEW.contentMode=UIViewContentModeScaleAspectFill;
         self.profileIMGVIEW.clipsToBounds=YES;
         
+      
+
         self.nameLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 15)];
         [self addSubview:self.nameLBL];
         self.nameLBL.text=@"Marry Lee";
         self.nameLBL.textColor=[UIColor whiteColor];
         self.nameLBL.textAlignment=NSTextAlignmentLeft;
-        self.nameLBL.font=[UIFont fontWithName:k_fontSemiBold size:12];
+        self.nameLBL.font=[UIFont fontWithName:k_fontSemiBold size:15];
         
         
         self.profLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 15)];
@@ -86,9 +89,10 @@
         self.profLBL.text=@"Photographer";
         self.profLBL.textColor=[UIColor whiteColor];
         self.profLBL.textAlignment=NSTextAlignmentLeft;
-        self.profLBL.font=[UIFont fontWithName:k_fontSemiBold size:12];
+        self.profLBL.font=[UIFont fontWithName:k_fontRegular size:13];
         self.profLBL.adjustsFontSizeToFitWidth=YES;
         self.profLBL.numberOfLines=2;
+        
         
         self.likeCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 40, 15)];
         [self addSubview:self.likeCountLBL];
@@ -108,17 +112,17 @@
         
         self.likeBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
         [self.likeBtn addTarget:self action:@selector(likeBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_LikeBtn.png"] forState:UIControlStateNormal];
         [self addSubview:self.likeBtn];
         
         self.commentBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
         [self.commentBtn addTarget:self action:@selector(commentBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [self.commentBtn setBackgroundImage:[UIImage imageNamed:@"comments.png"] forState:UIControlStateNormal];
+        [self.commentBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_CommentBtn.png"] forState:UIControlStateNormal];
         [self addSubview:self.commentBtn];
         
         self.shareBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
         [self.shareBtn addTarget:self action:@selector(shareBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-        [self.shareBtn setBackgroundImage:[UIImage imageNamed:@"share.png"] forState:UIControlStateNormal];
+        [self.shareBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_ShareBtn.png"] forState:UIControlStateNormal];
         [self addSubview:self.shareBtn];
         
         self.postIMGVIEW.hidden=false;
@@ -129,12 +133,50 @@
         hiddenView.hidden=true;
         hiddenView.backgroundColor=[UIColor whiteColor];
         
+       
         self.backgroundColor=[UIColor clearColor];
         
+        self.postIMGVIEW.frame=self.bounds;
+        self.shadowImage.frame=self.bounds;
+        
+        self.profileIMGVIEW.layer.borderWidth=1;
+        self.profileIMGVIEW.layer.borderColor=[UIColor colorWithWhite:0.75 alpha:1.0f].CGColor;
+        
+        self.likeCountLBL.frame=CGRectMake(15, frame.size.height-70, 50, 20);
+        self.commentCountLBL.frame=CGRectMake(frame.size.width/2-25, frame.size.height-70, 50, 20);
+
     }
     return self;
     
 }
+-(void)setFrameX:(CGRect)frame;
+{
+    
+    self.profileIMGVIEW.frame=CGRectMake(15, 15, 40, 40);
+    self.profileIMGVIEW.layer.cornerRadius=20;
+    self.nameLBL.frame=CGRectMake(15+40+5, 15+5, 200, 15);
+    self.profLBL.frame=CGRectMake(15+40+5, 15+15+5, 200, 15);
+    
+    
+    self.likeBtn.frame=CGRectMake(20, self.frame.size.height-20/2-31/2, 32/2*1.2, 30/2*1.2);
+    self.commentBtn.frame=CGRectMake(self.frame.size.width/2-18*1.2+5, self.frame.size.height-20/2-31/2, 36/2*1.2, 31/2*1.2);
+    self.shareBtn.frame=CGRectMake(self.frame.size.width-20-29/2*1.2-10, self.frame.size.height-20/2-31/2, 29/2*1.2, 29/2*1.2);
+
+    
+    self.likeCountLBL.center=CGPointMake(self.likeBtn.center.x,self.likeBtn.center.y-20);
+    self.commentCountLBL.center=CGPointMake(self.commentBtn.center.x,self.commentBtn.center.y-20);
+    
+
+    
+    self.tagName.frame=CGRectMake(15, self.frame.size.height-(20+31+100)/2, frame.size.width-30, 30);
+    self.timeLBL.frame=CGRectMake(15, self.frame.size.height-(20+31+100)/2, frame.size.width-30, 30);
+    
+    
+    
+    
+    
+}
+
 -(void)commentBtnClicked:(id)sender
 {
     
@@ -168,11 +210,11 @@
     
     if(liked==1)
     {
-        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_UnlikeBtn.png"] forState:UIControlStateNormal];
     }
     else
     {
-        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_LikeBtn.png"] forState:UIControlStateNormal];
     }
     
     [self setUpMediaType:dict.mediaType.intValue andColorNumber:dict.colorNumber.intValue];
@@ -266,63 +308,7 @@
     self.hidden=flag;
     
 }
--(void)setFrameX:(CGRect)frame;
-{
-    // self.frame=frame;
-    
-    /// self.frame=CGRectMake(self.frame.origin.x, self.frame.origin.y, frame.size.width, frame.size.height);
-    
-    hiddenView.frame=CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
-    self.postIMGVIEW.frame=frame;
-    self.shadowImage.frame=frame;
-    
-    [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
-    
-    //  self.statusLBL.frame=CGRectMake(15, 10, frame.size.width-30, frame.size.height-50);
-    
-    self.tagName.frame=CGRectMake(15, frame.size.height-40, frame.size.width-30, 30);
-    self.timeLBL.frame=CGRectMake(15, frame.size.height-40, frame.size.width-30, 30);
-    
-    self.profileIMGVIEW.frame=CGRectMake(15, frame.size.height-40-50, 40, 40);
-    self.profileIMGVIEW.layer.cornerRadius=20;
-    
-    self.nameLBL.frame=CGRectMake(15+45, frame.size.height-40-50, 200, 20);
-    self.profLBL.frame=CGRectMake(15+45, frame.size.height-40-35, 200, 20);
-    
-    self.likeCountLBL.frame=CGRectMake(frame.size.width-150, frame.size.height-40-50, 40, 20);
-    self.commentCountLBL.frame=CGRectMake(frame.size.width-100, frame.size.height-40-50, 40, 20);
-    
-    
-    self.likeBtn.frame=CGRectMake(frame.size.width-150, frame.size.height-40-35, 40, 40);
-    self.commentBtn.frame=CGRectMake(frame.size.width-100, frame.size.height-40-35, 40, 40);
-    self.shareBtn.frame=CGRectMake(frame.size.width-50, frame.size.height-40-35, 40, 40);
-    
-    
-    
-    ////
-    
-    self.profileIMGVIEW.frame=CGRectMake(15, 15+5, 40, 40);
-    self.profileIMGVIEW.layer.cornerRadius=20;
-    self.nameLBL.frame=CGRectMake(15+40+5, 15+10, 200, 15);
-    self.profLBL.frame=CGRectMake(15+40+5, 15+25, 200, 15);
-    
-    self.tagName.frame=CGRectMake(15, frame.size.height-100, frame.size.width-30, 30);
-    self.timeLBL.frame=CGRectMake(15, frame.size.height-100, frame.size.width-30, 30);
-    // self.statusLBL.frame=CGRectMake(15,  frame.size.height-50, frame.size.width-30,70);
-    
-    
-    
-    
-    
-    self.likeCountLBL.frame=CGRectMake(15, frame.size.height-70, 50, 20);
-    self.commentCountLBL.frame=CGRectMake(frame.size.width/2-25, frame.size.height-70, 50, 20);
-    self.likeBtn.frame=CGRectMake(15, frame.size.height-60, 50, 50);
-    self.commentBtn.frame=CGRectMake(frame.size.width/2-25, frame.size.height-60, 50, 50);
-    self.shareBtn.frame=CGRectMake(frame.size.width-15-50, frame.size.height-60, 50, 50);
-    
-    
-    
-}
+
 -(void)setUpMediaType:(int)number andColorNumber:(int)Cnumber
 {
     mediaType=number;
@@ -343,7 +329,9 @@
         
         int height=30;
        
-        self.statusLBL.frame=CGRectMake(15, self.frame.size.height-90-height, self.frame.size.width-30, height);
+     //   self.statusLBL.frame=CGRectMake(15, self.frame.size.height-90-height, self.frame.size.width-30, height);
+      //  self.statusLBL.frame=CGRectMake(15, frame.size.height-(55+31+100+50+height)/2, frame.size.width-30, 30);
+        self.statusLBL.frame=CGRectMake(15, self.frame.size.height-(20+31+100+50)/2, self.frame.size.width-30, 30);
 
         self.backgroundColor=[UIColor whiteColor];
         
@@ -395,7 +383,7 @@
      [self callLikeAPI];
         [[DataSession sharedInstance] postLiked:dataObj.postId];
 
-    [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"Unlike.png"] forState:UIControlStateNormal];
+    [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_UnlikeBtn.png"] forState:UIControlStateNormal];
     [self likeBtnAnimation];
         self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
 
@@ -406,7 +394,7 @@
         [self callLikeAPI];
         [[DataSession sharedInstance] postUnliked:dataObj.postId];
 
-        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"like.png"] forState:UIControlStateNormal];
+        [self.likeBtn setBackgroundImage:[UIImage imageNamed:@"ExploreFeed_LikeBtn.png"] forState:UIControlStateNormal];
         self.likeCountLBL.text=[NSString stringWithFormat:@"%d",dataObj.num_likes.intValue];
 
     }
@@ -446,7 +434,7 @@
     UIImageView *imageView1=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 50, 50)];
     imageView1.center=CGPointMake(self.frame.size.width/2, self.frame.size.height/2);
     [self addSubview:imageView1];
-    imageView1.image=[UIImage imageNamed:@"Unlike.png"];
+    imageView1.image=[UIImage imageNamed:@"ExploreFeed_UnlikeBtn.png"];
     
     
     

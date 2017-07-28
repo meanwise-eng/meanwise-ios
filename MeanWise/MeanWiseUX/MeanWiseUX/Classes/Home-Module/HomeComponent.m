@@ -131,7 +131,11 @@
     
     
 }
-
+-(void)playVideoIfAvaialble
+{
+    [self stoppedScrolling];
+    
+}
 -(void)refreshAction
 {
     
@@ -139,7 +143,6 @@
     
     emptyView.hidden=true;
     
-    [Constant setStatusBarColorWhite:false];
     
     APIManager *manager=[pManager getFreshAPIManager];
     //[manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
@@ -496,7 +499,8 @@
 -(void)stoppedScrolling
 {
     
-    
+    if([HMPlayerManager sharedInstance].Home_isVisibleBounds==true)
+    {
     CGRect visibleRect = (CGRect){.origin = feedList.contentOffset, .size = feedList.bounds.size};
     CGPoint visiblePoint = CGPointMake(CGRectGetMidX(visibleRect), CGRectGetMidY(visibleRect));
     NSIndexPath *visibleIndexPath = [feedList indexPathForItemAtPoint:visiblePoint];
@@ -531,7 +535,7 @@
             
         }
     }
-    
+    }
     
     
     // done, do whatever
@@ -897,6 +901,7 @@
     messageCompo=nil;
     [self showBottomBar];
 }
+
 -(void)setttingBtnClicked:(id)sender
 {
     [self HomeScreenGoesBack];
