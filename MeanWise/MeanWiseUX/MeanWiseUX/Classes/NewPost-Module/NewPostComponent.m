@@ -23,7 +23,7 @@
     
     containerView.clipsToBounds=YES;
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-In"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-In"];
 
      isPostHasAttachment=false;
     
@@ -254,14 +254,14 @@
 
     if(isSourceCamera==true)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-From Camera attached"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-From Camera attached"];
 
         [cropperControl setDirectCrop];
 
     }
     else
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-From Gallery attached"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-From Gallery attached"];
 
     }
     
@@ -297,7 +297,7 @@
 
 -(void)attachmentRemove:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Attachment Remove"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Attachment Remove"];
 
         [mediaAttachComponent cleanUp];
         mediaAttachComponent.hidden=true;
@@ -318,7 +318,7 @@
 
 -(void)cancelPostBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Cancel Post"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Cancel Post"];
 
     
     [statusView resignFirstResponder];
@@ -381,7 +381,7 @@
 }
 -(void)postBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Button Clicked"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Post Button Clicked"];
 
 
     NSString *statusString=statusView.text;
@@ -470,7 +470,7 @@
             
         }
         
-        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Image Posted"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Post Image Posted"];
 
         
         NSDictionary *dict=@{
@@ -486,7 +486,7 @@
     }
     else if(isPostHasAttachment==false)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Text Posted"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Post Text Posted"];
 
         NSDictionary *dict=@{
                              @"text":statusString,
@@ -502,7 +502,7 @@
     else if(isPostHasAttachment==true && [mediaAttachComponent isMediaTypeVideo]==true)
     {
         
-        [AnalyticsMXManager PushAnalyticsEvent:@"NewPost-Post Video Posted"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Post Video Posted"];
 
         
         NSString *mediaPath=[mediaAttachComponent getCroppedVideoPath];

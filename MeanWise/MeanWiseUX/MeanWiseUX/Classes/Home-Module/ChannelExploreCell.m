@@ -23,8 +23,15 @@
 
 -(void)setURLString:(NSString *)string
 {
-    
+    if(![string isEqualToString:@""])
+    {
     [self.profileIMGVIEW setUp:string];
+        
+    }
+    else
+    {
+       
+    }
     
 }
 -(id)initWithFrame:(CGRect)frame;
@@ -34,8 +41,9 @@
     if(self)
     {
         
-        self.backgroundColor=[UIColor clearColor];
         
+        self.backgroundColor=[UIColor blackColor];
+
         self.bgView=[[UIView alloc] initWithFrame:self.bounds];
         self.bgView.backgroundColor=[UIColor blackColor];
         [self addSubview:self.bgView];
@@ -68,7 +76,6 @@
         
        
         
-        self.backgroundColor=[UIColor blackColor];
         
     }
     return self;

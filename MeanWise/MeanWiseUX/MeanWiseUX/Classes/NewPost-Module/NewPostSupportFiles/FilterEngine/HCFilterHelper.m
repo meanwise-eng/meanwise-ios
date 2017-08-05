@@ -23,6 +23,7 @@ typedef enum {
     
     UIImageFilterTypeColorClamp=9,
     
+  //  UIImageFilterTypeVignette=10,
 } UIImageFilterType;
 
 -(void)setForView:(UIView *)view;
@@ -235,7 +236,16 @@ typedef enum {
         [CorefilterDB addObject:dictFull];
     }
     
-    
+//    {
+//        NSDictionary *dict1=@{@"filter":@"CIVignetteEffect",@"inputCenter":@"CENTER",@"inputIntensity":@(0.8f),@"inputRadius":@(640)};
+//        
+//        NSDictionary *dictFull=@{@"ENAME":@(UIImageFilterTypeVignette),
+//                                 @"DATA":@[
+//                                         dict1,
+//                                         ]};
+//        [CorefilterDB addObject:dictFull];
+//    }
+//    
     
     
     return CorefilterDB;
@@ -273,7 +283,7 @@ typedef enum {
         [MasterFilterDB addObject:dict];
     }
     
-    
+   
     
     {
         NSArray *pointArray=[NSArray arrayWithObjects:[NSValue valueWithCGPoint:CGPointMake(1, 1)],[NSValue valueWithCGPoint:CGPointMake(0, 0)], nil];
@@ -364,6 +374,16 @@ typedef enum {
         NSDictionary *dict=@{@"filter":@(UIImageFilterTypeInstant),@"colors":colorArray,@"MNAME":@"A9",@"points":pointArray};
         [MasterFilterDB addObject:dict];
     }
+    
+//    {
+//        NSArray *pointArray=[NSArray arrayWithObjects:[NSValue valueWithCGPoint:CGPointMake(1, 1)],[NSValue valueWithCGPoint:CGPointMake(0, 0)], nil];
+//        
+//        
+//        NSArray *colorArray=[[NSArray alloc] init];
+//        NSDictionary *dict=@{@"filter":@(UIImageFilterTypeVignette),@"colors":colorArray,@"MNAME":@"A10",@"points":pointArray};
+//        [MasterFilterDB addObject:dict];
+//    }
+    
     
     return MasterFilterDB;
 }

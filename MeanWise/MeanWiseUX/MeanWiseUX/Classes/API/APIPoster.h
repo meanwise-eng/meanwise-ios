@@ -23,6 +23,8 @@
 -(NSArray *)getInterestData;
 -(NSArray *)getProffesionData;
 
+-(NSArray *)getInterestDataForExploreScreen;
+
 -(void)saveDataAs:(NSArray *)array andKey:(NSString *)key;
 
 @end

@@ -846,13 +846,16 @@ timerBtn.hidden=false;
             AVAssetExportSession *exporter = [[AVAssetExportSession alloc] initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
             exporter.outputURL = url;
             exporter.outputFileType = AVFileTypeQuickTimeMovie;
-            exporter.shouldOptimizeForNetworkUse = FALSE;
+            exporter.shouldOptimizeForNetworkUse = YES;
             
             [exporter exportAsynchronouslyWithCompletionHandler:^{
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if (exporter.status == AVAssetExportSessionStatusCompleted) {
+                        
                         NSURL *URL = exporter.outputURL;
                         
+                        [FTIndicator dismissProgress];
+
                         [self fixTheOrientationOfVideo:URL];
 
                         
@@ -1037,9 +1040,10 @@ timerBtn.hidden=false;
     
     //    allPhotosOptions.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
     // allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"mediaType = %d",mediaType];
+   
     allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"!((mediaSubtype & %d) == %d) AND !((mediaSubtype & %d) == %d)", PHAssetMediaSubtypeVideoHighFrameRate,PHAssetMediaSubtypeVideoHighFrameRate,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse];
 
-  //  allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"!((mediaSubtype & %d) == %d) AND !((mediaSubtype & %d) == %d)", PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse];
+   // allPhotosOptions.predicate = [NSPredicate predicateWithFormat:@"!((mediaSubtype & %d) == %d) AND !((mediaSubtype & %d) == %d)", PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse,PHAssetMediaSubtypeVideoTimelapse];
 
     
     //  PHFetchResult *allPhotosResult = [PHAsset fetchAssetsWithMediaType:mediaType options:allPhotosOptions];

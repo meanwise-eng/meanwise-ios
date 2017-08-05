@@ -164,7 +164,7 @@
 }
 -(void)saveSession:(NSDictionary *)dict;
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Signup Completed"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Signup Completed"];
     [UserSession setSessionProfileObj:dict andAccessToken:accessToken];
     
 }

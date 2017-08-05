@@ -224,7 +224,7 @@
     
     if(sticker==nil)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Media-textoverlay"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Media-textoverlay"];
         
         sticker=[[OverlayStickerView alloc] initWithFrame:CGRectMake(0, 0, 100, 40)];
         [self addSubview:sticker];
@@ -253,7 +253,7 @@
     
     
   
-    [AnalyticsMXManager PushAnalyticsEvent:@"Media-textoverlay-del"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Media-textoverlay-del"];
 
 
     [UIView animateWithDuration:0.5 animations:^{
@@ -342,7 +342,7 @@
     
     if(MX_locationStickerObj==nil)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Media-locfilter"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Media-locfilter"];
 
         MX_locationStickerObj=[[LocationStickerView alloc] initWithFrame:CGRectMake(0, 0, 200, 200)];
         [self addSubview:MX_locationStickerObj];
@@ -367,7 +367,7 @@
 
 -(void)cancelThisMedia:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Media-Cancelled"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Media-Cancelled"];
 
     [target performSelector:attachmentRemoveFunc withObject:nil afterDelay:0.001];
     
@@ -433,7 +433,7 @@
     
     if(mediaType==0)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Media-save-Photo"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Media-save-Photo"];
 
         UIImage *image=[self getFinalOutputImage];
         
@@ -446,7 +446,7 @@
     }
     else
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Media-save-Video"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Media-save-Video"];
 
         NSDictionary *dict=[self getMetaDataOptions];
         UIImage *image=[self getOverLayVideoImage];
@@ -714,7 +714,7 @@
 //        
 //        if(touch.tapCount==2)
 //        {
-//            [AnalyticsMXManager PushAnalyticsEvent:@"Media-imageFilter"];
+//            [AnalyticsMXManager PushAnalyticsEventAction:@"Media-imageFilter"];
 //
 //            [mediaImageView generateNewEffectPoint:location];
 //        }
@@ -890,7 +890,7 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *destinationPath =  [documentsDirectory stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", arc4random() % 1000]];
+                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", 444]];
     [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
     
     

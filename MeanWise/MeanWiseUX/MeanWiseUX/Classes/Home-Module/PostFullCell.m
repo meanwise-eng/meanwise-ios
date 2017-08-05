@@ -88,6 +88,75 @@
     CGRect offsetFrame = CGRectOffset(frame, _imageOffset.x, _imageOffset.y);
     self.postIMGVIEW.frame = offsetFrame;
     player.frame = offsetFrame;
+    
+}
+-(void)hideShowControl:(BOOL)flag
+{
+    isfullMode=flag;
+    
+    
+    
+    float opacity=flag?0.0f:1.0f;
+
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        
+                self.timeLBL.alpha=opacity;
+                self.shareBtn.alpha=opacity;
+                self.commentBtn.alpha=opacity;
+                self.commentCountLBL.alpha=opacity;
+                self.likeBtn.alpha=opacity;
+                self.likeCountLBL.alpha=opacity;
+        
+                self.tagName.alpha=opacity;
+        
+                self.profileIMGVIEW.alpha=opacity;
+                self.nameLBL.alpha=opacity;
+                self.profLBL.alpha=opacity;
+
+                if(mediaType!=0)
+                {
+                    self.statusLBL.alpha=opacity;
+            
+                }
+                if(self.shouldHideCommentWriteBtn==false)
+                {
+                            self.commentWriteBtn.alpha=opacity;
+                }
+        
+    }];
+    
+    
+//        self.timeLBL.hidden=flag;
+//        self.shareBtn.hidden=flag;
+//        self.commentBtn.hidden=flag;
+//        self.commentCountLBL.hidden=flag;
+//        self.likeBtn.hidden=flag;
+//        self.likeCountLBL.hidden=flag;
+//
+//        self.tagName.hidden=flag;
+//
+//        self.profileIMGVIEW.hidden=flag;
+//        self.nameLBL.hidden=flag;
+//        self.profLBL.hidden=flag;
+    
+    
+    
+//    if(mediaType!=0)
+//    {
+//        self.statusLBL.hidden=flag;
+//
+//    }
+//    
+//    if(self.shouldHideCommentWriteBtn==false)
+//    {
+//                self.commentWriteBtn.hidden=flag;
+//
+//    }
+    
+    
+    
+    
 }
 
 
@@ -247,7 +316,7 @@
         [self.commentWriteBtn setTitle:@"Leave a comment ..." forState:UIControlStateNormal];
         [self.commentWriteBtn addTarget:self action:@selector(commentWriteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
         self.commentWriteBtn.hidden=true;
-        
+        self.shouldHideCommentWriteBtn=true;
         
         self.deleteBtn=[[UIButton alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
         [self.deleteBtn addTarget:self action:@selector(deleteBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
@@ -275,11 +344,26 @@
         
         [self setFrameX:frame];
         
-       
+        UILongPressGestureRecognizer *gesture=[[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longTapPressed:)];
+        gesture.numberOfTouchesRequired=1;
+        gesture.minimumPressDuration=0.3;
+        [self.contentView addGestureRecognizer:gesture];
         
 
     }
     return self;
+}
+-(void)longTapPressed:(UILongPressGestureRecognizer *)gesture
+{
+    if(gesture.state==UIGestureRecognizerStateBegan)
+    {
+    [self hideShowControl:true];
+    }
+    else if(gesture.state==UIGestureRecognizerStateEnded)
+    {
+        [self hideShowControl:false];
+
+    }
 }
 -(void)setShadowsCustom
 {
@@ -640,6 +724,7 @@
    // self.postIMGVIEW.frame=frame;
     //self.shadowImage.frame=frame;
     
+    isfullMode=false;
 
     self.timeLBL.frame=CGRectMake(15, frame.size.height-110, frame.size.width-30, 30);
     

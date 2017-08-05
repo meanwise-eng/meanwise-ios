@@ -16,8 +16,10 @@
 #import "FirstLaunchScreen.h"
 #import "ConnectionBar.h"
 #import "PostUploadLoader.h"
-#import "NotificationBadgeView.h"
 #import "VersionUtility.h"
+#import "NotificationsManager.h"
+
+//#import "NotificationBadgeView.h"
 
 @interface ViewController : UIViewController
 {
@@ -25,6 +27,8 @@
     UIView *mainKeyView;
     
     FirstLaunchScreen *c;
+    
+    NotificationsManager *notifyManager;
     
     
     BOOL statusBarHide;
@@ -34,7 +38,6 @@
     
     
 }
-@property (nonatomic, strong) APIObjects_ProfileObj *sessionMain;
 
 
 -(void)MasterlogoutBtnClicked:(id)sender;

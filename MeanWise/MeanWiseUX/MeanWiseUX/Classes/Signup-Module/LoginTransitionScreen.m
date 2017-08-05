@@ -70,7 +70,7 @@
     }
     else
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Login"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Login"];
         
         [self retrivingUserData:[responseObj.response valueForKey:@"token"] andUserId:[responseObj.response valueForKey:@"user_id"]];
         NSLog(@"%@",responseObj.response);

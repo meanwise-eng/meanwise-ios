@@ -25,7 +25,7 @@
     BOOL isPlayerShouldPlay;
     
     NSString *debugNumber;
-AVPlayerViewController *playerViewController;
+    AVPlayerViewController *playerViewController;
     LoaderMin *videoLoader;
     NSString *screenIdentifier;
     

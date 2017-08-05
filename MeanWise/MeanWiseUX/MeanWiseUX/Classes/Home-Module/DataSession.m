@@ -27,6 +27,7 @@
         sharedInstance.noOfNewNotificationReceived=[NSNumber numberWithInt:0];
         sharedInstance.noOfInstantNotificationReceived=[NSNumber numberWithInt:0];
         sharedInstance.SocialshareStatus=[NSNumber numberWithInteger:0];
+        sharedInstance.sessionMain=nil;
         
         // Do any other initialisation stuff here
     });

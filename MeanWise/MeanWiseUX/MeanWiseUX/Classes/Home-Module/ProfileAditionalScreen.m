@@ -35,7 +35,7 @@
 
     proffesionCityStr=[NSString stringWithFormat:@"%@\n%@",dataObj.profession_text,dataObj.city];
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile Screen"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile Screen"];
 
     
 
@@ -211,7 +211,7 @@
         cover_addBtn.alpha=0;
         cover_addBtn.enabled=false;
         
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen owner"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen owner"];
 
         
         if(![dataObj.cover_photo isEqualToString:@""] && ![dataObj.profile_photo isEqualToString:@""] && ![dataObj.bio isEqualToString:@""] && ![dataObj.profile_story_description isEqualToString:@""] && ![dataObj.profession_text isEqualToString:@""] && ([dataObj.skill_List count] > 0) && ![dataObj.city isEqualToString:@""] && ![dataObj.dob isEqualToString:@""]){
@@ -242,7 +242,7 @@
     }
     else if([[dataObj.friend_request_status lowercaseString] isEqualToString:@""])
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen Stranger"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen Stranger"];
 
         //no
         cover_addBtn.alpha=1;
@@ -256,7 +256,7 @@
     }
     else
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen Friends"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen Friends"];
 
         //rejected, accepted,pending
         cover_addBtn.alpha=0;
@@ -295,7 +295,7 @@
 {
     if(sender.state==UIGestureRecognizerStateBegan)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen Filters"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen Filters Open"];
 
     postFilterview.hidden=false;
     
@@ -315,7 +315,7 @@
     if(sender!=nil)
     {
 
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen Filters close"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen Filters close"];
 
         refreshIdentifier=[[HMPlayerManager sharedInstance] generateNewProfileRefreshIdentifier];
 
@@ -352,7 +352,7 @@
 }
 -(void)ProfileColorChangeBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Color Change"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Color Change"];
     
     QuickProfileColorComponent *component =[[QuickProfileColorComponent alloc] initWithFrame:CGRectMake(0, -self.frame.size.height, self.frame.size.width, self.frame.size.height)];
     [self addSubview:component];
@@ -394,7 +394,7 @@
 
 -(void)CompleteProfileClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Quick Complete"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Quick Complete"];
 
     QuickProfileEditComponent *component =[[QuickProfileEditComponent alloc] initWithFrame:CGRectMake(0, -self.frame.size.height, self.frame.size.width, self.frame.size.height)];
     [self addSubview:component];
@@ -434,7 +434,7 @@
 
 -(void)closeBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile-close"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-close"];
 
     [target performSelector:closeBtnClickedFunc withObject:nil afterDelay:0.01];
     
@@ -702,7 +702,7 @@
 #pragma mark - Cell Action
 -(void)deleteAPost:(APIObjects_FeedObj *)obj
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Delete-post"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Delete-post"];
 
     APIManager *manager=[[APIManager alloc] init];
     [manager sendRequestForDeletePost:obj.postId delegate:self andSelector:@selector(postDeletedCallBack:)];
@@ -776,7 +776,7 @@
     
     if(commentDisplay==nil)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Comment screen"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Comment screen"];
 
         [self feedScreenGoesBack];
         
@@ -804,7 +804,7 @@
 {
     if(sharecompo==nil)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Share screen"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Share screen"];
 
         [self feedScreenGoesBack];
         
@@ -873,7 +873,7 @@
 -(void)FriendShipBtnClicked:(id)sender
 {
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Friend Request"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Friend Request"];
 
     
     NSDictionary *dict=@{@"friend_id":dataObj.userId,@"status":@"pending"};

@@ -172,7 +172,7 @@
 
 -(void)backBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile - Color Updated"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile - Color Updated"];
 
         NSDictionary *dict=@{
                              @"profile_background_color":selectedColor,

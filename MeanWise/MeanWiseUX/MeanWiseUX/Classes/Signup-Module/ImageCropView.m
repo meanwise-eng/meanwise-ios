@@ -7,6 +7,7 @@
 //
 
 #import "ImageCropView.h"
+#import "FTIndicator.h"
 
 @implementation ImageCropView
 
@@ -14,6 +15,8 @@
 {
     ratioMain=ratio;
     profilePicRect=frame;
+    
+
     
     self.backgroundColor=[UIColor whiteColor];
     
@@ -139,6 +142,9 @@
     UIPanGestureRecognizer *gesture2=[[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panFinger:)];
     [self addGestureRecognizer:gesture2];
 
+    viewFace=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+    [imageView addSubview:viewFace];
+    viewFace.backgroundColor=[UIColor colorWithWhite:1 alpha:0.5];
     
 }
 -(void)panFinger:(UIPanGestureRecognizer *)gesture
@@ -204,6 +210,60 @@
 -(void)setUpImage:(UIImage *)image
 {
     imageView.image=image;
+    BOOL flag=[self detectFace:imageView.image];
+    
+    isOriginalFaceContainsHuman=flag;
+    if(flag==true)
+    {
+//        [FTIndicator showSuccessWithMessage:@"Success"];
+    }
+    else
+    {
+        FCAlertView *alert = [[FCAlertView alloc] init];
+        //alert.blurBackground = YES;
+        [alert showAlertWithTitle:@"Alert!"
+                     withSubtitle:@"Hey we didn't detect your face in the picture. This could mean less search visibility for your profile."
+                  withCustomImage:nil
+              withDoneButtonTitle:@"Ok"
+                       andButtons:nil];
+       
+      
+        alert.titleColor=[UIColor redColor];
+        alert.firstButtonTitleColor = [UIColor redColor];
+        
+        
+
+    }
+    
+}
+-(BOOL)detectFace:(UIImage *)image
+{
+    
+    
+        CIDetector  *detector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                                   context:nil
+                                                   options:[NSDictionary dictionaryWithObject: CIDetectorAccuracyHigh forKey: CIDetectorAccuracy]];
+        
+        CIImage *ciImage = [CIImage imageWithCGImage: [image CGImage]];
+        NSArray *features = [detector featuresInImage:ciImage];
+        
+
+   
+    if(features.count==0)
+    {
+        return 0;
+      
+        
+    }
+    else
+    {
+        return 1;
+        
+        
+    }
+    
+    
+
     
 }
 -(void)btnCancel:(id)sender
@@ -219,67 +279,61 @@
     
     UIImage *img=[self crop:palleteView.frame withImage:[self pb_takeSnapshot]];
 
-    UIImageView *imageViewT=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, img.size.width, img.size.height)];
-    [self addSubview:imageViewT];
-    imageViewT.image=img;
-    imageViewT.center=self.center;
+    BOOL flag=[self detectFace:img];
     
-    [target performSelector:doneBtnClicked withObject:img afterDelay:0.01];
+    
+    
+     if(flag==false && isOriginalFaceContainsHuman==YES)
+    {
+        FCAlertView *alert = [[FCAlertView alloc] init];
+        //alert.blurBackground = YES;
+        [alert showAlertWithTitle:@"Alert!"
+                     withSubtitle:@"Looks like your face is outside the crop area. Would you like to adjust the crop area?"
+                  withCustomImage:nil
+              withDoneButtonTitle:@"Ignore"
+                       andButtons:nil];
+                [alert addButton:@"Adjust" withActionBlock:^{
+        
+        
+        
+                }];
+        [alert doneActionBlock:^{
+            
+            
+                UIImageView *imageViewT=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, img.size.width, img.size.height)];
+                [self addSubview:imageViewT];
+                imageViewT.image=img;
+                imageViewT.center=self.center;
+            
+                [target performSelector:doneBtnClicked withObject:img afterDelay:0.01];
+            
+                [self removeFromSuperview];
+            
+            
+            
+            NSLog(@"done");
+            
+        }];
+        alert.titleColor=[UIColor redColor];
+        alert.doneButtonTitleColor = [UIColor redColor];
+        
+        
+    }
+    else
+    {
+        
+        
+        UIImageView *imageViewT=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, img.size.width, img.size.height)];
+        [self addSubview:imageViewT];
+        imageViewT.image=img;
+        imageViewT.center=self.center;
+        
+        [target performSelector:doneBtnClicked withObject:img afterDelay:0.01];
+        
+        [self removeFromSuperview];
+        
+    }
 
-    [self removeFromSuperview];
-    
-//    
-//    [UIView animateWithDuration:1 animations:^{
-//        
-//        NSArray *views=[self subviews];
-//        
-//        for(int i=0;i<[views count];i++)
-//        {
-//            UIView *view=[views objectAtIndex:i];
-//            if(view!=imageViewT)
-//            {
-//                view.alpha=0;
-//                
-//            }
-//            self.backgroundColor=[UIColor clearColor];
-//        }
-//        
-//       // imageViewT.layer.cornerRadius=imageViewT.frame.size.width/2;
-//
-//        
-//    } completion:^(BOOL finished) {
-//        
-//        
-//        [UIView animateWithDuration:0.5 animations:^{
-//            
-//            imageViewT.frame=profilePicRect;
-//            
-//          
-//            
-//            
-//        } completion:^(BOOL finished) {
-//            
-//            [UIView animateWithDuration:0.5 animations:^{
-//                
-//                
-//                if(ratioMain==1)
-//                {
-//                    imageViewT.layer.cornerRadius=profilePicRect.size.width/2;
-//                }
-//                
-//                
-//                
-//            } completion:^(BOOL finished) {
-//                
-//                [self removeFromSuperview];
-//                
-//            }];
-//            
-//        }];
-//    }];
-//    
-//    
-  
     
 
 

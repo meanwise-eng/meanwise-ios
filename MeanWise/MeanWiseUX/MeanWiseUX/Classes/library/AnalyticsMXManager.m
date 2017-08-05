@@ -23,7 +23,7 @@
     
     
 }
-+(void)PushAnalyticsEvent:(NSString *)eventName;
++(void)PushAnalyticsEventAction:(NSString *)eventName;
 {
     [CrashlyticsKit setObjectValue:eventName forKey:@"ActionEvent"];
     

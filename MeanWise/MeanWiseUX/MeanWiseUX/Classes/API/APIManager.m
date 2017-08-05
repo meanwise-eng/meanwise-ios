@@ -24,7 +24,7 @@
   //  return  @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8000/api/v4/";
     
 //Dev Server 1.1
- //  return @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8001/api/v4/";
+  // return @"http://ec2-34-228-26-196.compute-1.amazonaws.com:8001/api/v4/";
 //Live
  //  return @"https://api.meanwise.com/api/v4/";
     
@@ -1257,6 +1257,10 @@
 //    NSString *path=[NSString stringWithFormat:@"user/%@/home/feed/?page_size=200",userId];
     NSString *path=[NSString stringWithFormat:@"user/%@/home/feed/?page_size=%d&page=%d",userId,(int)self.countRequested,(int)self.pageNoRequested];
 
+    if((int)self.countRequested==-1)
+    {
+        path=[NSString stringWithFormat:@"user/%@/home/feed/",userId];
+    }
     
     NSString *finalURL=[NSString stringWithFormat:@"%@%@",[self baseString],path];
     finalURL = [finalURL stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
@@ -3610,13 +3614,15 @@
                     obj.message=@"Success";
                     obj.response=[jsonDict valueForKey:@"results"];
                     
-                    
+                    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-PushTokenSubmit-Success"];
+
                 }
                 else
                 {
                     obj.statusCode=500;
                     obj.message=[[jsonDict valueForKey:@"non_field_errors"] objectAtIndex:0];
-                    
+                    [AnalyticsMXManager PushAnalyticsEventAPI:@"API-PushTokenSubmit-Fail"];
+
                 }
             }
         }

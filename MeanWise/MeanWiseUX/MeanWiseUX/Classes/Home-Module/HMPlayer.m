@@ -87,6 +87,7 @@
                                              selector:@selector(playerTimelineLoop:)
                                                object:nil];
     
+    
 
     [playerViewController.player pause];
     [playerViewController.player replaceCurrentItemWithPlayerItem:nil];

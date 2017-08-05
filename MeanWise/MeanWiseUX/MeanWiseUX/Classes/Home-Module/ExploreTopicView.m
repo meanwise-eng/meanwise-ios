@@ -20,6 +20,7 @@
 }
 -(void)setSearchTerm:(NSString *)string;
 {
+
     searchTerm=string;
     [topicListView reloadData];
 }
@@ -60,13 +61,16 @@
     selectedChannel=channelId;
     [topicListView reloadData];
  
+    if(channelId!=-1)
+    {
     [self callTrendingTopicsForChannelId:selectedChannel];
+    }
     
 }
 -(void)callTrendingTopicsForChannelId:(int)channelNo
 {
     
-    NSArray *channelList=[[[APIPoster alloc] init] getInterestData];
+    NSArray *channelList=[[[APIPoster alloc] init] getInterestDataForExploreScreen];
     
     
     int channelId=[[[channelList objectAtIndex:channelNo] valueForKey:@"id"] intValue];
@@ -89,6 +93,8 @@
 {
     [self hideActivity];
     
+    if(obj.statusCode==200)
+    {
     if([obj.response isKindOfClass:[NSArray class]])
     {
         
@@ -101,6 +107,14 @@
         
         [topicListView reloadData];
         [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+    }
+    }
+    else
+    {
+        arrayTopics=[[NSMutableArray alloc] init];
+        [topicListView reloadData];
+        [topicListView scrollRectToVisible:CGRectMake(0, 0, 1, 1) animated:false];
+
     }
     
     NSLog(@"%@",obj.response);
@@ -136,8 +150,8 @@
     
     cell.nameLBL.text=string;
     
-    cell.bgView.backgroundColor=[Constant colorGlobal:(selectedChannel%13)];
-    cell.topicColor=[Constant colorGlobal:(selectedChannel%13)];
+    cell.bgView.backgroundColor=[Constant colorGlobal:((selectedChannel-1)%13)];
+    cell.topicColor=[Constant colorGlobal:((selectedChannel-1)%13)];
     
     
     return cell;

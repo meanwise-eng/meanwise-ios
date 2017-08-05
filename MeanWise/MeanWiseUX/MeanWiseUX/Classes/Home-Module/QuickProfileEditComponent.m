@@ -15,7 +15,7 @@
 #import "EditIntroBioComponent.h"
 #import "EditLocationComponent.h"
 #import "EditStoryComponent.h"
-
+#import "MyAccountComponent.h"
 
 #import "EditPCComponent.h"
 #import "EditSCComponent.h"
@@ -227,6 +227,36 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if(indexPath.row==0 && indexPath.section==0)
+    {
+        MyAccountComponent *Compo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+        
+        [Compo setUp];
+        [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+        
+        [self addSubview:Compo];
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            Compo.frame=self.bounds;
+            Compo.backgroundColor=[UIColor whiteColor];
+        }];
+    }
+    if(indexPath.row==1 && indexPath.section==0)
+    {
+        MyAccountComponent *Compo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+        
+        [Compo setUp];
+        [Compo setTarget:self andBackFunc:@selector(backFromSetting:)];
+        
+        [self addSubview:Compo];
+        
+        [UIView animateWithDuration:0.3 animations:^{
+            Compo.frame=self.bounds;
+            Compo.backgroundColor=[UIColor whiteColor];
+        }];
+        
+    }
+    
     
     if(indexPath.row==2 && indexPath.section==0)
     {
@@ -332,7 +362,7 @@
 {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
-        [AnalyticsMXManager PushAnalyticsEvent:@"Profile-Quick Update"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Profile-Quick Update"];
 
         dispatch_async(dispatch_get_main_queue(), ^{
             [profileItems removeAllObjects];

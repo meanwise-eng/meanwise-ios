@@ -27,7 +27,7 @@
         window = [[UIApplication sharedApplication].windows objectAtIndex:0];
     }
 
-    [AnalyticsMXManager PushAnalyticsEvent:@"ProfileFromFeed"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"ProfileFromFeed"];
     
     
     sourceFrame=self.frame;

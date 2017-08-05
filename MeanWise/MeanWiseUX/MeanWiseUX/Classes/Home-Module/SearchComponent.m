@@ -200,14 +200,14 @@
     {
         paramKey=@"username__contains";
         [self updateSearchTitle:@"Users"];
-        [AnalyticsMXManager PushAnalyticsEvent:@"Search -User"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Search -User"];
 
     }
     else
     {
         paramKey=@"skills_text__contains";
         [self updateSearchTitle:@"Skill"];
-        [AnalyticsMXManager PushAnalyticsEvent:@"Search -Skill"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Search -Skill"];
 
     }
     

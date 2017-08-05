@@ -8,6 +8,7 @@
 
 #import "HCFilterImageView.h"
 #import "FTIndicator.h"
+#import "AnalyticsMXManager.h"
 
 
 
@@ -94,6 +95,9 @@
 
     if(touch.tapCount==2)
     {
+        
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Image Filter"];
+        
         if(location.x>self.frame.size.width/2)
         {
             cFilterNo++;

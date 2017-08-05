@@ -24,7 +24,7 @@
 {
     postId=postIdString;
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Screen General"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Comment Screen General"];
 
     self.backgroundColor=[UIColor clearColor];
     
@@ -194,7 +194,7 @@
 {
     emptyView.hidden=true;
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Screen Refresh"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Comment Screen Refresh"];
 
     [UIView animateWithDuration:0.25 delay:0.02 options:UIViewAnimationOptionCurveEaseOut animations:^(void){
         
@@ -356,7 +356,7 @@
 }
 -(void)sendBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Post"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Comment Post"];
 
     [newChatMessageBox resignFirstResponder];
 
@@ -454,7 +454,7 @@
 -(void)onCommentDeleteBtnClicked:(NSString *)commentId
 {
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Comment Delete"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Comment Delete"];
 
    APIManager  *manager1=[[APIManager alloc] init];
     [manager1 sendRequestForDeleteComment:commentId postId:[NSString stringWithFormat:@"%@",postId] delegate:self andSelector:@selector(commnentDeleteResponse:)];

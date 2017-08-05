@@ -150,14 +150,12 @@
     if([self.notification_type isEqualToString:@"FriendRequestAccepted"])
     {
         self.msgText=@"Accepted your friend request!";
-
         self.notification_typeNo=[NSNumber numberWithInt:3];
         
     }
     if([self.notification_type isEqualToString:@"FriendRequestReceived"])
     {
         self.msgText=@"Added you as a friend!";
-
         self.notification_typeNo=[NSNumber numberWithInt:4];
 
     }

@@ -45,6 +45,7 @@
 
     NSString *screenIdentifier;
     
+    BOOL isfullMode;
 }
 -(void)setPlayerScreenIdeantifier:(NSString *)string;
 -(void)setPlayerRefreshIdentifier:(NSNumber *)number;
@@ -84,6 +85,7 @@
 
 @property (nonatomic, strong) UIButton *shareBtn;
 @property (nonatomic, strong) UIButton *commentWriteBtn;
+@property (nonatomic, assign) BOOL shouldHideCommentWriteBtn;
 
 
 

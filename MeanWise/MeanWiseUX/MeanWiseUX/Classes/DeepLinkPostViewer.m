@@ -20,7 +20,7 @@
 }
 -(void)setUpWithPostId:(NSDictionary *)postFeedObj withComment:(BOOL)commentFlag
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"DeepLink-PostView"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"DeepLink-PostView"];
 
     [[HMPlayerManager sharedInstance] StopKeepKillingDeepLinkVideosIfAvaialble];
     

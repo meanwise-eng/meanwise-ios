@@ -122,7 +122,7 @@
 
 -(void)inviteCodeSubmitBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Invite Screen-Attempt"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Invite Screen-Attempt"];
 
     [FTIndicator showProgressWithmessage:@"Verifying.." userInteractionEnable:false];
     APIManager *manager=[[APIManager alloc] init];

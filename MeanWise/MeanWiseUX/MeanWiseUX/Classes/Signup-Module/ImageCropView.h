@@ -13,6 +13,8 @@
 @interface ImageCropView : UIView  <UIScrollViewDelegate>
 {
     
+    BOOL isOriginalFaceContainsHuman;
+    UIView *viewFace;
     float ratioMain;
     
     UIView *palleteView;

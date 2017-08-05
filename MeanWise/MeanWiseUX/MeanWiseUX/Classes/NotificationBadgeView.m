@@ -39,9 +39,9 @@
 
     
     hiddenRect=CGRectMake(padding, -60, window.frame.size.width-padding*2, 55);
-    showingRect=CGRectMake(padding, padding, window.frame.size.width-padding*2, 55);
+    showingRect=CGRectMake(padding, padding+20, window.frame.size.width-padding*2, 55);
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"NotifyBadge"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NotifyBadge"];
 
 
     

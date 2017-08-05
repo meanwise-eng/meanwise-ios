@@ -13,7 +13,7 @@
 
 @interface AnalyticsMXManager : NSObject
 
-+(void)PushAnalyticsEvent:(NSString *)eventName;
++(void)PushAnalyticsEventAction:(NSString *)eventName;
 +(void)PushAnalyticsEventAPI:(NSString *)eventName;
 
 +(void)PushAnalyticsEventWithKey2:(NSString *)eventName forKey:(NSString *)key;

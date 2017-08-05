@@ -113,7 +113,7 @@
 -(void)manuallyRefresh
 {
     isRefreshing=1;
-    [AnalyticsMXManager PushAnalyticsEvent:@"Home Feed Manually Refresh"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Home Feed Manually Refresh"];
     
     emptyView.hidden=true;
     [UIView animateWithDuration:0.25 delay:0.02 options:UIViewAnimationOptionCurveEaseOut animations:^(void){
@@ -731,7 +731,7 @@
     
     if(sharecompo==nil)
     {
-        [AnalyticsMXManager PushAnalyticsEvent:@"Home Feed Share Button Clicked"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Home Feed Share Button Clicked"];
         
         [self HomeScreenGoesBack];
         
@@ -753,7 +753,7 @@
     if(commentDisplay==nil)
     {
         [self HomeScreenGoesBack];
-        [AnalyticsMXManager PushAnalyticsEvent:@"Home Feed Comment Button Clicked"];
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Home Feed Comment Button Clicked"];
         
         
         [self hideBottomBar];
@@ -810,7 +810,7 @@
 {
     [self HomeScreenGoesBack];
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Home Screen Top Profile"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Home Screen Top Profile"];
     
     //APIObjects_ProfileObj *obj=[resultData objectAtIndex:indexPath.row];
     
@@ -853,7 +853,7 @@
 -(void)messageBtnClicked:(id)sender
 {
     [self HomeScreenGoesBack];
-    [AnalyticsMXManager PushAnalyticsEvent:@"Home Screen Notification open"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Home Screen Notification open"];
     
     
     messageCompo=[[NotificationsComponent alloc] initWithFrame:CGRectMake(0, -self.frame.size.height, self.frame.size.width, self.frame.size.height)];
@@ -905,7 +905,7 @@
 -(void)setttingBtnClicked:(id)sender
 {
     [self HomeScreenGoesBack];
-    [AnalyticsMXManager PushAnalyticsEvent:@"Home Screen Settings open"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Home Screen Settings open"];
     
     
     myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];

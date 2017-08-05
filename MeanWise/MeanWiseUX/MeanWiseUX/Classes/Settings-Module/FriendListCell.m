@@ -75,7 +75,7 @@
         return;
     }
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen from Friend list"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen from Friend list"];
 
     
     if(![screenIdentifier isEqualToString:@"PROFILE"] && ![screenIdentifier isEqualToString:@"DEEPLINKPOST"] && ![screenIdentifier isEqualToString:@"NOTIFICATIONPOST"])

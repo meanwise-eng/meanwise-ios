@@ -28,7 +28,7 @@
 }
 -(void)setUpWithCellRect:(CGRect)rect
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Explore Screen Expand"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Explore Screen Expand"];
 
     screenIdentifier=@"EXPLORE";
 
@@ -146,9 +146,10 @@
     
 
     
-    [galleryView setDelegate:nil];
-    [galleryView setDataSource:nil];
+  //  [galleryView setDelegate:nil];
+   // [galleryView setDataSource:nil];
     [galleryView removeFromSuperview];
+    galleryView=nil;
     [delegate performSelector:downCallBackFunc withObject:globalPath afterDelay:0.0001];
 
  
@@ -185,6 +186,7 @@
 
     [cell setCallBackForCommentWrite:@selector(commentWriteBtnClicked:)];
     cell.commentWriteBtn.hidden=false;
+    cell.shouldHideCommentWriteBtn=false;
     
     [cell setPlayerScreenIdeantifier:screenIdentifier];
 //    cell.player.screenIdentifier=screenIdentifier;

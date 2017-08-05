@@ -386,18 +386,47 @@
 
     }
 }
--(int)cacheSizeCalculate
+-(NSString *)cacheSizeCalculate
 {
     NSString *path=[Constant applicationDocumentsDirectoryPath];
 
-        NSDictionary *fileDictionary = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-        if (fileDictionary) {
-            // make use of attributes
-        } else {
-            // handle error found in 'error'
+//        NSDictionary *fileDictionary = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+//        if (fileDictionary) {
+//            // make use of attributes
+//        } else {
+//            // handle error found in 'error'
+//        }
+//    NSLog(@"size = %lld",[fileDictionary fileSize]);
+//        int size=(int)[fileDictionary fileSize]/1024;
+//    
+    
+        NSArray *filesArray = [[NSFileManager defaultManager] subpathsOfDirectoryAtPath:path error:nil];
+        NSEnumerator *filesEnumerator = [filesArray objectEnumerator];
+        NSString *fileName;
+        unsigned long long int fileSize = 0;
+        
+        while (fileName = [filesEnumerator nextObject]) {
+            NSDictionary *fileDictionary = [[NSFileManager defaultManager] attributesOfItemAtPath:[path stringByAppendingPathComponent:fileName] error:nil];
+            fileSize += [fileDictionary fileSize];
         }
-        int size=(int)[fileDictionary fileSize]/1024;
-    return size;
+        
+
+    int inIntSize=(int)fileSize/1024;
+
+  NSString *temps=@"";
+    
+    if(inIntSize<1024)
+    {
+        temps=[NSString stringWithFormat:@"%d KB",inIntSize];
+    }
+    else
+    {
+        temps=[NSString stringWithFormat:@"%d MB",inIntSize/1024];
+   
+    }
+    
+    
+    return temps;
     
 }
 -(void)clearcache
@@ -416,7 +445,7 @@
         [[NSFileManager defaultManager] createDirectoryAtPath:path withIntermediateDirectories:NO attributes:nil error:nil]; //Create folder
     
 
-    
+ 
         NSArray *array=[[NSArray alloc] init];
         [[NSUserDefaults standardUserDefaults] setObject:array forKey:@"DATA_IMAGECACHE"];
         [[NSUserDefaults standardUserDefaults] synchronize];
@@ -424,6 +453,24 @@
     [VideoCacheManager clearCache];
     
 
+    [self removeNewPostsFiles];
+    
+//    items2=[NSArray arrayWithObjects:@"Name",@"Birthday",@"Mobile Number",@"Password",[NSString stringWithFormat:@"Clear Cache (%@)",[self cacheSizeCalculate]],@"Logout", nil];
+//    [listOfItems reloadData];
+
+}
+-(void)removeNewPostsFiles
+{
+    NSArray *array=[[NSArray alloc] initWithObjects:@"savedImage.png",@"0.jpg",@"1.jpg",@"2.jpg",@"3.jpg",@"4.jpg",@"5.jpg",@"6.jpg",@"7.jpg",@"8.jpg",@"9.jpg",@"compressedFile.jpg",@"fixOrientation-5.mov",@"hello.mp4",@"hello2.mp4",@"test3.mov",@"vid1.mp4",@"utput_555.mov",@"ProcessedVideo-444.mov", nil];
+    
+    for(int i=0;i<[array count];i++)
+    {
+    NSString *savedImagePath = [[Constant applicationDocumentsDirectoryPath] stringByAppendingPathComponent:[array objectAtIndex:i]];
+    
+    [[NSFileManager defaultManager] removeItemAtPath:savedImagePath error:nil];
+    }
+
+    
 }
 -(NSString *)getDocumentImageCachePath
 {

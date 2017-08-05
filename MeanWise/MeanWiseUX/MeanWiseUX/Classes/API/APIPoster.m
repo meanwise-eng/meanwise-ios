@@ -113,6 +113,8 @@
 }
 -(void)saveDataAs:(NSArray *)array andKey:(NSString *)key
 {
+
+    
     NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
     
     [ud setObject:array forKey:key];
@@ -133,6 +135,20 @@
 -(NSArray *)getInterestData
 {
     return [self getDataForKey:@"DATA_INTEREST"];
+}
+-(NSArray *)getInterestDataForExploreScreen
+{
+    NSArray *array=[self getDataForKey:@"DATA_INTEREST"];
+    
+        NSDictionary *dict=[[NSDictionary alloc] initWithObjectsAndKeys:[NSNumber numberWithInteger:-1],@"id",@"",@"name", @"",@"photo",nil];
+    
+        NSMutableArray *mutable=[[NSMutableArray alloc] initWithArray:array];
+        [mutable insertObject:dict atIndex:0];
+    
+        array=[NSArray arrayWithArray:mutable];
+    
+    return array;
+    
 }
 -(NSArray *)getSkillsData
 {

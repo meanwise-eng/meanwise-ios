@@ -286,7 +286,7 @@
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *documentsDirectory = [paths objectAtIndex:0];
     NSString *destinationPath =  [documentsDirectory stringByAppendingPathComponent:
-                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", arc4random() % 1000]];
+                                  [NSString stringWithFormat:@"ProcessedVideo-%d.mov", 444]];
     [[NSFileManager defaultManager] removeItemAtPath:destinationPath error:nil];
     
     
@@ -336,11 +336,11 @@
          }
          else if (encoder.status == AVAssetExportSessionStatusCancelled)
          {
-             NSLog(@"Video cancel error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+             NSLog(@"Video cancel error: %@ (%ld)", encoder.error.localizedDescription, (long)encoder.error.code);
          }
          else
          {
-             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, (long)encoder.error.code);
          }
      }];
     }
@@ -659,7 +659,7 @@
          }
          else
          {
-             NSLog(@"Video export failed with error: %@ (%ld)", encoder.error.localizedDescription, encoder.error.code);
+             NSLog(@"Video export failed with error: %@ (%d)", encoder.error.localizedDescription, (int)encoder.error.code);
          }
      }];
     
@@ -801,7 +801,7 @@
     
     [UserSession setUserSessionIfExist];
     
-    if(self.sessionMain==nil)
+    if([DataSession sharedInstance].sessionMain==nil)
     {
         c=[[FirstLaunchScreen alloc] initWithFrame:mainKeyView.bounds];
         [mainKeyView addSubview:c];
@@ -819,7 +819,10 @@
     }
     
     
-    [self UserNotificationAPI];
+    
+    notifyManager=[[NotificationsManager alloc] init];
+    [notifyManager setUp];
+    
     
 }
 
@@ -946,98 +949,12 @@
 }
 #pragma mark - Notifications
 
--(void)UserNotificationAPI
-{
-    int number=[[DataSession sharedInstance].SocialshareStatus intValue];
-
-    AppDelegate *delegate=(AppDelegate *)[UIApplication sharedApplication].delegate;
-    
-    if(self.sessionMain!=nil && number==0 && delegate.deepLinkViewer==nil)
-    {
-    APIManager *manager=[[APIManager alloc] init];
-    [manager sendRequestForMyNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
-        [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:90];
-
-    }
-    else
-    {
-        [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:5];
-
-    }
-    
-    
-}
-
--(void)UserNotificationAPIReceived:(APIResponseObj *)responseObj
-{
-   // NSLog(@"%@",responseObj.response);
-    
-    
-    if([[responseObj.response valueForKey:@"data"] isKindOfClass:[NSArray class]])
-    {
-        NSArray *array=(NSArray *)[responseObj.response valueForKey:@"data"];
-        APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-        [DataSession sharedInstance].notificationsResults=[NSMutableArray arrayWithArray:[parser parseObjects_NOTIFICATIONS:array]];
-        
-        
-        
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:@"NewNotificationDataReceived"
-         object:self];
-        
-        
-        if(!RX_isiPhone4Res)
-        {
-
-        if([DataSession sharedInstance].notificationsResults.count>0)
-        {
-        int no=[DataSession sharedInstance].noOfInstantNotificationReceived.intValue;
-        
-            if(no>0)
-            {
-
-        
-                NotificationBadgeView *notificationBar=[[NotificationBadgeView alloc] init];
-                [notificationBar setDelegate:self andFunc1:@selector(showStatusBar) andFunc2:@selector(hideStatusBar)];
-            
-
-                if(no==1)
-                {
-                    
-                    [notificationBar setUp:[[DataSession sharedInstance].notificationsResults objectAtIndex:0]];
-                }
-                else
-                {
-                    [notificationBar setUp:[NSNumber numberWithInt:no]];
-                }
-            }
-//
-        }
-        }
-        
-     //   [FTIndicator showNotificationWithTitle:@"Notifications" message:[NSString stringWithFormat:@"%d",(int)[DataSession sharedInstance].notificationsResults.count]];
-        
-        
-        /*NotificationScreen *screen=[[NotificationScreen alloc] initWithFrame:self.frame];
-        [self addSubview:screen];
-        [screen setUp:result];*/
-        
-        
-    }
-    
-    
-    
-    
-    
-    
-}
 
 #pragma mark - other
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     
-    int p=0;
     // Dispose of any resources that can be recreated.
 }
 

@@ -9,23 +9,25 @@
 #import "UserSession.h"
 #import "AppDelegate.h"
 #import "ViewController.h"
+#import "DataSession.h"
 
 @implementation UserSession
 
 +(APIObjects_ProfileObj *)sessionProfileObj
 {
     
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
+//    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    
+//    while (topController.presentedViewController) {
+//        topController = topController.presentedViewController;
+//    }
+//
+//    
+//    UINavigationController *vc=(UINavigationController *)topController;
+//    ViewController *t=(ViewController *)vc.topViewController;
+//    return t.sessionMain;
 
-    
-    UINavigationController *vc=(UINavigationController *)topController;
-    ViewController *t=(ViewController *)vc.topViewController;
-    
-    return t.sessionMain;
+    return [DataSession sharedInstance].sessionMain;
     
 }
 +(NSString *)getFirstName
@@ -171,21 +173,26 @@
 
 +(void)setSessionProfileObj:(NSDictionary *)sessionDict andAccessToken:(NSString *)token
 {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    
+//    while (topController.presentedViewController) {
+//        topController = topController.presentedViewController;
+//    }
+//    UINavigationController *vc=(UINavigationController *)topController;
+//    ViewController *t=(ViewController *)vc.topViewController;
+//    t.sessionMain=[[APIObjects_ProfileObj alloc] init];
+//    t.sessionMain.accessToken=token;
+//    [t.sessionMain setUpWithDict:sessionDict];
+//    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:t.sessionMain];
+//    
     
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
+    [DataSession sharedInstance].sessionMain=[[APIObjects_ProfileObj alloc] init];
+    [DataSession sharedInstance].sessionMain.accessToken=token;
+    [[DataSession sharedInstance].sessionMain setUpWithDict:sessionDict];
     
     
-    UINavigationController *vc=(UINavigationController *)topController;
-    ViewController *t=(ViewController *)vc.topViewController;
-
-    t.sessionMain=[[APIObjects_ProfileObj alloc] init];
-    t.sessionMain.accessToken=token;
-    [t.sessionMain setUpWithDict:sessionDict];
+    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:[DataSession sharedInstance].sessionMain];
     
-    NSData *encodedObject = [NSKeyedArchiver archivedDataWithRootObject:t.sessionMain];
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 
     [defaults setObject:encodedObject forKey:@"MW_UserSession"];
@@ -205,36 +212,39 @@
         obj=nil;
     }
 
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    
+//    while (topController.presentedViewController) {
+//        topController = topController.presentedViewController;
+//    }
+//    
+//    
+//    UINavigationController *vc=(UINavigationController *)topController;
+//    ViewController *t=(ViewController *)vc.topViewController;
+    ////    t.sessionMain=obj;
+
     
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    
-    
-    UINavigationController *vc=(UINavigationController *)topController;
-    ViewController *t=(ViewController *)vc.topViewController;
-    
-    t.sessionMain=obj;
+    [DataSession sharedInstance].sessionMain=obj;
 
     
 }
 +(void)clearUserSession;
 {
     
+//    
+//    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
+//    
+//    while (topController.presentedViewController) {
+//        topController = topController.presentedViewController;
+//    }
+//    
+//    
+//    UINavigationController *vc=(UINavigationController *)topController;
+//    ViewController *t=(ViewController *)vc.topViewController;
+//    
+//    t=nil;
     
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    
-    while (topController.presentedViewController) {
-        topController = topController.presentedViewController;
-    }
-    
-    
-    UINavigationController *vc=(UINavigationController *)topController;
-    ViewController *t=(ViewController *)vc.topViewController;
-    
-    t=nil;
-    
+    [DataSession sharedInstance].sessionMain=nil;
     
     NSUserDefaults *default1=[NSUserDefaults standardUserDefaults];
     [default1 removeObjectForKey:@"MW_UserSession"];

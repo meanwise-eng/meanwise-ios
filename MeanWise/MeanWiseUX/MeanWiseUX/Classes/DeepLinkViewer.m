@@ -22,7 +22,7 @@
     exploreIdentifier=[HMPlayerManager sharedInstance].Explore_urlIdentifier;
     notificationIdentifier=[HMPlayerManager sharedInstance].NotificationPost_urlIdentifier;
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"DeepLinkViewer"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"DeepLinkViewer"];
 
 
     [HMPlayerManager sharedInstance].Profile_urlIdentifier=@"";

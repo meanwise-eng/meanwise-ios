@@ -254,6 +254,12 @@
     [picker1 dismissViewControllerAnimated:YES completion:NULL];
     
 }
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker1;
+{
+    [DataSession sharedInstance].SocialshareStatus=[NSNumber numberWithInteger:0];
+    [picker1 dismissViewControllerAnimated:YES completion:NULL];
+
+}
 -(void)cropImage:(NSDictionary *)info
 {
     

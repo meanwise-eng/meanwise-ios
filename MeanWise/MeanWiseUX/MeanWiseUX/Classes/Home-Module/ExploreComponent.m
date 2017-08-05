@@ -17,21 +17,6 @@
 
 @implementation ExploreComponent
 
--(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2
-{
-    delegate=target;
-    hideBottomBarFunc=func1;
-    showBottomBarFunc=func2;
-    
-}
--(void)hideBottomBar
-{
-    [delegate performSelector:hideBottomBarFunc withObject:nil afterDelay:0.01];
-}
--(void)showBottomBar
-{
-    [delegate performSelector:showBottomBarFunc withObject:nil afterDelay:0.01];
-}
 
 -(void)setUp
 {
@@ -43,7 +28,7 @@
     //    channelList=[[NSArray alloc] initWithObjects:@"Music",@"Travel",@"Lifestyle",@"Sports",@"Science & Technology",@"Politics",@"Fashion",@"Finance",@"Gamming",nil];
 
     
-    channelList=[[[APIPoster alloc] init] getInterestData];
+    channelList=[[[APIPoster alloc] init] getInterestDataForExploreScreen];
     
     self.backgroundColor=[UIColor blackColor];
     
@@ -65,12 +50,11 @@
 
     
     
-    exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(36/2, 60/2, self.frame.size.width-34/2, 40)];
+    exploreTermBaseView=[[UIView alloc] initWithFrame:CGRectMake(36/2, 60/2, self.frame.size.width-36/2-50, 40)];
     [self addSubview:exploreTermBaseView];
 //    exploreTermBaseView.backgroundColor=[UIColor colorWithWhite:1.0f alpha:0.4f];
     exploreTermBaseView.layer.cornerRadius=2;
     exploreTermBaseView.clipsToBounds=YES;
-    
 
     settingsBtn=[[UIButton alloc] initWithFrame:CGRectMake(666/2, 73/2, 50/2, 50/2)];
     [self addSubview:settingsBtn];
@@ -124,7 +108,7 @@
     feedList.alwaysBounceHorizontal=YES;
     feedList.bounces=true;
     
-    selectedChannel=0;
+    selectedChannel=-1;
 
     topicView=[[ExploreTopicView alloc] initWithFrame:CGRectMake(0, 210-35, self.frame.size.width, 30)];
     [self addSubview:topicView];
@@ -193,43 +177,241 @@
                                                object:nil];
 
 }
--(void)dealloc
-{
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
 
+
+
+
+
+#pragma mark - API calls and Actions
+
+-(void)onTopicForChannelChanged:(NSString *)topicName
+{
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Explore Topic Change"];
+    topicNameForChannel=topicName;
+    typeOfSearch=4;
+    [self refreshAction];
 }
--(void)settingsBtnClicked:(id)sender
+
+-(void)searchAndAPICall:(NSString *)searchTag
 {
-    myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
-    [myAccountCompo setUp];
-    myAccountCompo.blackOverLayView.image=[Constant takeScreenshot];
-    myAccountCompo.blackOverLayView.alpha=1;
     
-    [myAccountCompo setTarget:self andBackFunc:@selector(backFromMessage)];
+    NSLog(@"%@",searchTag);
     
-    [self addSubview:myAccountCompo];
+    backCloseBtn.hidden=false;
+    currentSearchTerm=searchTag;
+    exploreTerm.hidden=true;
+    settingsBtn.hidden=true;
+    exploreTermBaseView.hidden=true;
+    exploreTerm.text=@"";
+    [self SearchTermChanged:nil];
+    ChannelList.hidden=true;
+    topicView.hidden=true;
     
-    [UIView animateWithDuration:0.3 animations:^{
-        myAccountCompo.frame=self.bounds;
-        myAccountCompo.backgroundColor=[UIColor whiteColor];
-    }];
-
-    [self endEditing:false];
-    [self hideBottomBar];
-
+    searchResultTitleLBL.hidden=false;
+    searchResultContentLBL.hidden=false;
+    searchResultContentLBL.text=currentSearchTerm;
+    
+    [self refreshAction];
+    [exploreTerm resignFirstResponder];
+    
 }
--(void)backFromMessage
+-(void)backToChannelSearch
 {
+    backCloseBtn.hidden=true;
+    exploreTerm.hidden=false;
+    settingsBtn.hidden=false;
+    exploreTermBaseView.hidden=false;
+    currentSearchTerm=@"";
+    ChannelList.hidden=false;
+    topicView.hidden=false;
+    exploreTerm.text=@"";
     
-    myAccountCompo=nil;
-    [self showBottomBar];
+    searchResultTitleLBL.hidden=true;
+    searchResultContentLBL.hidden=true;
+    
+    [self SearchTermChanged:nil];
+    [self refreshAction];
+    
+}
+
+
+-(void)SearchTermChanged:(id)sender
+{
+    if([exploreTerm.text length]>0)
+    {
+        
+        [searchResultView setSearchTerm:exploreTerm.text];
+        
+        if(searchResultView.hidden==true)
+        {
+            
+            
+            searchResultView.hidden=false;
+            
+            [UIView animateWithDuration:0.5 animations:^{
+                
+                searchResultView.alpha=1;
+                
+            } completion:^(BOOL finished) {
+                
+                [self hideBottomBar];
+                
+            }];
+            
+        }
+        
+    }
+    else
+    {
+        [searchResultView setSearchTerm:exploreTerm.text];
+        
+        
+        if(searchResultView.hidden==false)
+        {
+            [UIView animateWithDuration:0.5 animations:^{
+                
+                searchResultView.alpha=0;
+                
+            } completion:^(BOOL finished) {
+                
+                
+                searchResultView.hidden=true;
+                [self showBottomBar];
+                
+            }];
+            
+        }
+        
+    }
+    
+}
+
+
+-(void)refreshAction
+{
+    if([currentSearchTerm isEqualToString:@""])
+    {
+        if([topicNameForChannel isEqualToString:@""] && (selectedChannel!=-1 && selectedChannel!=0))
+        {
+            typeOfSearch=1;
+        }
+        else if(selectedChannel==-1 || selectedChannel==0)
+        {
+            typeOfSearch=-1;
+        }
+        else
+        {
+            typeOfSearch=4;
+        }
+    }
+    else if([currentSearchTerm hasPrefix:@"#"])
+    {
+        
+        typeOfSearch=2;
+    }
+    else
+    {
+        typeOfSearch=3;
+    }
+    
+    manager=[[APIManager alloc] init];
+    //[manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
+    
+    NSLog(@"Hello");
+    // [feedList setContentOffset:CGPointMake(0, feedList.contentOffset.y-feedList.frame.size.height) animated:YES];
+    
+    NSDictionary *dict;
+    
+    if(typeOfSearch==1)
+    {
+        NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
+        dict=@{@"type":[NSNumber numberWithInt:1],@"word":channelName};
+    }
+    if(typeOfSearch==2)
+    {
+        dict=@{@"type":[NSNumber numberWithInt:2],@"word":[currentSearchTerm substringFromIndex:1]};
+        
+    }
+    if(typeOfSearch==3)
+    {
+        dict=@{@"type":[NSNumber numberWithInt:3],@"word":[currentSearchTerm substringFromIndex:1]};
+        
+    }
+    if(typeOfSearch==4)
+    {
+        
+        NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
+        dict=@{@"type":[NSNumber numberWithInt:4],@"word":channelName,@"topic":topicNameForChannel};
+        
+    }
+    
+    
+    [DataSession sharedInstance].exploreFeedResults=[[NSMutableArray alloc] init];
+    [feedList reloadData];
+    emptyView.hidden=false;
+    emptyView.msgLBL.text=@"Loading..";
+    
+    if(typeOfSearch!=-1)
+    {
+    [manager sendRequestExploreFeedWithKey:dict Withdelegate:self andSelector:@selector(UsersPostReceived:)];
+    }
+    else
+    {
+        manager.pageNoRequested=1;
+        manager.countRequested=-1;
+        [manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
+
+    }
+    
+    feedList.userInteractionEnabled=false;
+    
+    
+    //[self performSelector:@selector(endRefreshControl) withObject:nil afterDelay:1.0f];
+}
+-(void)UsersPostReceived:(APIResponseObj *)responseObj
+{
+    feedList.userInteractionEnabled=true;
+    
+    NSArray *responseArray;
+    if([responseObj.response isKindOfClass:[NSArray class]])
+    {
+        responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
+    }
+    else
+    {
+    responseArray=[NSMutableArray arrayWithArray:[(NSArray *)responseObj.response valueForKey:@"data"]];
+    }
+    
+    // NSLog(@"%@",responseObj.response);
+    
+    APIObjectsParser *parser=[[APIObjectsParser alloc] init];
+    [DataSession sharedInstance].exploreFeedResults=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
+    
+    
+    [feedList reloadData];
+    //[self setUpDataRecords];
+    
+    if([DataSession sharedInstance].exploreFeedResults.count==0)
+    {
+        emptyView.hidden=false;
+        emptyView.msgLBL.text=@"Nothing to display";
+        
+    }
+    else
+    {
+        emptyView.hidden=true;
+    }
+    
+    [feedList setContentOffset:CGPointMake(0, 0) animated:false];
+    
+    
 }
 
 -(void)refreshTopicChannels
 {
-  
-        APIManager *mg=[[APIManager alloc] init];
-        [mg sendRequestForInterestWithDelegate:self andSelector:@selector(NewChannelListReceived:)];
+    
+    APIManager *mg=[[APIManager alloc] init];
+    [mg sendRequestForInterestWithDelegate:self andSelector:@selector(NewChannelListReceived:)];
 }
 -(void)NewChannelListReceived:(APIResponseObj *)responseObj
 {
@@ -256,218 +438,14 @@
         APIPoster *poster=[[APIPoster alloc] init];
         [poster saveDataAs:array andKey:@"DATA_INTEREST"];
     }
+    channelList=[[[APIPoster alloc] init] getInterestDataForExploreScreen];
     [ChannelList reloadData];
-  
-    
-}
--(void)onTopicForChannelChanged:(NSString *)topicName
-{
-    [AnalyticsMXManager PushAnalyticsEvent:@"Explore Topic Change"];
-
-    topicNameForChannel=topicName;
-    typeOfSearch=4;
-    [self refreshAction];
-
-}
--(void)searchAndAPICall:(NSString *)searchTag
-{
-    
-
-    NSLog(@"%@",searchTag);
-
-    backCloseBtn.hidden=false;
-    currentSearchTerm=searchTag;
-    exploreTerm.hidden=true;
-    exploreTermBaseView.hidden=true;
-    exploreTerm.text=@"";
-    [self SearchTermChanged:nil];
-    ChannelList.hidden=true;
-    topicView.hidden=true;
-    
-    searchResultTitleLBL.hidden=false;
-    searchResultContentLBL.hidden=false;
-    searchResultContentLBL.text=currentSearchTerm;
-    
-    [self refreshAction];
-    [exploreTerm resignFirstResponder];
-
-}
--(void)backToChannelSearch
-{
-    backCloseBtn.hidden=true;
-exploreTerm.hidden=false;
-        exploreTermBaseView.hidden=false;
-    currentSearchTerm=@"";
-  ChannelList.hidden=false;
-    topicView.hidden=false;
-    exploreTerm.text=@"";
-    
-    searchResultTitleLBL.hidden=true;
-    searchResultContentLBL.hidden=true;
-    
-    [self SearchTermChanged:nil];
-    [self refreshAction];
-
-}
--(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
-{
-    NSLog(@"%f",scrollView.contentOffset.x);
-}
--(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-        NSLog(@"%f",scrollView.contentOffset.x);
-}
-
-
--(void)refreshAction
-{
-    if([currentSearchTerm isEqualToString:@""])
-    {
-        if([topicNameForChannel isEqualToString:@""])
-        {
-            typeOfSearch=1;
-        }
-        else
-        {
-            typeOfSearch=4;
-        }
-    }
-    else if([currentSearchTerm hasPrefix:@"#"])
-    {
-
-        typeOfSearch=2;
-    }
-    else
-    {
-        typeOfSearch=3;
-    }
-    
-    manager=[[APIManager alloc] init];
-    //[manager sendRequestHomeFeedFor_UserWithdelegate:self andSelector:@selector(UsersPostReceived:)];
-    
-    NSLog(@"Hello");
-    // [feedList setContentOffset:CGPointMake(0, feedList.contentOffset.y-feedList.frame.size.height) animated:YES];
-    
-    NSDictionary *dict;
-    
-    if(typeOfSearch==1)
-    {
-    NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
-    dict=@{@"type":[NSNumber numberWithInt:1],@"word":channelName};
-    }
-    if(typeOfSearch==2)
-    {
-        dict=@{@"type":[NSNumber numberWithInt:2],@"word":[currentSearchTerm substringFromIndex:1]};
-
-    }
-    if(typeOfSearch==3)
-    {
-        dict=@{@"type":[NSNumber numberWithInt:3],@"word":[currentSearchTerm substringFromIndex:1]};
-        
-    }
-    if(typeOfSearch==4)
-    {
-        
-        NSString *channelName=[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"];
-        dict=@{@"type":[NSNumber numberWithInt:4],@"word":channelName,@"topic":topicNameForChannel};
-   
-    }
-    
-    
-    [DataSession sharedInstance].exploreFeedResults=[[NSMutableArray alloc] init];
-    [feedList reloadData];
-    emptyView.hidden=false;
-    emptyView.msgLBL.text=@"Loading..";
-
-
-    [manager sendRequestExploreFeedWithKey:dict Withdelegate:self andSelector:@selector(UsersPostReceived:)];
-    
-    feedList.userInteractionEnabled=false;
-    
-    
-    //[self performSelector:@selector(endRefreshControl) withObject:nil afterDelay:1.0f];
-}
--(void)UsersPostReceived:(APIResponseObj *)responseObj
-{
-    feedList.userInteractionEnabled=true;
-    
-    NSArray *responseArray=[NSMutableArray arrayWithArray:(NSArray *)responseObj.response];
-    
-   // NSLog(@"%@",responseObj.response);
-    
-    APIObjectsParser *parser=[[APIObjectsParser alloc] init];
-    [DataSession sharedInstance].exploreFeedResults=[NSMutableArray arrayWithArray:[parser parseObjects_FEEDPOST:responseArray]];
-    
-    
-    [feedList reloadData];
-    //[self setUpDataRecords];
-    
-    if([DataSession sharedInstance].exploreFeedResults.count==0)
-    {
-        emptyView.hidden=false;
-        emptyView.msgLBL.text=@"Nothing to display";
-
-    }
-    else
-    {
-        emptyView.hidden=true;
-    }
-    
-     [feedList setContentOffset:CGPointMake(0, 0) animated:false];
     
     
 }
 
--(void)SearchTermChanged:(id)sender
-{
-    if([exploreTerm.text length]>0)
-    {
-        
-        [searchResultView setSearchTerm:exploreTerm.text];
-        
-        if(searchResultView.hidden==true)
-        {
-         
-            
-            searchResultView.hidden=false;
 
-            [UIView animateWithDuration:0.5 animations:^{
-                
-                searchResultView.alpha=1;
-                
-            } completion:^(BOOL finished) {
-                
-                [self hideBottomBar];
-
-            }];
-
-        }
-        
-    }
-    else
-    {
-        [searchResultView setSearchTerm:exploreTerm.text];
-
-        
-        if(searchResultView.hidden==false)
-        {
-            [UIView animateWithDuration:0.5 animations:^{
-                
-                searchResultView.alpha=0;
-                
-            } completion:^(BOOL finished) {
-                
-                searchResultView.hidden=true;
-                [self showBottomBar];
-                
-            }];
-
-        }
-        
-    }
-    
-}
-
+#pragma mark - CollectionView Delegates / Sources
 
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
@@ -476,30 +454,60 @@ exploreTerm.hidden=false;
     if(collectionView==ChannelList)
     {
         
-
-    ChannelExploreCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
+        
+        ChannelExploreCell *cell=[collectionView dequeueReusableCellWithReuseIdentifier:@"cellIdentifier" forIndexPath:indexPath];
         
         
-
-   // cell.backgroundColor=[UIColor clearColor];
-    cell.nameLBL.text=[[channelList objectAtIndex:indexPath.row] valueForKey:@"name"];
+        
+        // cell.backgroundColor=[UIColor clearColor];
+        cell.nameLBL.text=[[channelList objectAtIndex:indexPath.row] valueForKey:@"name"];
         
         cell.nameLBL.frame=CGRectMake(5, 5, cell.frame.size.width-10, 30);
         [cell.nameLBL sizeToFit];
         
         
-        cell.overLayView.backgroundColor=[Constant colorGlobal:(indexPath.row%13)];
-
-
+        
+        
         
         //cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",(int)indexPath.row%5+3]];
-
+        
         NSString *urlString=[[channelList objectAtIndex:indexPath.row] valueForKey:@"photo"];
-    
         [cell setURLString:urlString];
+
+        if(![urlString isEqualToString:@""])
+        {
+            cell.bgView.backgroundColor=[UIColor blackColor];
+            
+            cell.bgView.hidden=false;
+            cell.profileIMGVIEW.hidden=false;
+            
+            cell.overLayView.backgroundColor=[Constant colorGlobal:((indexPath.row-1)%13)];
+            cell.contentView.backgroundColor=[UIColor blackColor];
+            cell.alpha=1;
+            
+            cell.contentView.layer.borderWidth=0;
+            cell.contentView.layer.borderColor=[UIColor whiteColor].CGColor;
+        }
+        else
+        {
+         
+            
+            cell.bgView.backgroundColor=[UIColor blackColor];
+            cell.bgView.hidden=true;
+            cell.profileIMGVIEW.hidden=true;
+            cell.overLayView.backgroundColor=[UIColor whiteColor];
+            cell.contentView.backgroundColor=[UIColor clearColor];
+            
+            cell.alpha=0.5;
+            cell.contentView.layer.borderWidth=1;
+            cell.contentView.layer.borderColor=[UIColor whiteColor].CGColor;
+
+            
+        }
+       
+
         
-        
-    return cell;
+        return cell;
     }
     else
     {
@@ -509,27 +517,27 @@ exploreTerm.hidden=false;
         
         [cell setFrameX:CGRectMake(0, 0, 250, 380)];
         [cell setDataObj:[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row]];
-
+        
         
         // [cell setSelectionStyle:UITableViewCellSelectionStyleNone];
         
         //    cell.postIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",(int)indexPath.row%5+3]];
         //D   cell.postIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"thumb%d.png",(int)indexPath.row%5+1]];
-       /* cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3]];
-        int mediaType=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
-        int colorNumber=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
-        [cell setUpMediaType:mediaType andColorNumber:colorNumber];
-        
-       
-        if(mediaType!=0)
-        {
-            NSString *imgURL=[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
-            cell.postIMGVIEW.image=[UIImage imageNamed:imgURL];
-        }
-        else
-        {
-            
-        }*/
+        /* cell.profileIMGVIEW.image=[UIImage imageNamed:[NSString stringWithFormat:@"profile%d.jpg",(int)indexPath.row%5+3]];
+         int mediaType=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
+         int colorNumber=[[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
+         [cell setUpMediaType:mediaType andColorNumber:colorNumber];
+         
+         
+         if(mediaType!=0)
+         {
+         NSString *imgURL=[[dataRecords objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
+         cell.postIMGVIEW.image=[UIImage imageNamed:imgURL];
+         }
+         else
+         {
+         
+         }*/
         
         //cell.postIMGVIEW.image=[UIImage imageNamed:imgURL];
         
@@ -537,7 +545,7 @@ exploreTerm.hidden=false;
         
         
         return cell;
-
+        
     }
 }
 -(void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
@@ -548,21 +556,21 @@ exploreTerm.hidden=false;
     }
     else
     {
-
-    cell.transform=CGAffineTransformMakeScale(0.7, 0.7);
-    cell.alpha=1;
-    
-    [UIView animateWithDuration:0.5
-                     animations:^{
-                         
-                         cell.transform=CGAffineTransformMakeScale(1, 1);
-                         cell.alpha=1;
-                         
-                         
-                     }
-                     completion:^(BOOL finished) {
-                         
-                     }];
+        
+        cell.transform=CGAffineTransformMakeScale(0.7, 0.7);
+        cell.alpha=1;
+        
+        [UIView animateWithDuration:0.5
+                         animations:^{
+                             
+                             cell.transform=CGAffineTransformMakeScale(1, 1);
+                             cell.alpha=1;
+                             
+                             
+                         }
+                         completion:^(BOOL finished) {
+                             
+                         }];
     }
     
     
@@ -574,7 +582,7 @@ exploreTerm.hidden=false;
     
     if(collectionView==ChannelList)
     {
-    return channelList.count;
+        return channelList.count;
     }
     else
     {
@@ -592,8 +600,8 @@ exploreTerm.hidden=false;
     else
     {
         return CGSizeMake(490/2, 720/2);
-
-//        return CGSizeMake(250, 370);
+        
+        //        return CGSizeMake(250, 370);
     }
 }
 
@@ -609,67 +617,67 @@ exploreTerm.hidden=false;
     exploreTerm.text=@"";
     [self SearchTermChanged:nil];
     [exploreTerm resignFirstResponder];
-
+    
     
     if(collectionView==feedList && 1==0)
     {
         
         
         
-    [self hideBottomBar];
-
-    UICollectionViewLayoutAttributes *attributes = [feedList layoutAttributesForItemAtIndexPath:indexPath];
-    
-    CGRect myRect = attributes.frame;
-    
-    
-    detailPostView=[[DetailViewComponent alloc] initWithFrame:self.bounds];
-    [self addSubview:detailPostView];
-    
-    HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
-    [cell setHiddenCustom:true];
-    
-    [detailPostView setDataRecords:[DataSession sharedInstance].exploreFeedResults];
-    
-    
-    
-    CGRect rect=CGRectMake(myRect.origin.x, feedList.frame.origin.y+myRect.origin.y, myRect.size.width, myRect.size.height);
-    
-    
-    
-    rect = CGRectOffset(rect, -feedList.contentOffset.x, -feedList.contentOffset.y);
-    
-    [detailPostView setUpWithCellRect:rect];
-    
+        [self hideBottomBar];
         
-    
-    //    UIImage *img=[cell screenshotOfVideo];
-    
-    
-    int mediaType=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
-    
-    if(mediaType!=0)
-    {
-        NSString *imgURL=[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
-        [detailPostView setImage:imgURL andNumber:indexPath];
-    }
-    else
-    {
-        int colorNumber=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
+        UICollectionViewLayoutAttributes *attributes = [feedList layoutAttributesForItemAtIndexPath:indexPath];
         
-        [detailPostView setColorNumber:colorNumber];
-        
-        [detailPostView setImage:@"red" andNumber:indexPath];
+        CGRect myRect = attributes.frame;
         
         
-    }
-    
-    
-    // [detailPostView setUIImage:[cell screenshotOfVideo]];
-    
-    [detailPostView setDelegate:self andPageChangeCallBackFunc:@selector(openingTableViewAtPath:) andDownCallBackFunc:@selector(downClicked:)];
-    
-    [detailPostView setForPostDetail];
+        detailPostView=[[DetailViewComponent alloc] initWithFrame:self.bounds];
+        [self addSubview:detailPostView];
+        
+        HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
+        [cell setHiddenCustom:true];
+        
+        [detailPostView setDataRecords:[DataSession sharedInstance].exploreFeedResults];
+        
+        
+        
+        CGRect rect=CGRectMake(myRect.origin.x, feedList.frame.origin.y+myRect.origin.y, myRect.size.width, myRect.size.height);
+        
+        
+        
+        rect = CGRectOffset(rect, -feedList.contentOffset.x, -feedList.contentOffset.y);
+        
+        [detailPostView setUpWithCellRect:rect];
+        
+        
+        
+        //    UIImage *img=[cell screenshotOfVideo];
+        
+        
+        int mediaType=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"postType"] intValue];
+        
+        if(mediaType!=0)
+        {
+            NSString *imgURL=[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"imageURL"];
+            [detailPostView setImage:imgURL andNumber:indexPath];
+        }
+        else
+        {
+            int colorNumber=[[[[DataSession sharedInstance].exploreFeedResults objectAtIndex:indexPath.row] valueForKey:@"color"] intValue];
+            
+            [detailPostView setColorNumber:colorNumber];
+            
+            [detailPostView setImage:@"red" andNumber:indexPath];
+            
+            
+        }
+        
+        
+        // [detailPostView setUIImage:[cell screenshotOfVideo]];
+        
+        [detailPostView setDelegate:self andPageChangeCallBackFunc:@selector(openingTableViewAtPath:) andDownCallBackFunc:@selector(downClicked:)];
+        
+        [detailPostView setForPostDetail];
     }
     else if(collectionView==feedList)
     {
@@ -688,12 +696,12 @@ exploreTerm.hidden=false;
         CGRect myRect = attributes.frame;
         
         
-
+        
         
         
         CGRect rect=CGRectMake(myRect.origin.x, feedList.frame.origin.y+myRect.origin.y, myRect.size.width, myRect.size.height);
         rect = CGRectOffset(rect, -feedList.contentOffset.x, -feedList.contentOffset.y);
-
+        
         
         detailPostView=[[DetailViewComponent alloc] initWithFrame:self.bounds];
         [self addSubview:detailPostView];
@@ -729,7 +737,7 @@ exploreTerm.hidden=false;
         UINavigationController *vc=(UINavigationController *)[Constant topMostController];
         ViewController *t=(ViewController *)vc.topViewController;
         [t setStatusBarHide:YES];
-
+        
         
     }
     else
@@ -742,22 +750,85 @@ exploreTerm.hidden=false;
     }
     
 }
+#pragma mark - ScrollView Delegates
+
+-(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    NSLog(@"%f",scrollView.contentOffset.x);
+}
+-(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    NSLog(@"%f",scrollView.contentOffset.x);
+}
+
+
+
+#pragma mark -  Other Helper
+
 -(void)updateBackground
 {
     [topicView setChannelId:selectedChannel];
     
+    
+    if(selectedChannel!=-1)
+    {
     [topicView setSearchTerm:[[channelList objectAtIndex:selectedChannel] valueForKey:@"name"]];
-
-//    backgroundImageView.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",selectedChannel%5+3]];
+    
+    //    backgroundImageView.image=[UIImage imageNamed:[NSString stringWithFormat:@"post_%d.jpeg",selectedChannel%5+3]];
     
     NSString *urlString=[[channelList objectAtIndex:selectedChannel] valueForKey:@"photo"];
     [backgroundImageView setUp:urlString];
-
+    
     
     backgroundImageOverLayView.backgroundColor=[Constant colorGlobal:(selectedChannel%13)];
-    
-   // backgroundImageOverLayView.backgroundColor=[UIColor colorWithRed:(selectedChannel%2)*0.3+0.5 green:(selectedChannel%3)*0.3+0.2 blue:(selectedChannel%4)*0.2+0.2 alpha:1.0f];
+    }
 
+    // backgroundImageOverLayView.backgroundColor=[UIColor colorWithRed:(selectedChannel%2)*0.3+0.5 green:(selectedChannel%3)*0.3+0.2 blue:(selectedChannel%4)*0.2+0.2 alpha:1.0f];
+    
+}
+
+-(void)updateTheCommentCountsForVisibleRows
+{
+    NSArray *arrayVisible=[feedList visibleCells];
+    
+    for(int i=0;i<arrayVisible.count;i++)
+    {
+        HomeFeedCell *cell=(HomeFeedCell *)[arrayVisible objectAtIndex:i];
+        [cell UpdateCommentCountIfRequired];
+    }
+    
+}
+-(void)downClicked:(NSIndexPath *)indexPath
+{
+    UINavigationController *vc=(UINavigationController *)[Constant topMostController];
+    ViewController *t=(ViewController *)vc.topViewController;
+    [t setStatusBarHide:false];
+    
+    detailPostView=nil;
+    [self updateTheCommentCountsForVisibleRows];
+    
+    [[HMPlayerManager sharedInstance] StartKeepKillingExploreFeedVideosIfAvaialble];
+    
+    [self showBottomBar];
+    
+    HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
+    [cell setHiddenCustom:false];
+}
+-(void)MakeAllCellVisible
+{
+    NSArray *array=[feedList visibleCells];
+    for(int i=0;i<[array count];i++)
+    {
+        HomeFeedCell *cell=[array objectAtIndex:i];
+        [cell setHiddenCustom:false];
+    }
+}
+-(void)setTarget:(id)target andHide:(SEL)func1 andShow:(SEL)func2
+{
+    delegate=target;
+    hideBottomBarFunc=func1;
+    showBottomBarFunc=func2;
+    
 }
 
 -(void)openingTableViewAtPath:(NSIndexPath *)indexPath
@@ -779,7 +850,7 @@ exploreTerm.hidden=false;
     //    [cell setKeepPlaying:true];
     
     CGRect rect=CGRectMake(myRect.origin.x, feedList.frame.origin.y+myRect.origin.y, myRect.size.width, myRect.size.height);
-
+    
     
     rect = CGRectOffset(rect, -feedList.contentOffset.x, -feedList.contentOffset.y);
     
@@ -788,42 +859,51 @@ exploreTerm.hidden=false;
     
 }
 
--(void)updateTheCommentCountsForVisibleRows
+
+-(void)dealloc
 {
-    NSArray *arrayVisible=[feedList visibleCells];
-    
-    for(int i=0;i<arrayVisible.count;i++)
-    {
-        HomeFeedCell *cell=(HomeFeedCell *)[arrayVisible objectAtIndex:i];
-        [cell UpdateCommentCountIfRequired];
-    }
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
     
 }
 
 
--(void)downClicked:(NSIndexPath *)indexPath
-{
-    UINavigationController *vc=(UINavigationController *)[Constant topMostController];
-    ViewController *t=(ViewController *)vc.topViewController;
-    [t setStatusBarHide:false];
-    
-    detailPostView=nil;
-    [self updateTheCommentCountsForVisibleRows];
+#pragma mark - Flow
 
-    [[HMPlayerManager sharedInstance] StartKeepKillingExploreFeedVideosIfAvaialble];
+-(void)settingsBtnClicked:(id)sender
+{
+    myAccountCompo=[[MyAccountComponent alloc] initWithFrame:CGRectMake(self.frame.size.width, 0, self.bounds.size.width, self.bounds.size.height)];
+    [myAccountCompo setUp];
+    myAccountCompo.blackOverLayView.image=[Constant takeScreenshot];
+    myAccountCompo.blackOverLayView.alpha=1;
     
+    [myAccountCompo setTarget:self andBackFunc:@selector(backFromMessage)];
+    
+    [self addSubview:myAccountCompo];
+    
+    [UIView animateWithDuration:0.3 animations:^{
+        myAccountCompo.frame=self.bounds;
+        myAccountCompo.backgroundColor=[UIColor whiteColor];
+    }];
+    
+    [self endEditing:false];
+    [self hideBottomBar];
+    
+}
+-(void)backFromMessage
+{
+    
+    myAccountCompo=nil;
     [self showBottomBar];
-    
-    HomeFeedCell *cell=(HomeFeedCell *)[feedList cellForItemAtIndexPath:indexPath];
-    [cell setHiddenCustom:false];
 }
--(void)MakeAllCellVisible
+
+-(void)hideBottomBar
 {
-    NSArray *array=[feedList visibleCells];
-    for(int i=0;i<[array count];i++)
-    {
-        HomeFeedCell *cell=[array objectAtIndex:i];
-        [cell setHiddenCustom:false];
-    }
+    
+    [delegate performSelector:hideBottomBarFunc withObject:nil afterDelay:0.01];
 }
+-(void)showBottomBar
+{
+    [delegate performSelector:showBottomBarFunc withObject:nil afterDelay:0.01];
+}
+
 @end

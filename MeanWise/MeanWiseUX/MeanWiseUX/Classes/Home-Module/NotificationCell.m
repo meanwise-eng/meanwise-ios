@@ -233,7 +233,7 @@
 
 -(void)profileBtnClicked:(NSDictionary *)userDict
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Profile screen from Notifications"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Profile screen from Notifications"];
 
     NSString *screenIdentifier=@"FLIST";
     

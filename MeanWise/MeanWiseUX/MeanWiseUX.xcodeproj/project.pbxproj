@@ -54,6 +54,7 @@
 		5613F9471EF67CA200D73338 /* Tutorial-page-4.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5613F9421EF67CA200D73338 /* Tutorial-page-4.jpg */; };
 		5613F9481EF67CA200D73338 /* Tutorial-page-5.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 5613F9431EF67CA200D73338 /* Tutorial-page-5.jpg */; };
 		5613F94B1EF68F0F00D73338 /* InviteCodeComponent.m in Sources */ = {isa = PBXBuildFile; fileRef = 5613F94A1EF68F0F00D73338 /* InviteCodeComponent.m */; };
+		56141D561F31F10A002206C0 /* NotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 56141D551F31F10A002206C0 /* NotificationsManager.m */; };
 		561473891DF5A31F00859925 /* UIButton+ContentSize.m in Sources */ = {isa = PBXBuildFile; fileRef = 561473881DF5A31F00859925 /* UIButton+ContentSize.m */; };
 		561556151F22563300C509CB /* HCFilterHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 561556101F22563300C509CB /* HCFilterHelper.m */; };
 		561556161F22563300C509CB /* HCFilterImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 561556121F22563300C509CB /* HCFilterImageView.m */; };
@@ -506,6 +507,8 @@
 		5613F9431EF67CA200D73338 /* Tutorial-page-5.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = "Tutorial-page-5.jpg"; sourceTree = "<group>"; };
 		5613F9491EF68F0F00D73338 /* InviteCodeComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InviteCodeComponent.h; sourceTree = "<group>"; };
 		5613F94A1EF68F0F00D73338 /* InviteCodeComponent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = InviteCodeComponent.m; sourceTree = "<group>"; };
+		56141D541F31F10A002206C0 /* NotificationsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotificationsManager.h; sourceTree = "<group>"; };
+		56141D551F31F10A002206C0 /* NotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationsManager.m; sourceTree = "<group>"; };
 		561473871DF5A31F00859925 /* UIButton+ContentSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+ContentSize.h"; sourceTree = "<group>"; };
 		561473881DF5A31F00859925 /* UIButton+ContentSize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+ContentSize.m"; sourceTree = "<group>"; };
 		5615560F1F22563300C509CB /* HCFilterHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HCFilterHelper.h; sourceTree = "<group>"; };
@@ -1386,6 +1389,8 @@
 				56F0741F1F24155600B562DA /* HandsFreeBtn.m */,
 				56C355AE1E89402D001D85BF /* UIFilterImageView.m */,
 				560FFC751EF997E700ABE4EF /* SAMTextView.h */,
+				56141D541F31F10A002206C0 /* NotificationsManager.h */,
+				56141D551F31F10A002206C0 /* NotificationsManager.m */,
 				560FFC761EF997E700ABE4EF /* SAMTextView.m */,
 				561282D21E728F3100E4DF03 /* UIImage+animatedGIF.h */,
 				561282D31E728F3100E4DF03 /* UIImage+animatedGIF.m */,
@@ -2127,6 +2132,9 @@
 							com.apple.Push = {
 								enabled = 1;
 							};
+							com.apple.SafariKeychain = {
+								enabled = 0;
+							};
 						};
 					};
 				};
@@ -2540,6 +2548,7 @@
 				5621C1A91EEC07910070DE09 /* VidLoopPlayer.m in Sources */,
 				5681A3841E23709800A4927F /* CommentCell.m in Sources */,
 				5669ACEB1DEF33D800B4EA7A /* IQTextView.m in Sources */,
+				56141D561F31F10A002206C0 /* NotificationsManager.m in Sources */,
 				5669ACE91DEF33D800B4EA7A /* IQKeyboardManager.m in Sources */,
 				56D7EFBC1EEDD6AE0059F749 /* DeepLinkPostViewer.m in Sources */,
 				56DE697D1E3631A900C4E920 /* APIObjects_ProfileObj.m in Sources */,

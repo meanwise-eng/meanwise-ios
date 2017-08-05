@@ -43,6 +43,8 @@
 
 
 
+@property (nonatomic, strong) APIObjects_ProfileObj *sessionMain;
+
 @property (nonatomic, strong) NSNumber *SocialshareStatus;
 @property (nonatomic, strong) SignupDataObjects *signupObject;
 

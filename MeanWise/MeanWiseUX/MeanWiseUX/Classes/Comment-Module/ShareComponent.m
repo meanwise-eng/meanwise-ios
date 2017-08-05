@@ -31,7 +31,7 @@
 }
 -(void)setUp
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Feed share Button Clicked"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Feed share Button Clicked"];
 
     blackOverLay=[[UIView alloc] initWithFrame:self.bounds];
     [self addSubview:blackOverLay];
@@ -292,7 +292,7 @@
 
 -(void)cancelBtnClicked:(id)sender
 {
-    [AnalyticsMXManager PushAnalyticsEvent:@"Feed share Close Clicked"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Feed share Close Clicked"];
 
     [UIView animateWithDuration:0.5 delay:0 usingSpringWithDamping:0.8 initialSpringVelocity:0.8 options:UIViewAnimationOptionCurveLinear animations:^{
         

@@ -289,7 +289,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    [AnalyticsMXManager PushAnalyticsEvent:@"Notification-Detail Screen"];
+    [AnalyticsMXManager PushAnalyticsEventAction:@"Notification-Detail Screen"];
 
     APIObjects_NotificationObj *obj=[dataFeeds objectAtIndex:indexPath.row];
     int typeNo=obj.notification_typeNo.intValue;

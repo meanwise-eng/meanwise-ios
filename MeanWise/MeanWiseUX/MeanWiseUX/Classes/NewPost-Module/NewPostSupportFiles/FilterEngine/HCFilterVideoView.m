@@ -6,6 +6,7 @@
 //  Copyright © 2017 Hardik. All rights reserved.
 //
 
+#import "AnalyticsMXManager.h"
 #import "HCFilterVideoView.h"
 
 @implementation HCFilterVideoView
@@ -125,6 +126,8 @@
     
     if(touch.tapCount==2)
     {
+        [AnalyticsMXManager PushAnalyticsEventAction:@"Video Filter"];
+
         if(location.x>self.frame.size.width/2)
         {
             cFilterNo++;

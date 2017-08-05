@@ -27,7 +27,7 @@
     UIButton *newPostBtn;
     UIButton *searchBtn;
     UIButton *notificationsBtn;
-    UIButton *backBtn;
+    UIButton *backBtn1;
     
     ExploreComponent *exploreComp;
 
