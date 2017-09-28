@@ -29,8 +29,11 @@
 #import "BaseControl.h"
 #import "EditLocationComponent.h"
 
-
-
+#import "SearchGraphComponent.h"
+#import "PostCollectionView.h"
+#import "NewExploreComponent.h"
+#import "ProfileWindowFeedControl.h"
+#import "CommentsPopControl.h"
 
 @interface ViewController ()
 
@@ -63,8 +66,11 @@
     mainKeyView.backgroundColor=[UIColor whiteColor];
 
 
+    NSLog(@"%@",NSStringFromCGRect(mainKeyView.frame));
 
     [GUIScaleManager setTransform:mainKeyView];
+    NSLog(@"%@",NSStringFromCGRect(mainKeyView.frame));
+
     mainKeyView.frame=CGRectMake(0, 0, mainKeyView.frame.size.width, mainKeyView.frame.size.height);
     
     if(RX_isiPhone4Res)
@@ -80,7 +86,53 @@
     
     
    [self AppStart];
+   
+   
+//    [UserSession setUserSessionIfExist];
+//    FullCommentDisplay *commentDisplay=[[FullCommentDisplay alloc] initWithFrame:self.view.bounds];
+//    [commentDisplay setUpWithPostId:[NSString stringWithFormat:@"%@",@"130"]];
+//    [self.view addSubview:commentDisplay];
     
+//    [commentDisplay setTarget:self andCloseBtnClicked:@selector(commentFullClosed:)];
+    //[commentDisplay setUpToWriteComment];
+
+    
+    
+    
+//    [UserSession setUserSessionIfExist];
+//    ProfileWindowFeedControl *cont=[[ProfileWindowFeedControl alloc] initWithFrame:self.view.bounds];
+//    [self.view addSubview:cont];
+//    [cont setUp];
+    
+   /* [UserSession setUserSessionIfExist];
+    NewExploreComponent *cont=[[NewExploreComponent alloc] initWithFrame:self.view.bounds];
+    [self.view addSubview:cont];
+    [cont setUp];
+    */
+    
+
+//            [UserSession setUserSessionIfExist];
+//             SearchGraphComponent *cont=[[SearchGraphComponent alloc] initWithFrame:self.view.bounds];
+//             [self.view addSubview:cont];
+//             [cont setUp];
+
+//                [UserSession setUserSessionIfExist];
+//                 PostCollectionView *cont=[[PostCollectionView alloc] initWithFrame:self.view.bounds];
+//                 [self.view addSubview:cont];
+//                 [cont setUp];
+
+    
+    
+//        [UserSession setUserSessionIfExist];
+//         HomeComponent *cont=[[HomeComponent alloc] initWithFrame:self.view.bounds];
+//         [self.view addSubview:cont];
+//         [cont setUp];
+    
+//     [UserSession setUserSessionIfExist];
+//     NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
+//     [self.view addSubview:cont];
+//     [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
+//
     
 //    [UserSession setUserSessionIfExist];
 //    BaseControl *control=[[BaseControl alloc] initWithFrame:self.view.bounds];
@@ -132,11 +184,7 @@
     
     
 
-  /*  [UserSession setUserSessionIfExist];
-    NewPostComponent *cont=[[NewPostComponent alloc] initWithFrame:self.view.bounds];
-    [self.view addSubview:cont];
-    [cont setUpWithCellRect:CGRectMake(0, self.view.frame.size.height, self.view.frame.size.width, 0)];
-*/
+ 
 //
     
     //TestCases
@@ -440,8 +488,6 @@
     
     
     
-    
-    
     AVAssetExportSession *exportSession = [[AVAssetExportSession alloc] initWithAsset:mixComposition presetName:KK_VideoQualityRatio];
     exportSession.videoComposition=videoComposition;
     
@@ -633,7 +679,11 @@
                                    @"interest":[dict valueForKey:@"interest"],
                                    @"media":destinationPath,
                                    @"topic_names":[dict valueForKey:@"topic_names"],
-                                   @"tags":[dict valueForKey:@"tags"]
+                                   @"tags":[dict valueForKey:@"tags"],
+                                   @"geo_location_lat":[dict valueForKey:@"geo_location_lat"],
+                                   @"geo_location_lng":[dict valueForKey:@"geo_location_lng"],
+                                   @"mentioned_users":[dict valueForKey:@"mentioned_users"],
+                                   
                                    };
              
              dispatch_async(dispatch_get_main_queue(), ^{
@@ -669,28 +719,47 @@
 
 -(void)newPostSubmit:(NSDictionary *)dict;
 {
+    
 //    NSDictionary *dict=@{
 //                         @"text":statusString,
 //                         @"interest":[NSString stringWithFormat:@"%d",channelId],
 //                         @"media":mediaPath,
 //                         @"topic_names":topicValue,
-//                         @"tags":hashTagArray
+//                         @"tags":hashTagValue,
+//                         @"mentioned_users":mentionUsers,
+//                         @"geo_location_lat":geo_location_lat,
+//                         @"geo_location_lng":geo_location_lng,
+//                         
 //                         };
-//    
+
     
     NSString *mediaPath=[dict valueForKey:@"media"];
     NSString *text=[dict valueForKey:@"text"];
     NSString *interest=[dict valueForKey:@"interest"];
     NSString *topic_names=[dict valueForKey:@"topic_names"];
     NSString *tags=[dict valueForKey:@"tags"];
+
+    NSNumber *geo_location_lat=[dict valueForKey:@"geo_location_lat"];
+    NSNumber *geo_location_lng=[dict valueForKey:@"geo_location_lng"];
     
-    
+    if(geo_location_lat==nil)
+    {
+        geo_location_lat=[NSNumber numberWithFloat:0.0];
+        geo_location_lng=[NSNumber numberWithFloat:0.0];
+        
+    }
+
+    NSArray *mentioned_users=[dict valueForKey:@"mentioned_users"];
+
     NSDictionary *dict1;
     if([topic_names isEqualToString:@""] && [tags isEqualToString:@"[]"])
     {
         dict1=@{
                 @"text":text,
                 @"interest":interest,
+                @"geo_location_lat":geo_location_lat,
+                @"geo_location_lng":geo_location_lng,
+                @"mentioned_users":mentioned_users,
                 };
     }
     if([topic_names isEqualToString:@""] && ![tags isEqualToString:@"[]"])
@@ -698,7 +767,11 @@
         dict1=@{
                 @"text":text,
                 @"interest":interest,
-                @"tags":tags
+                @"tags":tags,
+                @"geo_location_lat":geo_location_lat,
+                @"geo_location_lng":geo_location_lng,
+                @"mentioned_users":mentioned_users,
+
                 };
     }
     else if(![topic_names isEqualToString:@""] && [tags isEqualToString:@"[]"])
@@ -707,6 +780,10 @@
                 @"text":text,
                 @"interest":interest,
                 @"topic_names":topic_names,
+                @"geo_location_lat":geo_location_lat,
+                @"geo_location_lng":geo_location_lng,
+                @"mentioned_users":mentioned_users,
+
                 };
     }
     else if(![topic_names isEqualToString:@""] && ![tags isEqualToString:@"[]"])
@@ -715,7 +792,11 @@
                 @"text":text,
                 @"interest":interest,
                 @"topic_names":topic_names,
-                @"tags":tags
+                @"tags":tags,
+                @"geo_location_lat":geo_location_lat,
+                @"geo_location_lng":geo_location_lng,
+                @"mentioned_users":mentioned_users,
+
                 };
     }
     

@@ -14,19 +14,8 @@
 @implementation NewPostComponent
 
 
-
--(void)setUpWithCellRect:(CGRect)rect
+-(void)setUpNavBar
 {
-    [self setUpCellRect:rect];
-    containerView.backgroundColor=[UIColor whiteColor];
-    self.clipsToBounds=YES;
-    
-    containerView.clipsToBounds=YES;
-    
-    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-In"];
-
-     isPostHasAttachment=false;
-    
     UIView *navBar=[[UIView alloc] initWithFrame:CGRectMake(0, 0, self.frame.size.width, 65)];
     [containerView addSubview:navBar];
     navBar.backgroundColor=[UIColor whiteColor];
@@ -35,17 +24,8 @@
     [containerView addSubview:seperator];
     seperator.backgroundColor=[UIColor colorWithWhite:0.6 alpha:0.1];
     
-   
-
     
-//    UIButton *backBtn=[[UIButton alloc] initWithFrame:CGRectMake(10, 60, 25, 25)];
-//    [backBtn setShowsTouchWhenHighlighted:YES];
-//    //[backBtn addTarget:self action:@selector(backBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-//    [backBtn setBackgroundImage:[UIImage imageNamed:@"BackPlainForNav.png"] forState:UIControlStateNormal];
-//    [containerView addSubview:backBtn];
-//    
-//    backBtn.center=CGPointMake(10+25/2, 20+65/2-10);
-//    
+    
     
     UIButton *backBtn=[[UIButton alloc] initWithFrame:CGRectMake(10,20, 70, 45)];
     [backBtn setTitle:@"Cancel" forState:UIControlStateNormal];
@@ -54,7 +34,7 @@
     backBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:18];
     [backBtn setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
     [backBtn addTarget:self action:@selector(cancelPostBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-
+    
     
     postBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-70-10,20, 70, 45)];
     [postBtn setTitle:@"Publish" forState:UIControlStateNormal];
@@ -63,26 +43,26 @@
     postBtn.titleLabel.font=[UIFont fontWithName:k_fontSemiBold size:18];
     [postBtn setTitleColor:[UIColor redColor] forState:UIControlStateHighlighted];
     [postBtn addTarget:self action:@selector(postBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+    
+    
+
+}
+-(void)setUpWithCellRect:(CGRect)rect
+{
+    [self setUpCellRect:rect];
+    containerView.backgroundColor=[UIColor whiteColor];
+    self.clipsToBounds=YES;
+    isPostHasAttachment=false;
+    containerView.clipsToBounds=YES;
 
     
+    [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-In"];
+
+    
+    [self setUpNavBar];
     
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    topicArray=[[NSMutableArray alloc] init];
     
     
     profileIMGVIEW=[[UIImageHM alloc] initWithFrame:CGRectMake(15, 65+10, 50, 50)];
@@ -93,7 +73,6 @@
     profileIMGVIEW.clipsToBounds=YES;
     profileIMGVIEW.layer.cornerRadius=25;
     
-
     
     
     statusView=[[SAMTextView alloc] initWithFrame:CGRectMake(15, 65+70, self.frame.size.width-40, 42*2)];
@@ -102,7 +81,7 @@
     statusView.delegate=self;
     statusView.keyboardType=UIKeyboardTypeTwitter;
     statusView.scrollEnabled=false;
-    statusView.placeholder=@"Write a caption here use '@' to attach topics and '#' for hashtags";
+    statusView.placeholder=@"Write a caption here use '@' to mention users and '#' for hashtags";
    
     
     int height=self.frame.size.height-statusView.frame.origin.y-statusView.frame.size.height-170;
@@ -116,21 +95,6 @@
 
     [mediaAttachComponent setAttachmentRemoveCallBack:@selector(attachmentRemove:)];
 
-    
-    //attachedImage=[[PreviewViewComponent alloc] initWithFrame:CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, height)];
-//    attachedImage.backgroundColor=[UIColor grayColor];
-   // [containerView addSubview:attachedImage];
-   // attachedImage.hidden=true;
-  //  attachedImage.clipsToBounds=YES;
-    
- //   [attachedImage setTarget:self showFullScreenCallBack:@selector(mediaManupulatorOpen:) andShowThumbCallBack:@selector(mediaManupulatorClose:)];
-    
-    
-   // attachedImage.center=CGPointMake(self.frame.size.width/2, attachedImage.center.y);
-    
-    
-    
-    
 
     characterCountLBL=[[UILabel alloc] initWithFrame:CGRectMake(self.frame.size.width/2-50, 65+10, 100,50)];
     [containerView addSubview:characterCountLBL];
@@ -139,41 +103,41 @@
     characterCountLBL.textColor=[UIColor grayColor];
     characterCountLBL.textAlignment=NSTextAlignmentCenter;
     
+    locationBtn=[[UIButton alloc] initWithFrame:CGRectMake(self.frame.size.width-15-50, 65+10,50, 50)];
+    [containerView addSubview:locationBtn];
+    [locationBtn setBackgroundColor:[UIColor clearColor]];
+    [locationBtn setBackgroundImage:[UIImage imageNamed:@"post_location_on.png"] forState:UIControlStateSelected];
+    [locationBtn setBackgroundImage:[UIImage imageNamed:@"post_location_off.png"] forState:UIControlStateNormal];
+    
+    locationBtn.layer.cornerRadius=50/2;
+    locationBtn.clipsToBounds=YES;
+    [locationBtn addTarget:self action:@selector(locationToggleBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+
     
     
     UIView *seperator1=[[UIView alloc] initWithFrame:CGRectMake(0,self.frame.size.height-170, self.frame.size.width, 1)];
     seperator1.backgroundColor=[UIColor colorWithWhite:0.0f alpha:0.1f];
     [containerView addSubview:seperator1];
     
-    
-    
-    replyToLBL=[[UILabel alloc] initWithFrame:CGRectMake(15,self.frame.size.height-170, self.frame.size.width-30,50)];
-    [containerView addSubview:replyToLBL];
-    replyToLBL.font=[UIFont fontWithName:k_fontRegular size:20];
-    replyToLBL.text=@"@designerNews";
-    replyToLBL.textAlignment=NSTextAlignmentLeft;
-    replyToLBL.textColor=[UIColor colorWithRed:0.77 green:0.26 blue:0.78 alpha:1.00];
-    replyToLBL.text=@"@topic";
-    replyToLBL.textColor=[UIColor lightGrayColor];
-    
+    topicListBtn=[[UIButton alloc] initWithFrame:CGRectMake(15,self.frame.size.height-170, self.frame.size.width-30,50)];
+    [containerView addSubview:topicListBtn];
+    topicListBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:20];
+    topicListBtn.contentHorizontalAlignment=UIControlContentHorizontalAlignmentLeft;
+    [topicListBtn setTitleColor:[UIColor colorWithRed:0.77 green:0.26 blue:0.78 alpha:1.00] forState:UIControlStateNormal];
+    [topicListBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];;
+    [topicListBtn setTitle:@"+topic" forState:UIControlStateNormal];
+    [topicListBtn addTarget:self action:@selector(topicListBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
+
     
     UIView *seperator2=[[UIView alloc] initWithFrame:CGRectMake(0,self.frame.size.height-115, self.frame.size.width, 1)];
     seperator2.backgroundColor=[UIColor colorWithWhite:0.0f alpha:0.1f];
     [containerView addSubview:seperator2];
 
-  /*  ChannelSearchView *view=[[ChannelSearchView alloc] initWithFrame:self.bounds];
-    [self addSubview:view];
-    [view setUp];*/
-    
-    
     
     UIView *seperator3=[[UIView alloc] initWithFrame:CGRectMake(0, self.frame.size.height-55, self.frame.size.width, 1)];
     seperator3.backgroundColor=[UIColor colorWithWhite:0.0f alpha:0.1f];
     [containerView addSubview:seperator3];
     
-    
-    
- 
     
     photoControllerBtns=[[PhotosBtnController alloc] initWithFrame:CGRectMake(0, self.frame.size.height-50, self.frame.size.width, 50)];
     [containerView addSubview:photoControllerBtns];
@@ -186,16 +150,114 @@
     [containerView addSubview:channelSelectionView];
     [channelSelectionView setState1Frame:CGRectMake(20, self.frame.size.height-115, self.frame.size.width, 50)];
 
-   
-//    
-//    gallery=[[PhotoGallery alloc] initWithFrame:CGRectMake(0, 160+85+200, self.frame.size.width, self.frame.size.height- (160+85+200))];
-//    [containerView addSubview:gallery];
-//    [gallery setUp];
-//
+ 
     
+     geo_location_lat=0.00;
+     geo_location_lng=0.00;
+
     
     [self cameraSelect:nil];
     
+    suggestionView=[[UITextViewSuggestionsBox alloc] initWithFrame:CGRectMake(-5, 0, self.frame.size.width+10, 0)];
+    suggestionView.backgroundColor=[UIColor grayColor];
+    [self addSubview:suggestionView];
+    
+    [suggestionView setUp];
+    [suggestionView setPotisionUp:false andThemeDark:FALSE];
+    
+    [suggestionView setTarget:self onSelect:@selector(suggestionSelected:)];
+    
+    acHelper=[[UITextViewAutoSuggestionsDataSource alloc] init];
+    [acHelper setTextView:statusView];
+    [acHelper setSuggestionView:suggestionView];
+    [acHelper setUp];
+}
+
+-(void)suggestionSelected:(id)selectedItem
+{
+    [acHelper suggestionSelected:selectedItem];
+}
+-(void)locationToggleBtnClicked:(id)sender
+{
+    locationBtn.selected=!locationBtn.selected;
+    
+    if(locationBtn.selected==false)
+    {
+        geo_location_lat=0.00;
+        geo_location_lng=0.00;
+     
+    }
+    else
+    {
+        blockc=[[LocationManagerBlock alloc] init];
+        [blockc setUp];
+        [blockc updateCurrentLocation:^(CLLocation *currentLocation)
+         {
+             if(currentLocation==nil)
+             {
+                 geo_location_lat=0.00;
+                 geo_location_lng=0.00;
+                 locationBtn.selected=false;
+                 [FTIndicator showToastMessage:@"Sorry couldn't able to locate you."];
+             }
+             else
+             {
+                 geo_location_lat=currentLocation.coordinate.latitude;
+                 geo_location_lng=currentLocation.coordinate.longitude;
+                 
+
+
+                 
+             }
+             blockc=nil;
+
+         }];
+        
+    }
+    
+}
+-(void)topicListBtnClicked:(id)sender
+{
+    if(topicControl==nil)
+    {
+        
+        [self setGestureEnabled:false];
+
+
+    topicControl=[[TopicAutoCompleteControl alloc] initWithFrame:CGRectMake(0,self.frame.size.height+5, self.frame.size.width,50)];
+    [containerView addSubview:topicControl];
+    [topicControl setUp:self.bounds withData:topicArray];
+    [topicControl setTarget:self onCloseFunc:@selector(onTopicControlClose:)];
+        
+        
+        [UIView animateWithDuration:0.2 animations:^{
+            
+            topicListBtn.frame=CGRectMake(-self.frame.size.width-15,self.frame.size.height-170, self.frame.size.width-30,50);
+
+        } completion:^(BOOL finished) {
+            
+        }];
+        
+    }
+}
+-(void)onTopicControlClose:(NSMutableArray *)array
+{
+    [topicControl removeFromSuperview];
+    topicControl=nil;
+    
+    if(array!=nil)
+    {
+    [self setTopic:[NSArray arrayWithArray:array]];
+    }
+    
+    [UIView animateWithDuration:0.2 animations:^{
+        
+        topicListBtn.frame=CGRectMake(15,self.frame.size.height-170, self.frame.size.width-30,50);
+        
+    } completion:^(BOOL finished) {
+        [self setGestureEnabled:true];
+
+    }];
     
 }
 -(void)showTutorial
@@ -264,12 +326,7 @@
         [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-From Gallery attached"];
 
     }
-    
-//    if(isMediaFromCamera==true)
-//    {
-//        [cropperControl setDirectCrop];
-//    }
-   
+
 }
 -(void)showAttachImage:(NSString *)path
 {
@@ -284,13 +341,7 @@
     
     isPostHasAttachment=true;
     
-    
-    
-//    attachedImage.hidden=false;
-//    CGRect frame=attachedImage.frame;
-//    [attachedImage cleanUp];
-//    [attachedImage setUp:path andRect:frame];
-//    [attachedImage openFullMode:nil];
+
     
 }
 #pragma mark - Post Actions
@@ -303,9 +354,7 @@
         mediaAttachComponent.hidden=true;
 
     isPostHasAttachment=false;
-//    [attachedImage cleanUp];
-//    attachedImage.hidden=true;
-    
+
 }
 
 
@@ -346,9 +395,6 @@
         [FTIndicator showToastMessage:@"Post Cancelled"];
         
         [UIView animateWithDuration:0.1 animations:^{
-            // statusLabel.alpha=0;
-            // galleryView.alpha=0;
-            // label.alpha=0;
             
             
         } completion:^(BOOL finished) {
@@ -406,6 +452,8 @@
     }
     
     
+    //If validation is correct
+
     
     //Retriving Topic and Hashtags
     NSString *topicValue=@"";
@@ -421,6 +469,13 @@
     {
         topicValue=[topicArray componentsJoinedByString: @","];
     }
+    
+    
+    
+    NSMutableArray *hashTagArray=[acHelper getAllHashTagWords];
+    NSArray *mentioned_users=[acHelper getAllUniqueUserMentionsIds];
+    
+
     
     NSString *hashTagValue=@"[]";
     if(hashTagArray.count==0)
@@ -440,8 +495,6 @@
     }
     
 
-    
-    //If validation is correct
 
   
     UINavigationController *vc=(UINavigationController *)[Constant topMostController];
@@ -473,14 +526,20 @@
         [AnalyticsMXManager PushAnalyticsEventAction:@"NewPost-Post Image Posted"];
 
         
+    
+        
         NSDictionary *dict=@{
                              @"text":statusString,
                              @"interest":[NSString stringWithFormat:@"%d",channelId],
                              @"media":mediaPath,
                              @"topic_names":topicValue,
-                             @"tags":hashTagValue
+                             @"tags":hashTagValue,
+                             @"mentioned_users":mentioned_users,
+                             @"geo_location_lat":[NSNumber numberWithDouble:geo_location_lat],
+                             @"geo_location_lng":[NSNumber numberWithDouble:geo_location_lng],
+                             
                              };
-        [t newPostSubmit:dict];
+        [t newPostSubmit:[[NSDictionary alloc] initWithDictionary:dict]];
 
         
     }
@@ -493,9 +552,14 @@
                              @"interest":[NSString stringWithFormat:@"%d",channelId],
                              @"media":@"",
                              @"topic_names":topicValue,
-                             @"tags":hashTagValue
+                             @"tags":hashTagValue,
+                             @"mentioned_users":mentioned_users,
+                             @"geo_location_lat":[NSNumber numberWithDouble:geo_location_lat],
+                             @"geo_location_lng":[NSNumber numberWithDouble:geo_location_lng],
+                             
+
                              };
-        [t newPostSubmit:dict];
+        [t newPostSubmit:[[NSDictionary alloc] initWithDictionary:dict]];
 
         
     }
@@ -516,9 +580,14 @@
                              @"interest":[NSString stringWithFormat:@"%d",channelId],
                              @"topic_names":topicValue,
                              @"tags":hashTagValue,
-                             @"metaData":metaData
+                             @"metaData":metaData,
+                             @"mentioned_users":mentioned_users,
+                             @"geo_location_lat":[NSNumber numberWithDouble:geo_location_lat],
+                             @"geo_location_lng":[NSNumber numberWithDouble:geo_location_lng],
+
                              };
-        [t renderVideoAndPost:dict witPath:mediaPath overlayImage:image];
+        
+        [t renderVideoAndPost:[[NSDictionary alloc] initWithDictionary:dict] witPath:mediaPath overlayImage:image];
         
     }
     
@@ -561,20 +630,28 @@
 #pragma mark - Helper
 -(void)setTopic:(NSArray *)array
 {
+    topicArray=[NSMutableArray arrayWithArray:array];;
+    
     if(array.count==0)
     {
-        replyToLBL.text=@"@topic";
-        replyToLBL.textColor=[UIColor lightGrayColor];
+        
+        [topicListBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];;
+        [topicListBtn setTitle:@"+topic" forState:UIControlStateNormal];
+        topicListBtn.titleLabel.font=[UIFont fontWithName:k_fontRegular size:20];
+
     }
     else
     {
         
-        NSString *string=[NSString stringWithFormat:@"@%@",[array componentsJoinedByString: @" @"]];
+        NSString *string=[NSString stringWithFormat:@"%@",[array componentsJoinedByString: @", "]];
         
-        replyToLBL.text=string;
         
-        replyToLBL.textColor=[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00];
-        
+        topicListBtn.titleLabel.font=[UIFont fontWithName:k_fontSemiBold size:20];
+
+        [topicListBtn setTitleColor:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00] forState:UIControlStateNormal];;
+        [topicListBtn setTitle:string forState:UIControlStateNormal];
+        topicListBtn.titleLabel.adjustsFontSizeToFitWidth=YES;
+
     }
     
 }
@@ -609,6 +686,10 @@
 }
 
 #pragma mark - Text Methods
+- (void)textViewDidEndEditing:(UITextView *)textView;
+{
+    [acHelper cancelSearch];
+}
 -(void)textViewDidChange:(UITextView *)textView
 {
     
@@ -628,7 +709,6 @@
     
     mediaAttachComponent.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
 
-//    attachedImage.frame=CGRectMake(0, statusView.frame.origin.y+statusView.frame.size.height, self.frame.size.width, heightAttached);
     
     
     
@@ -636,78 +716,17 @@
     characterCountLBL.text=[NSString stringWithFormat:@"%i",200-len];
     
     
+  
     
-    NSString *string=textView.text;
-    
-    NSMutableAttributedString *hogan = [[NSMutableAttributedString alloc] initWithString:string];
-    [hogan addAttribute:NSFontAttributeName
-                  value:[UIFont fontWithName:k_fontRegular size:20]
-                  range:NSMakeRange(0, string.length)];
-    
-    [hogan addAttribute:NSForegroundColorAttributeName
-                  value:[UIColor colorWithRed:0.53 green:0.62 blue:0.66 alpha:1.00]
-                  range:NSMakeRange(0, string.length)];
-    
-    NSError *error1 = nil;
-    NSError *error2 = nil;
-    NSRegularExpression *regex1 = [NSRegularExpression regularExpressionWithPattern:@"#(\\w+)" options:0 error:&error1];
-    NSRegularExpression *regex2 = [NSRegularExpression regularExpressionWithPattern:@"@(\\w+)" options:0 error:&error2];
-    
-    NSArray *matches1 = [regex1 matchesInString:string options:0 range:NSMakeRange(0, string.length)];
-    NSArray *matches2 = [regex2 matchesInString:string options:0 range:NSMakeRange(0, string.length)];
-    
-    
-    
-    
-    topicArray=[[NSMutableArray alloc] init];
-    hashTagArray=[[NSMutableArray alloc] init];
-    
-    
-    for (NSTextCheckingResult *match in matches1)
-    {
-        NSRange wordRange = [match rangeAtIndex:0];
-        NSString* word = [string substringWithRange:wordRange];
-        NSLog(@"Found tag %@", word);
-        
-        [hogan addAttribute:NSForegroundColorAttributeName
-                      value:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00]
-                      range:wordRange];
-        
-        NSRange hashTagRange = [match rangeAtIndex:1];
-        NSString* hashTag = [string substringWithRange:hashTagRange];
-        
-        [hashTagArray addObject:hashTag];
-        
-    }
-    
-    
-    for (NSTextCheckingResult *match in matches2) {
-        NSRange wordRange = [match rangeAtIndex:0];
-        NSString* word = [string substringWithRange:wordRange];
-        NSLog(@"Found tag %@", word);
-        
-        [hogan addAttribute:NSForegroundColorAttributeName
-                      value:[UIColor colorWithRed:0.00 green:0.76 blue:0.89 alpha:1.00]
-                      range:wordRange];
-        
-        NSRange topicRange = [match rangeAtIndex:1];
-        NSString* topicName = [string substringWithRange:topicRange];
-        
-        [topicArray addObject:topicName];
-        
-        
-    }
-    [self setTopic:topicArray];
-    
-    
-    textView.attributedText=hogan;
-    
-    
+    [acHelper textViewDidChange:textView];
+
     
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text
 {
+    BOOL flag= [acHelper textView:textView shouldChangeTextInRange:range replacementText:text];
+
     if([text length] == 0)
     {
         if([textView.text length] != 0)
@@ -719,6 +738,8 @@
     {
         return NO;
     }
+    
+
     return YES;
 }
 

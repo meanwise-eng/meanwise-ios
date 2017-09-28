@@ -9,9 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "Constant.h"
 #import "UIImageHM.h"
+#import "TTTAttributedLabel.h"
+#import "APIObjects_CommentObj.h"
 
 
-@interface CommentCell : UICollectionViewCell
+@interface CommentCell : UICollectionViewCell <TTTAttributedLabelDelegate>
 {
     
     id target;
@@ -20,16 +22,16 @@
 }
 @property (nonatomic, strong) NSString *commentId;
 
-@property (nonatomic, strong) UIView *separatorView;
 
 @property (nonatomic, strong) UIImageHM *profileIMGVIEW;
 @property (nonatomic, strong) UILabel *timeLBL;
 
-@property (nonatomic, strong) UILabel *nameLBL;
+@property (nonatomic, strong) TTTAttributedLabel *nameLBL;
 @property (nonatomic, strong) UILabel *personNameLBL;
 @property (nonatomic, strong) UIButton *customDeleteBtn;
 
--(void)setNameLBLText:(NSString *)string;
+-(void)setNameLBLText:(APIObjects_CommentObj *)obj;
+
 -(void)setProfileImageURLString:(NSString *)stringPath;
 -(void)setTarget:(id)targetReceived andOnDelete:(SEL)deleteFunc;
 

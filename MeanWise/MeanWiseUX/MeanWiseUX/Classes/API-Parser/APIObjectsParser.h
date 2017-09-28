@@ -15,5 +15,6 @@
 -(NSArray *)parseObjects_COMMENTS:(NSArray *)array;
 -(NSArray *)parseObjects_PROFILES:(NSArray *)array;
 -(NSArray *)parseObjects_NOTIFICATIONS:(NSArray *)array;
+-(NSArray *)parseObjects_DISCUSSIONS:(NSArray *)array;
 
 @end

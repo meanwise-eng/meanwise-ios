@@ -31,6 +31,7 @@
 #define k_fontExtraBold @"OpenSans-Extrabold"
 #define k_fontSemiBold @"ProximaNova-Semibold"
 #define k_fontLight @"ProximaNova-Light"
+#define k_fontProximaBold @"ProximaNova-Extrabold"
 
 
 
@@ -43,7 +44,6 @@
 #define kk_chatFG1Color [UIColor whiteColor]
 #define kk_chatFG2Color [UIColor blackColor]
 #define kk_chatHeadMinHeight 60
-#define kk_chatBoxTextViewHeight 60
 
 #define kk_CommentHeadMinHeight 10
 
@@ -85,5 +85,8 @@
 #pragma mark - File Manager
 +(NSString *)static_getInterstFromId:(int)interstId;
 +(NSString *)static_getSKillFromId:(int)interstId;
+
++(BOOL)isAppDebugModeOn;
++(void)setAppDebugMode:(BOOL)flag;
 
 @end

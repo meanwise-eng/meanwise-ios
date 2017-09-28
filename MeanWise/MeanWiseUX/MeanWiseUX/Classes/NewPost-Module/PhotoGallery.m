@@ -826,6 +826,7 @@ timerBtn.hidden=false;
     
     // this one is key
     requestOptions.synchronous = false;
+    requestOptions.networkAccessAllowed=YES;
     
 
     if(asset.mediaType==PHAssetMediaTypeVideo)
@@ -1056,14 +1057,18 @@ timerBtn.hidden=false;
         
         
 
-
-        if(asset.isFavorite)
-        {
-            [assetFavorites addObject:asset];
-        }
+       if(asset.sourceType!=PHAssetSourceTypeCloudShared) //TRY
+       {
+           if(asset.isFavorite)
+           {
+               [assetFavorites addObject:asset];
+           }
+           
+           [assets addObject:asset];
+           NSLog(@"asset %@", asset);
+           
+       }
         
-        [assets addObject:asset];
-        NSLog(@"asset %@", asset);
         
         
     }];

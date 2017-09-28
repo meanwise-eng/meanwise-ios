@@ -12,6 +12,8 @@
 
 -(void)setUpWithDict:(NSDictionary *)dict
 {
+    self.comment_id_number=[NSNumber numberWithLong:[[dict valueForKey:@"id"] longValue]];
+    
     self.commentId=[dict valueForKey:@"id"];
     self.post_id=[dict valueForKey:@"post_id"];
     self.user_first_name=[dict valueForKey:@"user_first_name"];
@@ -26,6 +28,7 @@
     NSString *temp=[dict valueForKey:@"created_on"];
     self.timeString=[self dateTimeSetup:temp];
 
+    self.mentioned_users=[dict valueForKey:@"mentioned_users"];
 }
 -(NSString *)dateTimeSetup:(NSString *)dateString
 {

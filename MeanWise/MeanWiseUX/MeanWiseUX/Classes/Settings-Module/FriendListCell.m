@@ -7,7 +7,7 @@
 //
 
 #import "FriendListCell.h"
-#import "MiniProfileComponent.h"
+#import "ProfileWindowControl.h"
 #import "GUIScaleManager.h"
 
 @implementation FriendListCell
@@ -54,15 +54,7 @@
 }
 -(NSDictionary *)userDictDetail:(APIObjects_ProfileObj *)feedData
 {
-    
-    NSDictionary *dict=@{
-                         @"user_firstname":feedData.first_name,
-                         @"user_lastname":feedData.last_name,
-                         @"user_profile_photo_small":feedData.profile_photo_small,
-                         @"user_profession":feedData.profession_text,
-                         @"user_id":feedData.userId,
-                         @"user_cover_photo":feedData.cover_photo
-                         };
+    NSDictionary *dict=@{@"cover_photo":feedData.cover_photo,@"user_id":feedData.userId};
     
     return dict;
 }
@@ -97,11 +89,12 @@
         rect=CGRectMake(p.x-self.profileIMGVIEW.bounds.size.width/2, p.y-self.profileIMGVIEW.bounds.size.height/2, self.profileIMGVIEW.bounds.size.width, self.profileIMGVIEW.bounds.size.width);
 
         
-       // CGRect rect=CGRectMake(0, RX_mainScreenBounds.size.height, RX_mainScreenBounds.size.width, 0);
-        MiniProfileComponent *compo=[[MiniProfileComponent alloc] initWithFrame:rect];
-        [compo setUp:userDict];
-        [compo setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
         
+        
+        ProfileWindowControl *control=[[ProfileWindowControl alloc] init];
+        [control setUp:userDict andSourceFrame:rect];
+        [control setTarget:self onClose:@selector(ProfilecloseBtnClicked:)];
+
         
         NSLog(@"%@",userDict);
     }

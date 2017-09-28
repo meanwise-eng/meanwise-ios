@@ -7,39 +7,34 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ExploreComponent.h"
-#import "HomeComponent.h"
-#import "SearchComponent.h"
+//#import "ExploreComponent.h"
 #import "NewPostComponent.h"
 #import "TutorialComponent.h"
 #import "InviteCodeComponent.h"
 #import "ProfileFullScreen.h"
+#import "SearchGraphComponent.h"
+#import "NewExploreComponent.h"
 
 @interface BaseControl : UIView <UIScrollViewDelegate>
 {
     
-    UIScrollView *masterControl;
+//    UIScrollView *masterControl;
 
     UIImageView *baseShadow;
     
     UIButton *userBtn;
-    UIButton *homeFeedBtn;
     UIButton *newPostBtn;
     UIButton *searchBtn;
-    UIButton *notificationsBtn;
-    UIButton *backBtn1;
     
-    ExploreComponent *exploreComp;
+    NewExploreComponent *exploreComp;
 
-    HomeComponent *homeComp;
-    SearchComponent *searchComp;
+    SearchGraphComponent *searchComp;
     
     int visibleComp;
     TutorialComponent *tutorialCmp;
     InviteCodeComponent *inviteCodeComp;
 
     MyAccountComponent *myAccountCompo;
-    NotificationsComponent *messageCompo;
 
     UILabel *label;
 

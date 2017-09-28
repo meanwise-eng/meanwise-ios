@@ -11,28 +11,37 @@
 #import "Constant.h"
 #import "ChannelSearchView.h"
 #import "PhotoGallery.h"
-//#import "PreviewViewComponent.h"
 #import "MediaCropper.h"
 #import "UIImageHM.h"
 #import "PreviewMaxScreen.h"
 #import "SAMTextView.h"
+#import "TopicAutoCompleteControl.h"
+#import "LocationManagerBlock.h"
+#import "UITextViewSuggestionHelper.h"
 
 @interface NewPostComponent : ZoomGestureView<UITextViewDelegate>
 {
+    LocationManagerBlock *blockc;
+
     UIImageHM *profileIMGVIEW;
     UIButton *postBtn;
     
     
     
     SAMTextView *statusView;
-//    PreviewViewComponent *attachedImage;
     PreviewMaxScreen *mediaAttachComponent;
+    UITextViewSuggestionsBox *suggestionView;
+    UITextViewAutoSuggestionsDataSource *acHelper;
+
     
     
     UILabel *characterCountLBL;
     
-    UILabel *replyToLBL;
     
+    UIButton *topicListBtn;
+    
+    
+    TopicAutoCompleteControl *topicControl;
     ChannelSearchView *channelSelectionView;
     
     PhotosBtnController *photoControllerBtns;
@@ -41,27 +50,24 @@
     
     MediaCropper *cropperControl;
     
-    NSMutableArray *hashTagArray;
     NSMutableArray *topicArray;
+    NSMutableArray *mentionArray;
     
     id target;
     SEL closeCallBackfunc;
     
     BOOL isPostHasAttachment;
     BOOL isMediaFromCamera1;
+    
+    UIButton *locationBtn;
+    float geo_location_lat;
+    float geo_location_lng;
+
 
 }
 -(void)setUpWithCellRect:(CGRect)rect;
 -(void)setTarget:(id)targetReceived onCloseEvent:(SEL)func1;
-//-(void)openFullScreen:(id)sender;
 
 @end
 
 
-/*
-
-Close Button to cancel the image
- 
- 
-
-*/

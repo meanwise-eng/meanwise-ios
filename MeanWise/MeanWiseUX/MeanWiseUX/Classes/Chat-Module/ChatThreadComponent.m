@@ -13,7 +13,7 @@
 
 -(void)setUpFrame:(CGRect)rect andImage:(UIImage *)image
 {
-    
+    kk_chatBoxTextViewHeight=60;
     chatMessages=[[NSMutableArray alloc] init];
     
     

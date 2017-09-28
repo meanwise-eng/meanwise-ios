@@ -11,7 +11,7 @@
 #import "AppDelegate.h"
 #import "ViewController.h"
 #import "SharePostVC.h"
-
+#import "FTIndicator.h"
 
 @implementation ShareComponent
 
@@ -29,8 +29,13 @@
     delegate=target;
     closeBtnClicked=func1;
 }
+-(void)setIfItsForExplore:(BOOL)flag;
+{
+    isForExplore=flag;
+}
 -(void)setUp
 {
+    isForExplore=false;
     [AnalyticsMXManager PushAnalyticsEventAction:@"Feed share Button Clicked"];
 
     blackOverLay=[[UIView alloc] initWithFrame:self.bounds];
@@ -213,6 +218,12 @@
 
 -(void)shareBtnClicked:(UIButton *)sender
 {
+    if(isForExplore==false && sender.tag!=3)
+    {
+        [FTIndicator showToastMessage:@"Oops! Something went wrong.."];
+        [self cancelBtnClicked:nil];
+        return;
+    }
     
     NSString *string=[NSString stringWithFormat:@"Hey! https://meanwise.com/post?post=%@",postIdReceived];
 //
@@ -223,7 +234,9 @@
     ViewController *t=(ViewController *)vc.topViewController;
 //
 //    
-//    
+//
+    
+
     SharePostVC *vc1=[[SharePostVC alloc] init];
     
     if(sender.tag==0)

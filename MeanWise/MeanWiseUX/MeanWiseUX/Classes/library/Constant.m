@@ -425,6 +425,19 @@
     
     
 }
++(BOOL)isAppDebugModeOn
+{
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    BOOL flag=[ud boolForKey:@"UD_DEBUG"];
+    
+    return flag;
+}
++(void)setAppDebugMode:(BOOL)flag
+{
+    
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    [ud setBool:flag forKey:@"UD_DEBUG"];
 
+}
 
 @end

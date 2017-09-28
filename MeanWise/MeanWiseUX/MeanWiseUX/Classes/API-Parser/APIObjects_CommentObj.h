@@ -20,6 +20,8 @@
 @property (nonatomic, strong) NSString* comment_text;
 @property (nonatomic, strong) NSString* user_id;
 @property (nonatomic, strong) NSString* timeString;
+@property (nonatomic, strong) NSArray* mentioned_users;
+@property (nonatomic, strong) NSNumber* comment_id_number;
 
 
 -(void)setUpWithDict:(NSDictionary *)dict;

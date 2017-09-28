@@ -12,6 +12,9 @@
 #import "ResolutionVersion.h"
 #import "AnalyticsMXManager.h"
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import "PostTrackSeenHelper.h"
+#import "IQKeyboardManager.h"
+#import "CommentsPopControl.h"
 
 
 @interface AppDelegate ()
@@ -38,6 +41,7 @@
     
     [self listOfFonts];
     
+
     
     // TODO: Move this to where you establish a user session
 
@@ -435,6 +439,7 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
     [vuti requestForCall];
     [FBSDKAppEvents activateApp];
 
+    [[PostTrackSeenHelper sharedInstance] postAllJsonFiles];
        // [[Crashlytics sharedInstance] crash];
 
 

@@ -211,10 +211,6 @@
 
 - (void)prepareLayout
 {
-}
-
--(void)doNewLayout
-{
     id<UICollectionViewDelegateJSPintLayout> delegate = (id<UICollectionViewDelegateJSPintLayout>)self.collectionView.delegate;
     
     // get column width from delegate.  If the method isn't implemented fall back to our property
@@ -293,6 +289,11 @@
     self.contentSize = CGSizeMake(contentWidth,contentHeight);
     
     free(columnHeights);
+}
+
+-(void)doNewLayout
+{
+   
 }
 
 

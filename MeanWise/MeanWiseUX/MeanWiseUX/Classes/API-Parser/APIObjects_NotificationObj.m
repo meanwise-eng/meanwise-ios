@@ -12,14 +12,7 @@
 
 -(void)setUpWithDict:(NSDictionary *)dict
 {
-    /*
-     
-     
-     @property (nonatomic, strong) NSString* postId;
-     @property (nonatomic, strong) NSString* postThumbURL;
-     @property (nonatomic, strong) NSString* postType;
-     
-     */
+    
     
     self.notificationIdNo=[NSNumber numberWithInt:[[dict valueForKey:@"id"] intValue]];
     
@@ -32,12 +25,24 @@
     self.created_on=[self dateTimeSetup:temp];
 
     
-    if([self.notification_type isEqualToString:@"LikedPost"] || [self.notification_type isEqualToString:@"CommentedPost"])
+   
+    if([self.notification_type isEqualToString:@"LikedPost"] || [self.notification_type isEqualToString:@"CommentedPost"] || [self.notification_type isEqualToString:@"CommentMentionedUser"] || [self.notification_type isEqualToString:@"PostMentionedUser"])
     {
+        if(![[dict valueForKey:@"post"] isKindOfClass:[NSNull class]])
+        {
         self.postId=[[dict valueForKey:@"post"] valueForKey:@"id"];
         
-        NSString *VideoThumbURL=[[dict valueForKey:@"post"] valueForKey:@"video_thumb_url"];
-        NSString *PhotoThumbURL=[[dict valueForKey:@"post"] valueForKey:@"image_url"];
+        NSString *VideoThumbURL=@"";
+        NSString *PhotoThumbURL=@"";
+        if([[dict valueForKey:@"post"] valueForKey:@"video_thumb_url"]!=nil)
+        {
+            VideoThumbURL=[[dict valueForKey:@"post"] valueForKey:@"video_thumb_url"];
+        }
+        
+        if([[dict valueForKey:@"post"] valueForKey:@"image_url"]!=nil)
+        {
+            PhotoThumbURL=[[dict valueForKey:@"post"] valueForKey:@"image_url"];
+        }
         
         if(VideoThumbURL!=nil && ![VideoThumbURL isEqualToString:@""])
         {
@@ -53,13 +58,15 @@
         {
             self.postType=@"1";
         }
-        
-        
+        }
+        else
+        {
+            int q=0;
+        }
     }
-    if([self.notification_type isEqualToString:@"LikedPost"] || [self.notification_type isEqualToString:@"CommentedPost"])
+    if([self.notification_type isEqualToString:@"LikedPost"] || [self.notification_type isEqualToString:@"CommentedPost"] || [self.notification_type isEqualToString:@"CommentMentionedUser"] || [self.notification_type isEqualToString:@"PostMentionedUser"])
     {
         self.postFeedObj=[dict valueForKey:@"post"];
-        
     }
     
     
@@ -75,8 +82,6 @@
         self.notifier_userThumbURL=[[dict valueForKey:@"comment"] valueForKey:@"user_profile_photo_small"];
         self.notifier_userCoverURL=[[dict valueForKey:@"comment"] valueForKey:@"cover_photo"];
 
-        
-        
         //self.commentText=[dict valueForKey:@"commentText"];
 
     }
@@ -132,6 +137,41 @@
         
         
     }
+    
+    if([self.notification_type isEqualToString:@"PostMentionedUser"])
+    {
+        
+        self.notifier_userId=[[dict valueForKey:@"post"] valueForKey:@"user_id"];
+        self.notifier_userFirstName=[[dict valueForKey:@"post"] valueForKey:@"user_firstname"];
+        
+        self.notifier_userLastName=[[dict valueForKey:@"post"] valueForKey:@"user_lastname"];
+         
+        self.notifier_userThumbURL=[[dict valueForKey:@"post"] valueForKey:@"user_profile_photo_small"];
+        
+        self.notifier_userCoverURL=[[dict valueForKey:@"post"] valueForKey:@"user_cover_photo"];;
+
+        self.notifier_userUserName=@"";
+
+
+    }
+    if([self.notification_type isEqualToString:@"CommentMentionedUser"])
+    {
+        if(![[dict valueForKey:@"comment"] isKindOfClass:[NSNull class]])
+        {
+
+        self.notifier_userId=[[dict valueForKey:@"comment"] valueForKey:@"user_id"];
+        self.notifier_userFirstName=[[dict valueForKey:@"comment"] valueForKey:@"user_first_name"];
+        
+        self.notifier_userLastName=[[dict valueForKey:@"comment"] valueForKey:@"user_last_name"];
+        
+        self.notifier_userThumbURL=[[dict valueForKey:@"comment"] valueForKey:@"user_profile_photo"];
+        
+        self.notifier_userCoverURL=@"";
+        
+        self.notifier_userUserName=@"";
+        }
+        
+    }
 
     
     if([self.notification_type isEqualToString:@"LikedPost"])
@@ -159,6 +199,19 @@
         self.notification_typeNo=[NSNumber numberWithInt:4];
 
     }
+    if([self.notification_type isEqualToString:@"PostMentionedUser"])
+    {
+        self.msgText=@"Mentioned you in a post!";
+        self.notification_typeNo=[NSNumber numberWithInt:5];
+   
+    }
+    if([self.notification_type isEqualToString:@"CommentMentionedUser"])
+    {
+        self.msgText=@"Mentioned you in a comment!";
+        self.notification_typeNo=[NSNumber numberWithInt:6];
+        
+    }
+    
     
     int p=0;
 
@@ -170,6 +223,14 @@
 
 - (void)encodeWithCoder:(NSCoder *)encoder
 {
+    
+    
+    
+    
+    
+    
+
+    
     //Encode properties, other class variables, etc
     [encoder encodeObject:self.notificationId forKey:@"notificationId"];
     [encoder encodeObject:self.notification_type forKey:@"notification_type"];
@@ -191,7 +252,15 @@
 
     [encoder encodeObject:self.msgText forKey:@"msgText"];
 
+    [encoder encodeObject:self.notificationIsNew forKey:@"notificationIsNew"];
+    [encoder encodeObject:self.postFeedObj forKey:@"postFeedObj"];
+    [encoder encodeObject:self.notification_typeNo forKey:@"notification_typeNo"];
+    [encoder encodeObject:self.notificationIdNo forKey:@"notificationIdNo"];
+    [encoder encodeObject:self.notificationReceiverUserName forKey:@"notificationReceiverUserName"];
+
     
+    
+  
 }
 
 - (id)initWithCoder:(NSCoder *)decoder
@@ -218,6 +287,24 @@
         self.postThumbURL = [decoder decodeObjectForKey:@"postThumbURL"];
         self.postType = [decoder decodeObjectForKey:@"postType"];
         self.msgText = [decoder decodeObjectForKey:@"msgText"];
+
+        
+        self.notificationIsNew = [decoder decodeObjectForKey:@"notificationIsNew"];
+        self.postFeedObj = [decoder decodeObjectForKey:@"postFeedObj"];
+        self.notification_typeNo = [decoder decodeObjectForKey:@"notification_typeNo"];
+        self.notificationIdNo = [decoder decodeObjectForKey:@"notificationIdNo"];
+        self.notificationReceiverUserName = [decoder decodeObjectForKey:@"notificationReceiverUserName"];
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 
         
     }

@@ -24,7 +24,7 @@
     
     UIView *newChatBox;
     UITextView *newChatMessageBox;
-    
+    int kk_chatBoxTextViewHeight;
    
 }
 -(void)setUpFrame:(CGRect)rect andImage:(UIImage *)image;

@@ -12,33 +12,42 @@
 #import "APIManager.h"
 #import "EmptyView.h"
 #import "SAMTextView.h"
+#import "APIExplorePageManager.h"
+
 
 
 @interface FullCommentDisplay : UIView <UICollectionViewDelegate,UICollectionViewDataSource,UITextViewDelegate>
 {
- 
-    EmptyView *emptyView;
-    NSString *postId;
-    
+    APIExplorePageManager *pageManager;
     APIManager *manager;
+
+    
+    UIView *newCommentBox;
+    SAMTextView *newCommentTextView;
+    UIButton *sendBtn;
+
+    int newCommentBoxTextViewHeight;
+    int newCommentBoxMinHeight;
+    int newCommentBoxBottomOrigin;
+    BOOL wasKeyboardManagerEnabled;
+
+    float currentKeyboardHeight;
+    
+    UICollectionView *commentList;
+    EmptyView *emptyView;
+
+    
+    NSString *postId;
+    NSMutableArray *commentsData;
+
+    
     UIView *navBar;
     UILabel *navBarTitle;
     UIButton *backBtn;
-    
-    UICollectionView *commentList;
-    
-    NSMutableArray *chatMessages;
-
-    
-    UIView *newChatBox;
-    SAMTextView *newChatMessageBox;
-    UIButton *sendBtn;
-    
     id delegate;
     SEL closeBtnClicked;
     
-    BOOL wasKeyboardManagerEnabled;
-    UIRefreshControl *refreshControl;
+    BOOL refreshForNewPost;
 
 }
 -(void)setUpWithPostId:(NSString *)postIdString;

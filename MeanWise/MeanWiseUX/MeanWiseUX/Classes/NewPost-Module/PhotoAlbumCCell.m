@@ -53,7 +53,7 @@
     }
     
         requestOptions.synchronous = false;
-        
+        requestOptions.networkAccessAllowed=YES;
     
         [manager requestImageForAsset:asset
                            targetSize:CGSizeMake(150, 150)

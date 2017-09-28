@@ -38,6 +38,7 @@
     self.image_url=[dict valueForKey:@"image_url"];
     self.user_id=[dict valueForKey:@"user_id"];
     
+    self.topicLists=[dict valueForKey:@"topics"];
     
    // self.user_profession=[[dict valueForKey:@"user_profession"] valueForKey:@"name"];
 
@@ -51,6 +52,8 @@
         self.user_profession=[dict valueForKey:@"user_profession_text"];
         
     }
+    
+    self.mentioned_users=[dict valueForKey:@"mentioned_users"];
     
     
     
@@ -66,8 +69,14 @@
     self.num_likes=[dict valueForKey:@"num_likes"];
     
     
-    if(self.video_url!=nil && ![self.video_url isEqualToString:@""])
+    if(![self.video_url isKindOfClass:[NSNull class]] && self.video_url!=nil &&![self.video_url isEqualToString:@""])
     {
+        if([self.video_url isEqualToString:@"https://api.meanwise.com/media/post_videos/1856.mp4"])
+        {
+        self.video_url=@"https://d8d913s460fub.cloudfront.net/krpanocloud/video/airpano/video-1920x960a.mp4";
+        self.isPanoromaVideo=@(true);
+        }
+        
         self.mediaType=[NSNumber numberWithInt:2];
         
         self.image_url=[dict valueForKey:@"video_thumb_url"];
@@ -82,15 +91,15 @@
         }
 
     }
-    else if(self.image_url!=nil && ![self.image_url isEqualToString:@""])
+    else if(![self.image_url isKindOfClass:[NSNull class]] && ![self.image_url isEqualToString:@""])
     {
+        self.video_url=@"";
         self.mediaType=[NSNumber numberWithInt:1];
-        
     }
     else
     {
+        self.video_url=@"";
         self.mediaType=[NSNumber numberWithInt:0];
-        
     }
     
     int flag=[[dict valueForKey:@"is_liked"] intValue];

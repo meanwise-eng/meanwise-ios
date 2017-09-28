@@ -20,5 +20,11 @@
 @property(nonatomic) NSInteger totalNumOfPagesAvailable;
 @property(nonatomic) NSInteger inputPageNo;
 
+@property (strong,nonatomic) NSString *forwardURLStr;
+@property (strong,nonatomic) NSString *backwardURLStr;
+
+@property(nonatomic) NSInteger totalRecords;
+
+@property (strong,nonatomic) id apiInputInfo;
 
 @end

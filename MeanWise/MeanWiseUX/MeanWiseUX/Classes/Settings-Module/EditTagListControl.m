@@ -172,22 +172,24 @@
     
     int skillNo=[[dict valueForKey:@"id"] intValue];
     
-    self.backgroundColor=[Constant colorGlobal:skillNo%12];
-
+  
     
     tagInfo=dict;
     
     //setup
+    if(skillNo!=-1)
+    {
     tagLabel.text=[[dict valueForKey:@"text"] lowercaseString];
+    }
+    else
+    {
+        tagLabel.text=[dict valueForKey:@"text"] ;
+
+    }
     tagLabel.font=[UIFont fontWithName:k_fontBold size:15];
 
     
     //visual property
-    tagLabel.textColor=[UIColor whiteColor];
-    tagLabel.textAlignment=NSTextAlignmentLeft;
-    
-
-    
     
     
     //calculating size
@@ -199,7 +201,29 @@
     removeTagBtn.frame=CGRectMake(size.width, 0, 30, size.height);
     
     
-    self.layer.cornerRadius=size.height/2;
+    
+    if(skillNo!=-1)
+    {
+        self.layer.cornerRadius=size.height/2;
+        tagLabel.textColor=[UIColor whiteColor];
+        tagLabel.textAlignment=NSTextAlignmentLeft;
+        self.backgroundColor=[Constant colorGlobal:skillNo%12];
+        self.layer.borderWidth=0;
+        [removeTagBtn setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+
+    }
+    else
+    {
+        self.layer.cornerRadius=5;
+        tagLabel.textColor=[UIColor lightGrayColor];
+        tagLabel.textAlignment=NSTextAlignmentLeft;
+        self.backgroundColor=[UIColor whiteColor];
+        self.layer.borderWidth=1;
+        self.layer.borderColor=[UIColor lightGrayColor].CGColor;
+        [removeTagBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateNormal];
+
+    }
+
     self.clipsToBounds=YES;
 
 }

@@ -34,6 +34,12 @@
 
 #pragma mark - Home
 
+
+
+//AutoComplete
+-(void)sendRequestGenericAutoCompleteAPI:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector;
+
+
 //HOME
 -(void)sendRequestHomeFeedFor_UserWithdelegate:(id)delegate andSelector:(SEL)selector;
 -(void)sendRequestForMyNotificationsWithdelegate:(id)delegate andSelector:(SEL)selector;
@@ -43,6 +49,9 @@
 
 -(void)sendRequestForPostInfoWithId:(NSString *)postId Withdelegate:(id)delegate andSelector:(SEL)selector;
 
+
+-(void)sendRequestExploreFeedWithDict:(NSDictionary *)dict Withdelegate:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestExploreFeedWithURL:(NSString *)url Withdelegate:(id)delegate andSelector:(SEL)selector;
 
 
 //Edit Profile
@@ -123,12 +132,18 @@
 -(void)sendRequestForPostOfUsersId:(NSString *)userId delegate:(id)delegate andSelector:(SEL)selector;
 
 
+//Influencers
+-(void)sendRequestForGetInfluencers:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
+
+-(void)sendRequestForGetDiscussions:(NSDictionary *)dict delegate:(id)delegate andSelector:(SEL)selector;
+
 
 
 //Push Notifications
 -(void)registerDeviceForPushNotification:(NSString *)device delegate:(id)delegate andSelector:(SEL)selector;
 
 -(void)sendRequestForDeviceVersion:(id)delegate andSelector:(SEL)selector;
+-(void)sendRequestForPostAnalytics:(NSDictionary *)dict withFileName:(NSString *)fileName delegate:(id)delegate andSelector:(SEL)selector;
 
 
 

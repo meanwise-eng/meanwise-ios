@@ -13,12 +13,40 @@
 #import "APIObjects_ProfileObj.h"
 #import "APIObjects_NotificationObj.h"
 #import "DataSession.h"
+#import "APIObjects_DiscussionObj.h"
 
 //Friendlist, profile, posts
 
 
 @implementation APIObjectsParser
+-(NSArray *)parseObjects_DISCUSSIONS:(NSArray *)array;
+{
+ 
+    NSMutableArray *resultArray=[[NSMutableArray alloc] init];
+    
+    for(int i=0;i<[array count];i++)
+    {
+        
+        APIObjects_DiscussionObj *obj=[[APIObjects_DiscussionObj alloc] init];
+        [obj setUpWithDict:[array objectAtIndex:i]];
+        
+        
+      
+            [resultArray addObject:obj];
+        
+        
+    }
+    
+    NSArray *resultA=[NSArray arrayWithArray:resultArray];
+    
+    
+    //  NSSortDescriptor * descriptor = [[NSSortDescriptor alloc] initWithKey:@"postId" ascending:false];
+    //resultA = [resultA sortedArrayUsingDescriptors:@[descriptor]];
+    
+    
+    return resultA;
 
+}
 -(NSArray *)parseObjects_FEEDPOST:(NSArray *)array
 {
     
@@ -61,8 +89,12 @@
         [resultArray addObject:obj];
         
     }
+      NSSortDescriptor * descriptor = [[NSSortDescriptor alloc] initWithKey:@"comment_id_number" ascending:true];
+    NSArray *tempArray=[NSArray arrayWithArray:resultArray];
+    tempArray = [tempArray sortedArrayUsingDescriptors:@[descriptor]];
     
-    return [NSArray arrayWithArray:resultArray];
+
+    return tempArray;
     
 }
 
@@ -93,6 +125,7 @@
         number=[NSNumber numberWithInt:0];
     }
 
+    NSArray *typeOfAvaialbleNotifications=[NSArray arrayWithObjects:@"LikedPost",@"CommentedPost",@"PostMentionedUser",@"CommentMentionedUser",@"FriendRequestAccepted",@"FriendRequestReceived", nil];
     
     int countNew=0;
 
@@ -104,20 +137,27 @@
         APIObjects_NotificationObj *obj=[[APIObjects_NotificationObj alloc] init];
         [obj setUpWithDict:[array objectAtIndex:i]];
         
-        if([obj.notificationReceiverUserName isEqualToString:[UserSession getUserName]])
+        if([typeOfAvaialbleNotifications containsObject:obj.notification_type])
         {
-            if(obj.notificationIdNo.intValue>number.intValue)
+            if([obj.notificationReceiverUserName isEqualToString:[UserSession getUserName]])
             {
+                if(obj.notificationIdNo.intValue>number.intValue)
+                {
                 countNew++;
                 obj.notificationIsNew=[NSNumber numberWithInt:1];
-            }
-            else
-            {
-                obj.notificationIsNew=[NSNumber numberWithInt:0];
-            }
+                }
+                else
+                {
+                    obj.notificationIsNew=[NSNumber numberWithInt:0];
+                }
             
-            [resultArray addObject:obj];
-
+                [resultArray addObject:obj];
+            }
+        }
+        else
+        {
+            //Bug - New Notifications are there
+            int p=0;
         }
         
         

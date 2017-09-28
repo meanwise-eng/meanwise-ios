@@ -36,6 +36,10 @@
 @property (nonatomic,strong) NSNumber *is_liked;
 @property (nonatomic, strong) NSNumber* mediaType;
 
+@property (nonatomic, strong) NSArray* mentioned_users;
+@property (nonatomic, strong) NSArray* topicLists;
+
+@property (nonatomic,strong) NSNumber *isPanoromaVideo;
 
 -(void)setUpWithDict:(NSDictionary *)dict;
 

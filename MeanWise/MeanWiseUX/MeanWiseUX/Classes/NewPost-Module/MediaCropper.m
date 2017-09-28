@@ -1133,6 +1133,23 @@
 -(void)cropFinished:(id)sender
 {
     isPlayerPaused=true;
+    
+    /*
+     CMTime playerEndTimeTemp=playerViewControl.player.currentItem.duration;
+     float sec=CMTimeGetSeconds(playerEndTimeTemp);
+     
+     float fir=CMTimeGetSeconds(playerStartTime);
+     
+     if(sec-fir>25.0)
+     {
+     
+     CMTime timeToAdd   = CMTimeMakeWithSeconds(25,1);
+     
+     playerEndTime  = CMTimeAdd(playerStartTime,timeToAdd);
+     sec=CMTimeGetSeconds(playerEndTime);
+     
+     }
+*/
     [FTIndicator showProgressWithmessage:@"Preparing.." userInteractionEnable:NO];
     CGRect visibleRect = [scrollView convertRect:scrollView.bounds toView:imageView];
     

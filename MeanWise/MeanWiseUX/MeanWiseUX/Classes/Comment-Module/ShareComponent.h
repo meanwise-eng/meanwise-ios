@@ -10,11 +10,14 @@
 #import "Constant.h"
 #import "APIObjects_FeedObj.h"
 
+//https://stackoverflow.com/questions/26554894/how-to-present-uialertcontroller-when-not-in-a-view-controller
+//
+
 @interface ShareComponent : UIView <UICollectionViewDelegate,UICollectionViewDataSource>
 {
     
     UIView *blackOverLay;
-        UIView *containerView;
+    UIView *containerView;
     
     UIButton *cancelBtn;
     
@@ -35,12 +38,14 @@
 
     APIObjects_FeedObj *mainData;
     NSString *postIdReceived;
+    
+    BOOL isForExplore;
 }
 -(void)setUp;
 -(void)setTarget:(id)target andCloseBtnClicked:(SEL)func1;
 -(void)setMainData:(APIObjects_FeedObj *)feed;
 -(void)setPostId:(NSString *)postId;
-
+-(void)setIfItsForExplore:(BOOL)flag;
 @end
 
 /*

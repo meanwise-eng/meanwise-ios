@@ -36,11 +36,9 @@
     if([DataSession sharedInstance].sessionMain!=nil && number==0 && delegate.deepLinkViewer==nil)
     {
         
-        
-        
         APIManager *manager=[[APIManager alloc] init];
         [manager sendRequestForMyNotificationsWithdelegate:self andSelector:@selector(UserNotificationAPIReceived:)];
-        [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:90];
+        [self performSelector:@selector(UserNotificationAPI) withObject:nil afterDelay:300];
         
     }
     else

@@ -145,6 +145,7 @@
     viewFace=[[UIView alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
     [imageView addSubview:viewFace];
     viewFace.backgroundColor=[UIColor colorWithWhite:1 alpha:0.5];
+    viewFace.userInteractionEnabled=false;
     
 }
 -(void)panFinger:(UIPanGestureRecognizer *)gesture
@@ -219,18 +220,20 @@
     }
     else
     {
-        FCAlertView *alert = [[FCAlertView alloc] init];
-        //alert.blurBackground = YES;
-        [alert showAlertWithTitle:@"Alert!"
-                     withSubtitle:@"Hey we didn't detect your face in the picture. This could mean less search visibility for your profile."
-                  withCustomImage:nil
-              withDoneButtonTitle:@"Ok"
-                       andButtons:nil];
-       
-      
-        alert.titleColor=[UIColor redColor];
-        alert.firstButtonTitleColor = [UIColor redColor];
         
+//        
+//        FCAlertView *alert = [[FCAlertView alloc] init];
+//        //alert.blurBackground = YES;
+//        [alert showAlertWithTitle:@"Alert!"
+//                     withSubtitle:@"Hey we didn't detect your face in the picture. This could mean less search visibility for your profile."
+//                  withCustomImage:nil
+//              withDoneButtonTitle:@"Ok"
+//                       andButtons:nil];
+//       
+//      
+//        alert.titleColor=[UIColor redColor];
+//        alert.firstButtonTitleColor = [UIColor redColor];
+//        
         
 
     }

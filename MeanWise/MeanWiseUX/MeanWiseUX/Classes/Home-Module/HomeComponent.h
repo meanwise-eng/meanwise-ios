@@ -65,4 +65,11 @@
 
 @end
 
+/*
+ homeComp=[[HomeComponent alloc] initWithFrame:CGRectMake(0,0, self.frame.size.width, self.frame.size.height)];
+ [homeComp setUp];
+ [masterControl addSubview:homeComp];
+ [homeComp setTarget:self andHide:@selector(hideBottomBar) andShow:@selector(showBottomBar)];
+ 
+*/
 
